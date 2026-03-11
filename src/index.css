@@ -33,6 +33,10 @@
     --chart-5: 27 87% 67%;
   }
 
+  /* Semantic colors for status (works in light) */
+  --success: 142, 76%, 36%;
+  --warning: 38, 92%, 50%;
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -53,6 +57,8 @@
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
+    --success: 142, 70%, 45%;
+    --warning: 38, 92%, 50%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -65,8 +71,19 @@
   * {
     @apply border-border;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-family: 'DM Sans', sans-serif;
+  }
+  /* Focus visible for keyboard users only */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
   }
 }
