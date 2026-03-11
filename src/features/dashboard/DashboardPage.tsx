@@ -37,7 +37,7 @@ const getRateVariant = (rate: string) => {
 
 // --- Helper Components ---
 const StatCard = ({ title, value, change, isPositive, icon: Icon }: { title: string; value: string; change: string; isPositive: boolean; icon: React.ComponentType<{ className?: string }> }) => (
-  <div className="group p-6 rounded-xl border bg-card text-card-foreground shadow-sm flex flex-col transition-all duration-200 hover:shadow-md hover:border-border/80">
+  <div className="group p-6 rounded-xl border bg-card text-card-foreground flex flex-col transition-colors duration-200 hover:bg-muted/30 hover:border-primary/20 cursor-default">
     <div className="flex justify-between items-start mb-4">
       <div className="p-2.5 bg-primary/10 rounded-xl text-primary transition-colors group-hover:bg-primary/15">
         <Icon className="w-5 h-5" aria-hidden />
@@ -71,7 +71,7 @@ const DashboardPage = () => {
       </div>
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" aria-label="Charts">
-        <div className="lg:col-span-2 p-6 rounded-xl border bg-card shadow-sm">
+        <div className="lg:col-span-2 p-6 rounded-xl border bg-card">
           <h2 className="text-lg font-semibold mb-6 tracking-tight">Weekly Attendance Trend</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -90,7 +90,7 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        <div className="p-6 rounded-xl border bg-card shadow-sm">
+        <div className="p-6 rounded-xl border bg-card">
           <h2 className="text-lg font-semibold mb-6 tracking-tight">Course Distribution</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -106,10 +106,10 @@ const DashboardPage = () => {
         </div>
       </section>
 
-      <section className="p-6 rounded-xl border bg-card shadow-sm" aria-labelledby="recent-sessions-heading">
+      <section className="p-6 rounded-xl border bg-card" aria-labelledby="recent-sessions-heading">
         <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
           <h2 id="recent-sessions-heading" className="text-lg font-semibold tracking-tight">Recent Attendance Sessions</h2>
-          <Button variant="ghost" size="sm" className="text-primary font-medium">
+          <Button variant="ghost" size="sm" className="text-primary font-medium cursor-pointer transition-colors duration-150">
             View all
           </Button>
         </div>
@@ -148,7 +148,7 @@ const DashboardPage = () => {
                     </div>
                   </td>
                   <td className="px-4 py-4 text-right">
-                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
+                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary cursor-pointer transition-colors duration-150">
                       View
                     </Button>
                   </td>

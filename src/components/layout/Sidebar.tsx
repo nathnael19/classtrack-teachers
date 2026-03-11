@@ -29,7 +29,7 @@ const Sidebar = () => {
       aria-label="Main navigation"
     >
       <div className="p-6 border-b flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shadow-sm" aria-hidden>
+        <div className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm" aria-hidden>
           G
         </div>
         <h2 className="text-xl font-bold tracking-tight">GeoAttend</h2>
@@ -41,7 +41,7 @@ const Sidebar = () => {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium border-l-2 border-transparent ${
+              `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-150 text-sm font-medium border-l-2 border-transparent cursor-pointer ${
                 isActive
                   ? 'bg-primary/10 text-primary border-primary'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground border-transparent'

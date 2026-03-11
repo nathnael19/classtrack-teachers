@@ -9,7 +9,7 @@ const TopNav = () => {
       <div className="flex items-center gap-3 md:gap-4">
         <button
           type="button"
-          className="md:hidden p-2 -ml-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          className="md:hidden p-2 -ml-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-150 cursor-pointer"
           aria-label="Open menu"
         >
           <Menu className="w-5 h-5" aria-hidden />
@@ -36,7 +36,7 @@ const TopNav = () => {
       <div className="flex items-center gap-2 ml-auto">
         <button
           type="button"
-          className="relative p-2.5 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="relative p-2.5 text-muted-foreground hover:text-foreground transition-colors duration-150 rounded-full hover:bg-muted cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           aria-label="View notifications"
         >
           <Bell className="w-5 h-5" aria-hidden />
