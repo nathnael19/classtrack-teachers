@@ -45,7 +45,6 @@ export default {
   			},
   			success: 'hsl(var(--success))',
   			warning: 'hsl(var(--warning))',
-  			/* Use in Tailwind as bg-success, text-warning, etc. */
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
