@@ -1,5 +1,6 @@
 import { ArrowUpRight, ArrowDownRight, Users, BookOpen, Clock, Activity } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Button } from '@/components/ui/button';
 
 // --- Dummy Data ---
 const performanceData = [
@@ -27,21 +28,28 @@ const recentSessions = [
 ];
 // ------------------
 
+const getRateVariant = (rate: string) => {
+  const n = parseInt(rate, 10);
+  if (n >= 90) return 'bg-success';
+  if (n >= 80) return 'bg-warning';
+  return 'bg-destructive';
+};
+
 // --- Helper Components ---
-const StatCard = ({ title, value, change, isPositive, icon: Icon }: any) => (
-  <div className="p-6 rounded-xl border bg-card text-card-foreground shadow-sm flex flex-col">
+const StatCard = ({ title, value, change, isPositive, icon: Icon }: { title: string; value: string; change: string; isPositive: boolean; icon: React.ComponentType<{ className?: string }> }) => (
+  <div className="group p-6 rounded-xl border bg-card text-card-foreground shadow-sm flex flex-col transition-all duration-200 hover:shadow-md hover:border-border/80">
     <div className="flex justify-between items-start mb-4">
-      <div className="p-2 bg-primary/10 rounded-lg text-primary">
-        <Icon className="w-5 h-5" />
+      <div className="p-2.5 bg-primary/10 rounded-xl text-primary transition-colors group-hover:bg-primary/15">
+        <Icon className="w-5 h-5" aria-hidden />
       </div>
-      <div className={`flex items-center text-sm font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-        {isPositive ? <ArrowUpRight className="w-4 h-4 mr-1" /> : <ArrowDownRight className="w-4 h-4 mr-1" />}
-        {change}
+      <div className={`flex items-center text-sm font-medium ${isPositive ? 'text-success' : 'text-destructive'}`}>
+        {isPositive ? <ArrowUpRight className="w-4 h-4 mr-1 shrink-0" aria-hidden /> : <ArrowDownRight className="w-4 h-4 mr-1 shrink-0" aria-hidden />}
+        <span>{change}</span>
       </div>
     </div>
     <div>
-      <h3 className="text-muted-foreground text-sm font-medium">{title}</h3>
-      <div className="text-3xl font-bold mt-1 tracking-tight">{value}</div>
+      <p className="text-muted-foreground text-sm font-medium">{title}</p>
+      <p className="text-3xl font-bold mt-1 tracking-tight tabular-nums">{value}</p>
     </div>
   </div>
 );
@@ -50,10 +58,10 @@ const StatCard = ({ title, value, change, isPositive, icon: Icon }: any) => (
 const DashboardPage = () => {
   return (
     <div className="animate-in fade-in duration-500">
-      <div className="mb-8">
+      <header className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground mt-2">Welcome back, Dr. Smith. Here's your overview for today.</p>
-      </div>
+        <p className="text-muted-foreground mt-1.5 text-base">Welcome back, Dr. Smith. Here&apos;s your overview for today.</p>
+      </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard title="Total Courses" value="12" change="+2 from last term" isPositive={true} icon={BookOpen} />
@@ -62,89 +70,94 @@ const DashboardPage = () => {
         <StatCard title="Average Attendance Rate" value="89.5%" change="+2.4% this week" isPositive={true} icon={Clock} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-2 p-6 rounded-xl border bg-card/50 backdrop-blur-sm shadow-sm">
-          <h3 className="text-lg font-semibold mb-6 tracking-tight">Weekly Attendance Trend</h3>
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" aria-label="Charts">
+        <div className="lg:col-span-2 p-6 rounded-xl border bg-card shadow-sm">
+          <h2 className="text-lg font-semibold mb-6 tracking-tight">Weekly Attendance Trend</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={performanceData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} dx={-10} domain={[60, 100]} />
-                <Tooltip 
-                  contentStyle={{borderRadius: '8px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
-                  cursor={{stroke: '#f3f4f6', strokeWidth: 2}}
+              <LineChart data={performanceData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} className="stroke-border" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} dx={-10} domain={[60, 100]} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 'var(--radius)', border: '1px solid hsl(var(--border))', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                  cursor={{ stroke: 'hsl(var(--muted))', strokeWidth: 2 }}
                 />
-                <Line type="monotone" dataKey="rate" stroke="#171717" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
-                <Line type="monotone" dataKey="rate2" stroke="#d1d5db" strokeWidth={3} dot={false} activeDot={false} />
+                <Line type="monotone" dataKey="rate" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="rate2" stroke="hsl(var(--muted-foreground) / 0.4)" strokeWidth={2} dot={false} activeDot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
-        
-        <div className="p-6 rounded-xl border bg-card/50 backdrop-blur-sm shadow-sm">
-          <h3 className="text-lg font-semibold mb-6 tracking-tight">Course Distribution</h3>
+
+        <div className="p-6 rounded-xl border bg-card shadow-sm">
+          <h2 className="text-lg font-semibold mb-6 tracking-tight">Course Distribution</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={courseDistributionData} layout="vertical" margin={{ top: 0, right: 0, left: 10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e5e7eb" />
-                <XAxis type="number" axisLine={false} tickLine={false} tick={{fill: '#6b7280', fontSize: 12}} />
-                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fill: '#374151', fontSize: 12, fontWeight: 500}} />
-                <Tooltip cursor={{fill: '#f3f4f6'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}/>
-                <Bar dataKey="students" fill="#171717" radius={[0, 4, 4, 0]} barSize={24} />
+              <BarChart data={courseDistributionData} layout="vertical" margin={{ top: 0, right: 8, left: 10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} className="stroke-border" />
+                <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
+                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--foreground))', fontSize: 12, fontWeight: 500 }} />
+                <Tooltip cursor={{ fill: 'hsl(var(--muted) / 0.5)' }} contentStyle={{ borderRadius: 'var(--radius)', border: '1px solid hsl(var(--border))', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }} />
+                <Bar dataKey="students" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} barSize={24} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="p-6 rounded-xl border bg-card/50 backdrop-blur-sm shadow-sm">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold tracking-tight">Recent Attendance Sessions</h3>
-          <button className="text-sm font-medium text-primary hover:underline transition-all">View all</button>
+      <section className="p-6 rounded-xl border bg-card shadow-sm" aria-labelledby="recent-sessions-heading">
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+          <h2 id="recent-sessions-heading" className="text-lg font-semibold tracking-tight">Recent Attendance Sessions</h2>
+          <Button variant="ghost" size="sm" className="text-primary font-medium">
+            View all
+          </Button>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-xs text-muted-foreground bg-muted/50 uppercase">
+        <div className="overflow-x-auto -mx-1">
+          <table className="w-full text-sm text-left min-w-[600px]">
+            <thead className="text-xs text-muted-foreground bg-muted/50 uppercase tracking-wider">
               <tr>
-                <th className="px-4 py-3 font-semibold rounded-tl-lg">Course</th>
-                <th className="px-4 py-3 font-semibold">Session Date</th>
-                <th className="px-4 py-3 font-semibold">Students Present</th>
-                <th className="px-4 py-3 font-semibold">Attendance Rate</th>
-                <th className="px-4 py-3 font-semibold rounded-tr-lg text-right">Actions</th>
+                <th scope="col" className="px-4 py-3 font-semibold rounded-tl-lg">Course</th>
+                <th scope="col" className="px-4 py-3 font-semibold">Session Date</th>
+                <th scope="col" className="px-4 py-3 font-semibold">Students Present</th>
+                <th scope="col" className="px-4 py-3 font-semibold">Attendance Rate</th>
+                <th scope="col" className="px-4 py-3 font-semibold rounded-tr-lg text-right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {recentSessions.map((session, index) => (
-                <tr key={session.id} className={`border-b border-muted/50 hover:bg-muted/20 transition-colors ${index === recentSessions.length - 1 ? 'border-b-0' : ''}`}>
+                <tr
+                  key={session.id}
+                  className={`border-b border-border/50 transition-colors hover:bg-muted/30 ${index === recentSessions.length - 1 ? 'border-b-0' : ''}`}
+                >
                   <td className="px-4 py-4 font-medium text-foreground">{session.course}</td>
                   <td className="px-4 py-4 text-muted-foreground">{session.date}</td>
-                  <td className="px-4 py-4">
+                  <td className="px-4 py-4 tabular-nums">
                     <span className="font-medium">{session.present}</span>
                     <span className="text-muted-foreground text-xs ml-1">/ {session.total}</span>
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full rounded-full ${parseInt(session.rate) >= 90 ? 'bg-green-500' : parseInt(session.rate) >= 80 ? 'bg-amber-500' : 'bg-red-500'}`} 
-                          style={{width: session.rate}}
+                      <div className="w-16 h-2 bg-muted rounded-full overflow-hidden" role="img" aria-label={`Attendance ${session.rate}`}>
+                        <div
+                          className={`h-full rounded-full ${getRateVariant(session.rate)}`}
+                          style={{ width: session.rate }}
                         />
                       </div>
-                      <span className="font-medium">{session.rate}</span>
+                      <span className="font-medium tabular-nums">{session.rate}</span>
                     </div>
                   </td>
                   <td className="px-4 py-4 text-right">
-                    <button className="text-muted-foreground hover:text-primary transition-colors hover:bg-muted p-1.5 rounded-md">
+                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
                       View
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
