@@ -12,21 +12,40 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import api from '@/services/api';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
-    // Simulate auth lag
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const formData = new URLSearchParams();
+      formData.append('username', email); // OAuth2 expects 'username'
+      formData.append('password', password);
+
+      const response = await api.post('/auth/token', formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      });
+      
+      const { access_token } = response.data;
+      localStorage.setItem('geoattend_token', access_token);
+      
       toast.success('Access Granted. Welcome back, Admin.');
       navigate('/');
-    }, 1500);
+    } catch (error: any) {
+      const message = error.response?.data?.detail || 'Authentication failed. Check your coordinates.';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,6 +82,8 @@ const LoginPage = () => {
                       type="email" 
                       placeholder="admin@classtrack.ai" 
                       className="h-16 pl-14 bg-white/40 border-none rounded-2xl shadow-inner focus-visible:ring-2 focus-visible:ring-primary/20 text-lg font-bold"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
@@ -82,6 +103,8 @@ const LoginPage = () => {
                       type="password" 
                       placeholder="••••••••••••" 
                       className="h-16 pl-14 bg-white/40 border-none rounded-2xl shadow-inner focus-visible:ring-2 focus-visible:ring-primary/20 text-lg font-bold"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       required
                     />
                   </div>
