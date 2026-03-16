@@ -1,22 +1,26 @@
-import { Bell, Search, Menu } from 'lucide-react';
+import { Bell, Search, Menu, X } from 'lucide-react';
+import { useUIStore } from '@/store/uiStore';
 
 const TopNav = () => {
+  const { isMobileMenuOpen, toggleMobileMenu } = useUIStore();
+
   return (
     <header
-      className="h-14 md:h-16 border-b bg-card/95 flex items-center px-4 md:px-6 justify-between sticky top-0 z-10 backdrop-blur-sm"
+      className="h-14 md:h-18 border-b bg-background/60 flex items-center px-4 md:px-8 justify-between sticky top-0 z-40 backdrop-blur-xl transition-all duration-300"
       role="banner"
     >
       <div className="flex items-center gap-3 md:gap-4">
         <button
           type="button"
-          className="md:hidden p-2 -ml-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors duration-150 cursor-pointer"
-          aria-label="Open menu"
+          onClick={toggleMobileMenu}
+          className="md:hidden p-2.5 -ml-2 rounded-2xl text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all duration-300 cursor-pointer active:scale-90"
+          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
         >
-          <Menu className="w-5 h-5" aria-hidden />
+          {isMobileMenuOpen ? <X className="w-6 h-6" aria-hidden /> : <Menu className="w-6 h-6" aria-hidden />}
         </button>
-        <div className="md:hidden font-bold flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold" aria-hidden>C</div>
-          <span className="tracking-tight">ClassTrack</span>
+        <div className="md:hidden font-black flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-md" aria-hidden>C</div>
+          <span className="tracking-tighter">ClassTrack</span>
         </div>
 
         <div className="hidden md:block relative">
