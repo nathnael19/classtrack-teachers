@@ -315,7 +315,7 @@ const AnalyticsPage = () => {
            <div className="flex flex-col items-center">
             <div className="h-72 w-full relative">
               <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-2">
-                 <span className="text-4xl font-black text-slate-900 tracking-tighter">82%</span>
+                 <span className="text-4xl font-black text-slate-900 tracking-tighter">{engagementData[0]?.value ?? 0}%</span>
                  <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">On Protocol</span>
               </div>
               <ResponsiveContainer width="100%" height="100%">
