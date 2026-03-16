@@ -55,7 +55,46 @@ export default {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			}
-  		}
+  		},
+      keyframes: {
+        blob: {
+          "0%": {
+            transform: "translate(0px, 0px) scale(1)"
+          },
+          "33%": {
+            transform: "translate(30px, -50px) scale(1.1)"
+          },
+          "66%": {
+            transform: "translate(-20px, 20px) scale(0.9)"
+          },
+          "100%": {
+            transform: "translate(0px, 0px) scale(1)"
+          }
+        },
+        morph: {
+          "0%, 100%": {
+            borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%"
+          },
+          "50%": {
+            borderRadius: "30% 60% 70% 40% / 50% 60% 30% 60%"
+          }
+        },
+        "gradient-x": {
+          "0%, 100%": {
+            "background-size": "200% 200%",
+            "background-position": "left center"
+          },
+          "50%": {
+            "background-size": "200% 200%",
+            "background-position": "right center"
+          }
+        }
+      },
+      animation: {
+        blob: "blob 7s infinite",
+        morph: "morph 8s ease-in-out infinite",
+        "gradient-x": "gradient-x 15s ease infinite"
+      }
   	}
   },
   plugins: [require("tailwindcss-animate")],
