@@ -7,8 +7,6 @@ import {
   Loader2,
   BookOpen,
   Search,
-  Filter,
-  Download,
   ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -75,12 +73,13 @@ const CoursesPage = () => {
     }
   });
 
-  const handleOpenInNewTab = (courseId: number) => {
-    window.open(`/analytics?course_id=${courseId}`, '_blank');
-  };
-
-  const handleViewAnalytics = (courseId: number) => {
-    navigate(`/analytics?course_id=${courseId}`);
+  const handleViewAnalytics = (courseId: number, newTab = false) => {
+    const url = `/analytics?course_id=${courseId}`;
+    if (newTab) {
+      window.open(url, '_blank');
+    } else {
+      navigate(url);
+    }
   };
 
   // --- Filtered Data ---
@@ -142,16 +141,7 @@ const CoursesPage = () => {
             )}
           </div>
           
-          <div className="flex items-center gap-4">
-            <Button variant="outline" className="rounded-2xl h-14 px-8 border-indigo-100 hover:bg-primary/5 gap-3 font-black text-xs uppercase tracking-widest group transition-all">
-              <Filter className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-              Intelligence
-            </Button>
-            <Button variant="outline" className="rounded-2xl h-14 px-8 border-indigo-100 hover:bg-primary/5 gap-3 font-black text-xs uppercase tracking-widest group transition-all">
-              <Download className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-              Export Data
-            </Button>
-          </div>
+
         </div>
 
         <div className="overflow-x-auto min-h-[400px]">
@@ -183,8 +173,6 @@ const CoursesPage = () => {
                         </Link>
                         <div className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-all">
                            <span className="text-[10px] font-black uppercase tracking-widest bg-muted px-2 py-0.5 rounded-md">ID-{course.id}</span>
-                           <span className="w-1 h-1 rounded-full bg-slate-300" />
-                           <span className="text-[10px] font-black uppercase tracking-[0.2em]">Academic Term 2024</span>
                         </div>
                       </div>
                     </div>
@@ -241,7 +229,7 @@ const CoursesPage = () => {
                           className="rounded-xl gap-4 py-4 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group/item"
                         >
                           <Eye className="w-5 h-5 text-muted-foreground group-hover/item:text-primary transition-colors" /> 
-                          <span className="font-black text-sm uppercase tracking-wider">Analytics View</span>
+                          <span className="font-black text-sm uppercase tracking-wider">View Analytics</span>
                         </DropdownMenuItem>
 
                         <EditCourseModal course={course} />
@@ -249,7 +237,7 @@ const CoursesPage = () => {
                         <EnrollStudentsModal courseId={course.id} courseName={course.name} />
 
                         <DropdownMenuItem 
-                          onClick={() => handleOpenInNewTab(course.id)}
+                          onClick={() => handleViewAnalytics(course.id, true)}
                           className="rounded-xl gap-4 py-4 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group/item"
                         >
                           <ExternalLink className="w-5 h-5 text-muted-foreground group-hover/item:text-primary transition-colors" /> 
@@ -295,26 +283,20 @@ const CoursesPage = () => {
           </Table>
         </div>
 
-        <div className="p-10 border-t border-indigo-50/50 bg-slate-50/30 backdrop-blur-sm flex flex-col md:flex-row md:items-center justify-between gap-8">
-          <div className="flex items-center gap-6">
-            <div className="flex flex-col">
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/40 leading-none mb-2">Total Capacity</span>
-              <p className="text-sm font-bold text-muted-foreground flex items-center gap-3">
-                Monitoring <span className="text-primary font-black px-4 py-1.5 bg-primary/10 rounded-xl text-lg shadow-sm">{filteredCourses.length}</span> live modules
-              </p>
-            </div>
-            <div className="w-[1px] h-12 bg-indigo-50" />
-            <div className="flex flex-col">
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/40 leading-none mb-2">System Status</span>
-              <p className="text-xs font-black text-emerald-500 flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                Operational
-              </p>
-            </div>
+        <div className="p-10 border-t border-indigo-50/50 bg-slate-50/30 backdrop-blur-sm flex items-center gap-6">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/40 leading-none mb-2">Total Modules</span>
+            <p className="text-sm font-bold text-muted-foreground flex items-center gap-3">
+              Monitoring <span className="text-primary font-black px-4 py-1.5 bg-primary/10 rounded-xl text-lg shadow-sm">{filteredCourses.length}</span> active modules
+            </p>
           </div>
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="lg" disabled className="rounded-2xl h-14 px-10 border-indigo-100 font-black uppercase text-[10px] tracking-widest opacity-50 shadow-sm">Previous</Button>
-            <Button variant="outline" size="lg" className="rounded-2xl h-14 px-10 border-indigo-100 hover:border-primary/30 hover:bg-primary/5 font-black uppercase text-[10px] tracking-widest transition-all shadow-sm active:translate-y-1">Next Phase</Button>
+          <div className="w-[1px] h-12 bg-indigo-50" />
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/40 leading-none mb-2">System Status</span>
+            <p className="text-xs font-black text-emerald-500 flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+              Operational
+            </p>
           </div>
         </div>
       </div>
