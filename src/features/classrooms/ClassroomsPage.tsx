@@ -57,7 +57,8 @@ const ClassroomsPage = () => {
     building: '',
     latitude: 0,
     longitude: 0,
-    geofence_radius: 50
+    geofence_radius: 50,
+    capacity: 30,
   });
 
   const createRoomMutation = useMutation({
@@ -68,14 +69,14 @@ const ClassroomsPage = () => {
           latitude: data.latitude,
           longitude: data.longitude,
           geofence_radius: data.geofence_radius,
-          capacity: 50 // Default capacity
+          capacity: data.capacity,
       };
       return await api.post('/rooms/', payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rooms'] });
       setIsCreateModalOpen(false);
-      setFormData({ name: '', building: '', latitude: 0, longitude: 0, geofence_radius: 50 });
+      setFormData({ name: '', building: '', latitude: 0, longitude: 0, geofence_radius: 50, capacity: 30 });
       toast.success('Node provisioned successfully');
     },
     onError: (error: any) => {
@@ -164,39 +165,39 @@ const ClassroomsPage = () => {
               PROVISION NODE
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] rounded-[2rem] border-white/10 bg-[#0B0F19]/95 backdrop-blur-3xl text-slate-200">
+          <DialogContent className="sm:max-w-[480px] rounded-[2rem] border-border/40 bg-background/95 backdrop-blur-3xl">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-black text-white flex items-center gap-3">
-                <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-400 border border-emerald-500/20">
+              <DialogTitle className="text-2xl font-black text-foreground flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-xl text-primary border border-primary/20">
                   <Target className="w-5 h-5" />
                 </div>
-                Provision Facility
+                New Classroom
               </DialogTitle>
-              <DialogDescription className="text-slate-400 font-medium">
-                Register a new geospatial node for attendance tracking.
+              <DialogDescription className="text-muted-foreground font-medium">
+                Register a new classroom for attendance tracking.
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleCreateRoom} className="space-y-6 mt-4">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="roomName" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Node Designation</Label>
+                  <Label htmlFor="roomName" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Room Name</Label>
                   <Input 
                     id="roomName" 
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="e.g. EC-101" 
-                    className="h-14 bg-black/20 border-white/5 focus-visible:ring-emerald-500/50 rounded-xl text-white font-mono"
+                    className="h-14 bg-muted/50 border-border focus-visible:ring-primary/50 rounded-xl font-mono"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="building" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sector / Building</Label>
+                  <Label htmlFor="building" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Building / Sector</Label>
                   <Input 
                     id="building" 
                     value={formData.building}
                     onChange={(e) => setFormData(prev => ({ ...prev, building: e.target.value }))}
                     placeholder="Engineering Block" 
-                    className="h-14 bg-black/20 border-white/5 focus-visible:ring-emerald-500/50 rounded-xl text-white"
+                    className="h-14 bg-muted/50 border-border focus-visible:ring-primary/50 rounded-xl"
                     required
                   />
                 </div>
@@ -213,27 +214,39 @@ const ClassroomsPage = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                   <div className="flex justify-between items-center">
-                    <Label htmlFor="radius" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Secure Radius</Label>
-                    <span className="text-[10px] font-black text-emerald-400">{formData.geofence_radius}m</span>
-                   </div>
-                   <input 
-                      type="range" 
-                      min="10" 
-                      max="100" 
-                      step="5"
-                      value={formData.geofence_radius}
-                      onChange={(e) => setFormData(prev => ({ ...prev, geofence_radius: parseInt(e.target.value) }))}
-                      className="w-full accent-emerald-500 h-2 bg-white/10 rounded-lg appearance-none cursor-pointer"
-                   />
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="radius" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Geofence Radius</Label>
+                    <span className="text-[10px] font-black text-primary">{formData.geofence_radius}m</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="10" 
+                    max="100" 
+                    step="5"
+                    value={formData.geofence_radius}
+                    onChange={(e) => setFormData(prev => ({ ...prev, geofence_radius: parseInt(e.target.value) }))}
+                    className="w-full accent-primary h-2 bg-muted rounded-lg appearance-none cursor-pointer"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="capacity" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Capacity (Students)</Label>
+                  <Input
+                    id="capacity"
+                    type="number"
+                    min="1"
+                    value={formData.capacity}
+                    onChange={(e) => setFormData(prev => ({ ...prev, capacity: parseInt(e.target.value) || 1 }))}
+                    className="h-14 bg-muted/50 border-border focus-visible:ring-primary/50 rounded-xl font-mono"
+                    required
+                  />
                 </div>
               </div>
               <Button 
                 type="submit" 
                 disabled={createRoomMutation.isPending}
-                className="w-full h-14 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+                className="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 text-white font-black tracking-widest uppercase transition-all shadow-lg shadow-primary/20"
               >
-                {createRoomMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : "Initialize Sector"}
+                {createRoomMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : "Add Classroom"}
               </Button>
             </form>
           </DialogContent>
@@ -296,7 +309,13 @@ const ClassroomsPage = () => {
                                 <Edit2 className="w-4 h-4 text-slate-400 group-hover:text-primary" /> 
                                 <span className="font-black text-xs uppercase tracking-widest">Update Specs</span>
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="rounded-2xl gap-4 py-4 cursor-pointer hover:bg-indigo-500/5 focus:bg-indigo-500/5 group">
+                              <DropdownMenuItem 
+                                className="rounded-2xl gap-4 py-4 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group"
+                                onClick={() => {
+                                  // Opens the satellite view of this classroom location in Google Maps
+                                  window.open(`https://www.google.com/maps/@${room.latitude},${room.longitude},18z`, '_blank');
+                                }}
+                              >
                                 <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-indigo-600" /> 
                                 <span className="font-black text-xs uppercase tracking-widest">Satellite View</span>
                               </DropdownMenuItem>
@@ -376,8 +395,8 @@ const ClassroomsPage = () => {
                    <p className="text-2xl font-black text-slate-900">{rooms.length}</p>
                 </div>
                 <div className="space-y-1">
-                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Perim.</p>
-                   <p className="text-2xl font-black text-slate-900">4 / 4</p>
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Nodes</p>
+                   <p className="text-2xl font-black text-slate-900">{rooms.length}</p>
                 </div>
              </div>
              <div className="pt-4 border-t border-indigo-50/50">
