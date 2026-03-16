@@ -72,15 +72,10 @@ const LiveSessionPage = () => {
   const { data: session, isLoading: isLoadingSession, error: sessionError } = useQuery<ActiveSession>({
     queryKey: ['active-session'],
     queryFn: async () => {
-      // First get the session
       const res = await api.get('/sessions/active-lecturer');
       const sessionData = res.data;
-      
-      // Then get course details for it
-      const courseRes = await api.get(`/courses/`);
-      const course = courseRes.data.find((c: any) => c.id === sessionData.course_id);
-      
-      return { ...sessionData, course };
+      const courseRes = await api.get(`/courses/${sessionData.course_id}`);
+      return { ...sessionData, course: courseRes.data };
     },
     retry: 1,
   });
@@ -313,24 +308,24 @@ const LiveSessionPage = () => {
                   <Badge className="bg-blue-500/10 text-blue-600 border-none text-[9px] font-black">ENFORCED</Badge>
                </div>
                <div className="flex justify-between items-center group">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-500/10 rounded-xl text-purple-600 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
-                      <ArrowRightLeft className="w-4 h-4" />
-                    </div>
-                    <span className="text-xs font-black uppercase tracking-widest text-slate-500">Latency Flux</span>
-                  </div>
-                  <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[9px] font-black">12ms • STABLE</Badge>
-               </div>
-               <div className="flex justify-between items-center group pt-2 border-t border-indigo-50/50">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 rounded-xl text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                    <span className="text-xs font-black uppercase tracking-widest text-slate-500">QR Encryption</span>
-                  </div>
-                  <Badge className="bg-primary/10 text-primary border-none text-[9px] font-black">AES-256V4</Badge>
-               </div>
-            </div>
+                   <div className="flex items-center gap-3">
+                     <div className="p-2 bg-purple-500/10 rounded-xl text-purple-600 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
+                       <ArrowRightLeft className="w-4 h-4" />
+                     </div>
+                     <span className="text-xs font-black uppercase tracking-widest text-slate-500">Auth Method</span>
+                   </div>
+                   <Badge className="bg-purple-500/10 text-purple-600 border-none text-[9px] font-black">HMAC-SHA256</Badge>
+                </div>
+                <div className="flex justify-between items-center group pt-2 border-t border-indigo-50/50">
+                   <div className="flex items-center gap-3">
+                     <div className="p-2 bg-primary/10 rounded-xl text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                       <Sparkles className="w-4 h-4" />
+                     </div>
+                     <span className="text-xs font-black uppercase tracking-widest text-slate-500">Token Rotation</span>
+                   </div>
+                   <Badge className="bg-primary/10 text-primary border-none text-[9px] font-black">2-MIN WINDOW</Badge>
+                </div>
+             </div>
           </Card>
         </div>
 
