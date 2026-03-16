@@ -42,27 +42,30 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 142 71% 45%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --glass-opacity: 0.4;
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --background: 226 38% 7%; /* #0B0F19 equivalent or close premium dark */
+    --foreground: 210 40% 98%;
+    --card: 226 38% 10%;
+    --card-foreground: 210 40% 98%;
+    --popover: 226 38% 10%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 239 84% 67%; /* Keep indigo primary */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 226 38% 15%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 226 38% 12%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 160 84% 39%; /* Keep emerald accent */
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 226 38% 15%;
+    --input: 226 38% 15%;
+    --ring: 239 84% 67%;
+    
+    /* Glassmorphism Dark Refinement */
+    --glass-opacity: 0.15;
+    --glass-blur: 16px;
+    --glass-border: rgba(255, 255, 255, 0.08);
   }
 }
 
