@@ -8,8 +8,14 @@ import {
   FileText, 
   MapPin, 
   Settings,
-  ChevronRight
+  ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
+import { useUIStore } from '@/store/uiStore';
+import { useAuthStore } from '@/store/authStore';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
@@ -23,77 +29,164 @@ const navItems = [
 ];
 
 const Sidebar = () => {
+  const { sidebarCollapsed, toggleSidebar, isMobileMenuOpen, setMobileMenuOpen } = useUIStore();
+  const { user } = useAuthStore();
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
   return (
-    <aside
-      className="w-full md:w-72 bg-background hidden md:flex flex-col h-screen sticky top-0 shrink-0 p-4"
-      role="navigation"
-      aria-label="Main navigation"
-    >
-      <div className="bg-card rounded-3xl shadow-sm border border-border/50 flex flex-col h-full overflow-hidden relative">
-        {/* Branding Section */}
-        <div className="p-8 pb-6 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-primary/20 transition-transform hover:scale-105 active:scale-95 duration-300" aria-hidden>
-            C
-          </div>
-          <div className="flex flex-col">
-            <h2 className="text-2xl font-bold tracking-tight text-foreground leading-none">ClassTrack</h2>
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary/60 mt-1">Enterprise</span>
-          </div>
-        </div>
+    <>
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden animate-in fade-in duration-300"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
 
-        {/* Navigation Section */}
-        <nav className="px-4 py-2 space-y-1 flex-1 overflow-y-auto custom-scrollbar" aria-label="Primary">
-          <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.2em] mb-4 px-4">Navigation</div>
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                `group flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 text-sm font-semibold relative overflow-hidden ${
-                  isActive
-                    ? 'bg-primary text-white shadow-xl shadow-primary/20 translate-x-1'
-                    : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'
-                }`
-              }
-            >
-              <div className="flex items-center gap-4 relative z-10">
-                <item.icon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110`} aria-hidden />
-                <span>{item.label}</span>
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 md:sticky md:z-auto transition-all duration-500 ease-in-out p-4 flex flex-col h-screen shrink-0 overflow-hidden bg-background",
+          sidebarCollapsed ? "w-28" : "w-72",
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        )}
+        role="navigation"
+        aria-label="Main navigation"
+      >
+        <div className="bg-card rounded-[2.5rem] shadow-xl border border-border/40 flex flex-col h-full overflow-hidden relative">
+          {/* Branding Section */}
+          <div className={cn(
+            "p-8 pb-6 flex items-center transition-all duration-500",
+            sidebarCollapsed ? "justify-center" : "gap-4"
+          )}>
+            <div className="relative group/logo">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-indigo-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-primary/30 transition-all duration-300 group-hover/logo:scale-110 group-hover/logo:rotate-3 active:scale-95" aria-hidden>
+                C
               </div>
-              <ChevronRight className={`w-4 h-4 opacity-0 transition-all duration-300 group-hover:opacity-40 group-hover:translate-x-1`} />
-              
-              {/* Subtle Active Indicator Glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-            </NavLink>
-          ))}
-        </nav>
-
-        {/* User Profile Section */}
-        <div className="p-4 mt-auto">
-          <div className="bg-muted/30 p-4 rounded-2xl border border-border/20 group cursor-pointer transition-all hover:bg-muted/50" role="complementary" aria-label="Current user">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-100 to-indigo-200 text-primary flex items-center justify-center text-lg font-bold shadow-inner relative overflow-hidden group-hover:scale-105 transition-transform" aria-hidden>
-                JD
-                <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">John Doe</span>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Senior Lecturer</span>
-              </div>
+              <div className="absolute -inset-1 bg-primary/20 rounded-2xl blur opacity-0 group-hover/logo:opacity-100 transition-opacity duration-500" />
             </div>
             
-            <div className="mt-4 pt-4 border-t border-border/20 flex items-center justify-between text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest px-1">
-              <span>System v4.2</span>
-              <div className="flex gap-1">
-                <div className="w-1 h-1 rounded-full bg-emerald-500" />
-                <div className="w-1 h-1 rounded-full bg-emerald-500" />
-                <div className="w-1 h-1 rounded-full bg-emerald-500 opacity-30" />
+            {!sidebarCollapsed && (
+              <div className="flex flex-col animate-in fade-in slide-in-from-left-2 duration-500">
+                <h2 className="text-2xl font-bold tracking-tight text-foreground leading-none">ClassTrack</h2>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 mt-1.5">Enterprise</span>
               </div>
+            )}
+          </div>
+
+          {/* Navigation Section */}
+          <nav className="px-4 py-2 space-y-1.5 flex-1 overflow-y-auto custom-scrollbar" aria-label="Primary">
+            <div className={cn(
+              "text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.3em] mb-6 px-4 transition-all duration-500",
+              sidebarCollapsed && "opacity-0"
+            )}>
+              Menu
+            </div>
+            {navItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "group flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-300 text-sm font-bold relative overflow-hidden",
+                    isActive
+                      ? "bg-primary text-white shadow-lg shadow-primary/30 translate-x-1"
+                      : "text-muted-foreground/80 hover:bg-primary/5 hover:text-primary"
+                  )
+                }
+              >
+                <div className={cn(
+                  "flex items-center gap-4 relative z-10 transition-all duration-500",
+                  sidebarCollapsed && "justify-center w-full"
+                )}>
+                  <item.icon className={cn(
+                    "w-5 h-5 transition-all duration-300",
+                    "group-hover:scale-110 group-hover:rotate-6"
+                  )} aria-hidden />
+                  {!sidebarCollapsed && (
+                    <span className="animate-in fade-in slide-in-from-left-2 duration-500">{item.label}</span>
+                  )}
+                </div>
+                {!sidebarCollapsed && (
+                  <ChevronRight className="w-4 h-4 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-40 group-hover:translate-x-0" />
+                )}
+                
+                {/* Active Reflection Effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* Bottom Actions & User Profile */}
+          <div className="p-4 mt-auto space-y-3">
+            {/* Collapse Toggle (Desktop only) */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              className="hidden md:flex w-full h-12 rounded-2xl bg-muted/20 hover:bg-muted/40 transition-all border border-transparent hover:border-border/30 group"
+            >
+              {sidebarCollapsed ? (
+                <PanelLeftOpen className="w-5 h-5 text-muted-foreground group-hover:scale-110 transition-transform" />
+              ) : (
+                <div className="flex items-center gap-3 w-full px-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                  <PanelLeftClose className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                  <span className="animate-in fade-in duration-500">Collapse</span>
+                </div>
+              )}
+            </Button>
+
+            {/* Profile Section */}
+            <div className={cn(
+              "bg-muted/30 p-4 rounded-[2rem] border border-border/20 group cursor-pointer transition-all hover:bg-muted/50 hover:shadow-lg hover:shadow-indigo-500/5",
+              sidebarCollapsed ? "items-center" : "flex-col"
+            )} role="complementary" aria-label="Current user">
+              <div className={cn(
+                "flex items-center gap-4 transition-all duration-500",
+                sidebarCollapsed && "justify-center"
+              )}>
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-100 to-indigo-200 text-primary flex items-center justify-center text-lg font-black shadow-inner relative overflow-hidden group-hover:scale-105 transition-transform" aria-hidden>
+                    {user ? getInitials(user.name) : '??'}
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full shadow-sm" />
+                </div>
+                
+                {!sidebarCollapsed && (
+                  <div className="flex flex-col min-w-0 animate-in fade-in slide-in-from-left-2 duration-500">
+                    <span className="text-sm font-black text-foreground truncate group-hover:text-primary transition-colors">
+                      {user?.name || 'Guest User'}
+                    </span>
+                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-wider opacity-60">
+                      {user?.role || 'Guest'}
+                    </span>
+                  </div>
+                )}
+              </div>
+              
+              {!sidebarCollapsed && (
+                <div className="mt-4 pt-4 border-t border-border/20 flex items-center justify-between text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.3em] px-1 animate-in fade-in duration-700">
+                  <span>v4.2.0</span>
+                  <div className="flex gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };
 
