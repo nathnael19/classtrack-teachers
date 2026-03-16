@@ -190,16 +190,7 @@ const Sidebar = () => {
                 )}
               </div>
 
-              {!sidebarCollapsed && (
-                <div className="mt-4 pt-4 border-t border-border/20 flex items-center justify-between text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.3em] px-1 animate-in fade-in duration-700">
-                  <span>v4.2.0</span>
-                  <div className="flex gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                    <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-                  </div>
-                </div>
-              )}
+
             </div>
           </div>
         </div>
