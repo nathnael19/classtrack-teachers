@@ -17,7 +17,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
@@ -33,7 +32,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import api from '@/services/api';
-import { cn } from '@/lib/utils';
 
 const courseSchema = z.object({
   name: z.string().min(3, 'Course name must be at least 3 characters'),
