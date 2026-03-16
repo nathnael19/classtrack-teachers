@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { api } from '@/services/api';
+import api from '@/services/api';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
