@@ -33,10 +33,8 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
-        path: "/",
         element: <MainLayout />,
         children: [
-          { index: true, element: <Navigate to="/dashboard" replace /> },
           { path: "dashboard", element: <DashboardPage /> },
           { path: "courses", element: <CoursesPage /> },
           { path: "courses/:id", element: <CourseDetailsPage /> },
