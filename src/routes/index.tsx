@@ -8,6 +8,7 @@ import AnalyticsPage from "@/features/analytics/AnalyticsPage";
 import ReportsPage from "@/features/reports/ReportsPage";
 import ClassroomsPage from "@/features/classrooms/ClassroomsPage";
 import SettingsPage from "@/features/settings/SettingsPage";
+import LoginPage from "@/features/auth/LoginPage";
 
 export const router = createBrowserRouter([
   {
@@ -23,5 +24,9 @@ export const router = createBrowserRouter([
       { path: "classrooms", element: <ClassroomsPage /> },
       { path: "settings", element: <SettingsPage /> },
     ],
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
   },
 ]);
