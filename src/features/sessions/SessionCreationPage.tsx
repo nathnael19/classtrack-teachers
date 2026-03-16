@@ -53,6 +53,8 @@ interface Room {
   id: number;
   name: string;
   building: string;
+  latitude: number;
+  longitude: number;
 }
 
 interface SessionContext {
@@ -109,14 +111,17 @@ const SessionCreationPage = () => {
     const startTime = new Date();
     const endTime = new Date(startTime.getTime() + parseInt(values.duration) * 60000);
     
+    // Find the selected room to get its telemetry
+    const selectedRoom = rooms.find(r => r.name === values.room);
+    
     const payload = {
       course_id: parseInt(values.courseId),
       room: values.room,
       start_time: startTime.toISOString(),
       end_time: endTime.toISOString(),
-      qr_code_content: `SESSION-${values.courseId}-${startTime.getTime()}`,
-      latitude: 0,
-      longitude: 0,
+      qr_code_content: `SECURE-SESSION-${values.courseId}-${startTime.getTime()}-${Math.random().toString(36).substring(7).toUpperCase()}`,
+      latitude: selectedRoom?.latitude || 0,
+      longitude: selectedRoom?.longitude || 0,
       geofence_radius: parseFloat(values.radius),
     };
 
