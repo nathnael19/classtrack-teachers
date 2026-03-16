@@ -6,7 +6,6 @@ import {
   Play, 
   Clock, 
   MapPin, 
-  Info,
   Loader2,
   Sparkles,
   History,
@@ -77,7 +76,7 @@ const SessionCreationPage = () => {
     queryFn: async () => (await api.get('/rooms/')).data,
   });
 
-  const { data: context, isLoading: isLoadingContext } = useQuery<SessionContext>({
+  const { data: context } = useQuery<SessionContext>({
     queryKey: ['session-context'],
     queryFn: async () => (await api.get('/analytics/session-context')).data,
   });
