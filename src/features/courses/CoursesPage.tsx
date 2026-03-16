@@ -31,7 +31,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/services/api';
 import { cn } from '@/lib/utils';
@@ -175,9 +175,12 @@ const CoursesPage = () => {
                         <BookOpen className="w-6 h-6" />
                       </div>
                       <div className="flex flex-col gap-1.5 min-w-0">
-                        <span className="font-black text-xl text-foreground leading-none group-hover:text-primary transition-colors truncate">
+                        <Link 
+                          to={`/courses/${course.id}`}
+                          className="font-black text-xl text-foreground leading-none hover:text-primary transition-colors truncate"
+                        >
                           {course.name}
-                        </span>
+                        </Link>
                         <div className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-all">
                            <span className="text-[10px] font-black uppercase tracking-widest bg-muted px-2 py-0.5 rounded-md">ID-{course.id}</span>
                            <span className="w-1 h-1 rounded-full bg-slate-300" />
