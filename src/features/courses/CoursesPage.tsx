@@ -37,6 +37,7 @@ import api from '@/services/api';
 import { cn } from '@/lib/utils';
 import { CreateCourseModal } from './components/CreateCourseModal';
 import { EditCourseModal } from './components/EditCourseModal';
+import { EnrollStudentsModal } from './components/EnrollStudentsModal';
 import { toast } from 'sonner';
 
 interface Course {
@@ -44,7 +45,7 @@ interface Course {
   name: string;
   code: string;
   lecturer_id: number;
-  students?: number;
+  student_count?: number;
   sessions?: number;
   status?: 'Active' | 'Archived';
 }
@@ -196,7 +197,7 @@ const CoursesPage = () => {
                         <Users className="w-4 h-4" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-black text-lg">{course.students || 0}</span>
+                        <span className="font-black text-lg">{course.student_count || 0}</span>
                         <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Active Students</span>
                       </div>
                     </div>
@@ -241,6 +242,8 @@ const CoursesPage = () => {
                         </DropdownMenuItem>
 
                         <EditCourseModal course={course} />
+
+                        <EnrollStudentsModal courseId={course.id} courseName={course.name} />
 
                         <DropdownMenuItem 
                           onClick={() => handleOpenInNewTab(course.id)}
