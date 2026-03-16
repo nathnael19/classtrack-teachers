@@ -12,7 +12,6 @@ import {
   Signal,
   ArrowRightLeft,
   Activity,
-  LogOut,
   Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -80,7 +79,7 @@ const LiveSessionPage = () => {
   });
 
   // 2. Fetch Live Attendance (Poll every 5s)
-  const { data: attendance = [], isLoading: isLoadingAttendance } = useQuery<AttendanceRecord[]>({
+  const { data: attendance = [] } = useQuery<AttendanceRecord[]>({
     queryKey: ['session-attendance', session?.id],
     queryFn: async () => {
       if (!session?.id) return [];
