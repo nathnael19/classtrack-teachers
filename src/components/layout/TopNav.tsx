@@ -1,8 +1,8 @@
-import { Bell, Search, Menu, X } from 'lucide-react';
+import { Bell, Search, Menu, X, Sun, Moon } from 'lucide-react';
 import { useUIStore } from '@/store/uiStore';
 
 const TopNav = () => {
-  const { isMobileMenuOpen, toggleMobileMenu } = useUIStore();
+  const { isMobileMenuOpen, toggleMobileMenu, theme, toggleTheme } = useUIStore();
 
   return (
     <header
@@ -38,6 +38,19 @@ const TopNav = () => {
       </div>
 
       <div className="flex items-center gap-2 ml-auto">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="p-2.5 text-muted-foreground hover:text-foreground transition-all duration-300 rounded-full hover:bg-muted cursor-pointer active:scale-95"
+          aria-label={theme === 'dark' ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          {theme === 'dark' ? (
+            <Sun className="w-5 h-5 text-amber-400 animate-in zoom-in spin-in-90 duration-500" aria-hidden />
+          ) : (
+            <Moon className="w-5 h-5 text-indigo-400 animate-in zoom-in spin-in-90 duration-500" aria-hidden />
+          )}
+        </button>
+
         <button
           type="button"
           className="relative p-2.5 text-muted-foreground hover:text-foreground transition-colors duration-150 rounded-full hover:bg-muted cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
