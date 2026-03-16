@@ -1,17 +1,16 @@
 import { useState } from 'react';
-import { 
-  MapPin, 
-  Plus, 
-  MoreVertical,
-  Edit2,
+import {
+  Settings2,
   Trash2,
   ExternalLink,
-  Target,
-  Loader2,
-  Activity,
+  Edit2,
   Globe,
-  Settings2,
-  AlertTriangle
+  MoreVertical,
+  Activity,
+  MapPin,
+  Target,
+  AlertTriangle,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,6 +33,9 @@ import { Card } from '@/components/ui/card';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/services/api';
 import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface Room {
   id: number;
@@ -48,6 +50,43 @@ interface Room {
 const ClassroomsPage = () => {
   const queryClient = useQueryClient();
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    building: '',
+    latitude: 0,
+    longitude: 0,
+    geofence_radius: 50
+  });
+
+  const createRoomMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      const payload = {
+          name: data.name,
+          building: data.building,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          geofence_radius: data.geofence_radius,
+          capacity: 50 // Default capacity
+      };
+      return await api.post('/rooms/', payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rooms'] });
+      setIsCreateModalOpen(false);
+      setFormData({ name: '', building: '', latitude: 0, longitude: 0, geofence_radius: 50 });
+      toast.success('Node provisioned successfully');
+    },
+    onError: (error: any) => {
+      console.error("Creation error:", error);
+      toast.error('Failed to provision node');
+    }
+  });
+
+  const handleCreateRoom = (e: React.FormEvent) => {
+    e.preventDefault();
+    createRoomMutation.mutate(formData);
+  };
 
   // 1. Fetch live rooms
   const { data: rooms = [], isLoading, error } = useQuery<Room[]>({
@@ -78,7 +117,7 @@ const ClassroomsPage = () => {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh] gap-6 animate-in fade-in duration-500">
         <div className="p-4 bg-red-50 rounded-3xl text-red-500">
-           <AlertTriangle className="w-10 h-10" />
+          <AlertTriangle className="w-10 h-10" />
         </div>
         <div className="text-center">
           <p className="text-sm font-black uppercase tracking-[0.2em] text-red-600/80">Sync Failure</p>
@@ -117,10 +156,103 @@ const ClassroomsPage = () => {
           <h1 className="text-5xl font-black tracking-tighter bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900 bg-clip-text text-transparent italic">Facility Matrix</h1>
           <p className="text-slate-500 text-lg font-semibold max-w-2xl leading-relaxed">Geospatial management of academic environments and secure geofence protocols.</p>
         </div>
-        <Button className="w-full md:w-auto gap-4 rounded-3xl px-10 h-16 bg-slate-900 hover:bg-slate-800 text-white shadow-2xl shadow-indigo-500/10 transition-all hover:scale-105 active:scale-95 font-black uppercase tracking-widest text-sm">
-          <Plus className="w-5 h-5" />
-          Provision Node
-        </Button>
+        <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+          <DialogTrigger asChild>
+            <Button className="w-full md:w-auto gap-4 rounded-3xl px-10 h-16 bg-[#161B22] border border-white/5 hover:bg-[#21262D] hover:border-white/10 text-white shadow-2xl transition-all hover:scale-105 active:scale-95 font-bold uppercase tracking-[0.2em] text-sm">
+              <span className="text-xl">+</span>
+              PROVISION NODE
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px] rounded-[2rem] border-white/10 bg-[#0B0F19]/95 backdrop-blur-3xl text-slate-200">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-black text-white flex items-center gap-3">
+                <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-400 border border-emerald-500/20">
+                  <Target className="w-5 h-5" />
+                </div>
+                Provision Facility
+              </DialogTitle>
+              <DialogDescription className="text-slate-400 font-medium">
+                Register a new geospatial node for attendance tracking.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleCreateRoom} className="space-y-6 mt-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="roomName" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Node Designation</Label>
+                  <Input 
+                    id="roomName" 
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="e.g. EC-101" 
+                    className="h-14 bg-black/20 border-white/5 focus-visible:ring-emerald-500/50 rounded-xl text-white font-mono"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="building" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sector / Building</Label>
+                  <Input 
+                    id="building" 
+                    value={formData.building}
+                    onChange={(e) => setFormData(prev => ({ ...prev, building: e.target.value }))}
+                    placeholder="Engineering Block" 
+                    className="h-14 bg-black/20 border-white/5 focus-visible:ring-emerald-500/50 rounded-xl text-white"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="lat" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Latitude</Label>
+                    <Input 
+                      id="lat" 
+                      type="number" 
+                      step="any"
+                      value={formData.latitude}
+                      onChange={(e) => setFormData(prev => ({ ...prev, latitude: parseFloat(e.target.value) || 0 }))}
+                      placeholder="0.0000" 
+                      className="h-14 bg-black/20 border-white/5 focus-visible:ring-emerald-500/50 rounded-xl text-white font-mono"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lng" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Longitude</Label>
+                    <Input 
+                      id="lng" 
+                      type="number" 
+                      step="any"
+                      value={formData.longitude}
+                      onChange={(e) => setFormData(prev => ({ ...prev, longitude: parseFloat(e.target.value) || 0 }))}
+                      placeholder="0.0000" 
+                      className="h-14 bg-black/20 border-white/5 focus-visible:ring-emerald-500/50 rounded-xl text-white font-mono"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                   <div className="flex justify-between items-center">
+                    <Label htmlFor="radius" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Secure Radius</Label>
+                    <span className="text-[10px] font-black text-emerald-400">{formData.geofence_radius}m</span>
+                   </div>
+                   <input 
+                      type="range" 
+                      min="10" 
+                      max="100" 
+                      step="5"
+                      value={formData.geofence_radius}
+                      onChange={(e) => setFormData(prev => ({ ...prev, geofence_radius: parseInt(e.target.value) }))}
+                      className="w-full accent-emerald-500 h-2 bg-white/10 rounded-lg appearance-none cursor-pointer"
+                   />
+                </div>
+              </div>
+              <Button 
+                type="submit" 
+                disabled={createRoomMutation.isPending}
+                className="w-full h-14 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black tracking-widest uppercase transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+              >
+                {createRoomMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : "Initialize Sector"}
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-12">
@@ -267,7 +399,7 @@ const ClassroomsPage = () => {
           </Card>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
