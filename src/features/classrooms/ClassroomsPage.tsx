@@ -36,6 +36,7 @@ import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import MapSelector from '@/components/MapSelector';
 
 interface Room {
   id: number;
@@ -199,32 +200,16 @@ const ClassroomsPage = () => {
                     required
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="lat" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Latitude</Label>
-                    <Input 
-                      id="lat" 
-                      type="number" 
-                      step="any"
-                      value={formData.latitude}
-                      onChange={(e) => setFormData(prev => ({ ...prev, latitude: parseFloat(e.target.value) || 0 }))}
-                      placeholder="0.0000" 
-                      className="h-14 bg-black/20 border-white/5 focus-visible:ring-emerald-500/50 rounded-xl text-white font-mono"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lng" className="text-[10px] font-black uppercase tracking-widest text-slate-400">Longitude</Label>
-                    <Input 
-                      id="lng" 
-                      type="number" 
-                      step="any"
-                      value={formData.longitude}
-                      onChange={(e) => setFormData(prev => ({ ...prev, longitude: parseFloat(e.target.value) || 0 }))}
-                      placeholder="0.0000" 
-                      className="h-14 bg-black/20 border-white/5 focus-visible:ring-emerald-500/50 rounded-xl text-white font-mono"
-                      required
-                    />
+                <div className="space-y-4">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Satellite Location Selection</Label>
+                  <MapSelector 
+                    onLocationSelect={(lat, lng) => setFormData(prev => ({ ...prev, latitude: lat, longitude: lng }))}
+                    initialLat={formData.latitude}
+                    initialLng={formData.longitude}
+                  />
+                  <div className="flex justify-between px-2 text-[10px] font-mono text-indigo-400/60 font-black">
+                    <span>LAT: {formData.latitude?.toFixed(6) ?? "0.000000"}</span>
+                    <span>LNG: {formData.longitude?.toFixed(6) ?? "0.000000"}</span>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -287,7 +272,9 @@ const ClassroomsPage = () => {
                             <div className="p-2 bg-indigo-500/5 rounded-xl text-indigo-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                                <MapPin className="w-4 h-4" />
                             </div>
-                            <span className="opacity-80">{room.latitude.toFixed(4)}, {room.longitude.toFixed(4)}</span>
+                            <span className="opacity-80">
+                              {(room.latitude?.toFixed(4)) ?? "0.0000"}, {(room.longitude?.toFixed(4)) ?? "0.0000"}
+                            </span>
                          </div>
                       </TableCell>
                       <TableCell className="px-10 py-8">
