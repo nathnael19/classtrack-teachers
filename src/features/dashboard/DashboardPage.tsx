@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowUpRight, ArrowDownRight, Users, BookOpen, Clock, Activity, Loader2, Target, TrendingUp } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Users, BookOpen, Clock, Activity, Loader2, TrendingUp } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Button } from '@/components/ui/button';
 import api from '@/services/api';
