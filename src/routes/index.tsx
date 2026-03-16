@@ -10,13 +10,20 @@ import ClassroomsPage from "@/features/classrooms/ClassroomsPage";
 import SettingsPage from "@/features/settings/SettingsPage";
 import LoginPage from "@/features/auth/LoginPage";
 import RegisterPage from "@/features/auth/RegisterPage";
+import LandingPage from "@/features/landing/LandingPage";
+import { Navigate } from "react-router-dom";
 
 export const router = createBrowserRouter([
   {
     path: "/",
+    element: <LandingPage />,
+  },
+  {
+    path: "/",
     element: <MainLayout />,
     children: [
-      { index: true, element: <DashboardPage /> },
+      { index: true, element: <Navigate to="/dashboard" replace /> },
+      { path: "dashboard", element: <DashboardPage /> },
       { path: "courses", element: <CoursesPage /> },
       { path: "sessions/new", element: <SessionCreationPage /> },
       { path: "sessions/live", element: <LiveSessionPage /> },
