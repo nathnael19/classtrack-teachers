@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import DashboardPage from "@/features/dashboard/DashboardPage";
 import CoursesPage from "@/features/courses/CoursesPage";
+import CourseDetailsPage from "@/features/courses/CourseDetailsPage";
 import SessionCreationPage from "@/features/sessions/SessionCreationPage";
 import LiveSessionPage from "@/features/sessions/LiveSessionPage";
 import AnalyticsPage from "@/features/analytics/AnalyticsPage";
@@ -25,6 +26,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: "dashboard", element: <DashboardPage /> },
       { path: "courses", element: <CoursesPage /> },
+      { path: "courses/:id", element: <CourseDetailsPage /> },
       { path: "sessions/new", element: <SessionCreationPage /> },
       { path: "sessions/live", element: <LiveSessionPage /> },
       { path: "analytics", element: <AnalyticsPage /> },
