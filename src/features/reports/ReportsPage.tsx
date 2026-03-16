@@ -12,8 +12,7 @@ import {
   Filter,
   Zap,
   ArrowUpRight,
-  Database,
-  ExternalLink
+  Database
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -82,15 +81,32 @@ const ReportsPage = () => {
     },
   });
 
-  const handleExport = (type: string) => {
+  const handleExport = async (type: string) => {
+    if (type !== 'CSV') {
+      toast.error(`${type} export not yet implemented. Use CSV.`);
+      return;
+    }
+
     setIsExporting(true);
-    const promise = new Promise(resolve => setTimeout(resolve, 1500));
-    toast.promise(promise, {
-      loading: `Preparing ${type} export logic...`,
-      success: `Reports compiled successfully as ${type}!`,
-      error: 'Failed to export report.',
-    });
-    promise.finally(() => setIsExporting(false));
+    try {
+      const response = await api.get('/analytics/reports/export/csv', {
+        responseType: 'blob',
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `attendance_report_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success('Report exported successfully!');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Failed to export report.');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   if (isLoading && reports.length === 0) {
@@ -272,23 +288,10 @@ const ReportsPage = () => {
           </Table>
         </div>
 
-        <div className="p-10 border-t border-slate-100 bg-slate-50/50 backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-8">
-          <div className="flex items-center gap-4">
-             <div className="px-6 py-3 bg-white rounded-2xl shadow-lg shadow-slate-200/50 flex items-center gap-4 border border-white">
-                <span className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Active Records</span>
-                <span className="text-xl font-black text-primary leading-none tabular-nums">{reports.length}</span>
-             </div>
-             <div className="px-6 py-3 bg-white rounded-2xl shadow-lg shadow-slate-200/50 flex items-center gap-2 border border-white">
-                <ExternalLink className="w-4 h-4 text-slate-300" />
-                <span className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Total History</span>
-             </div>
-          </div>
-          <div className="flex gap-3">
-            {[1, 2, 3].map(i => (
-              <Button key={i} variant="outline" className={`w-12 h-12 rounded-2xl border-none shadow-xl transition-all font-black text-xs ${i === 1 ? 'bg-primary text-white shadow-primary/20' : 'bg-white text-slate-400 hover:bg-primary/5 hover:text-primary'}`}>
-                {i}
-              </Button>
-            ))}
+        <div className="p-10 border-t border-slate-100 bg-slate-50/50 backdrop-blur-md flex items-center gap-4">
+          <div className="px-6 py-3 bg-white rounded-2xl shadow-lg shadow-slate-200/50 flex items-center gap-4 border border-white">
+            <span className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Active Records</span>
+            <span className="text-xl font-black text-primary leading-none tabular-nums">{reports.length}</span>
           </div>
         </div>
       </div>
