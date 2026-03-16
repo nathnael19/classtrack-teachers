@@ -1,9 +1,10 @@
-import { ArrowUpRight, ArrowDownRight, Users, BookOpen, Clock, Activity, Loader2, TrendingUp } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Users, BookOpen, Clock, Activity, Loader2, TrendingUp, RefreshCw } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import api from '@/services/api';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // --- Types ---
 interface DashboardStats {
@@ -76,6 +77,16 @@ const StatCard = ({ title, value, change, isPositive, icon: Icon, suffix = "" }:
 );
 
 const DashboardPage = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
+    queryClient.invalidateQueries({ queryKey: ['weekly-trend'] });
+    queryClient.invalidateQueries({ queryKey: ['course-distribution'] });
+    queryClient.invalidateQueries({ queryKey: ['recent-sessions'] });
+  };
+
   // --- Queries ---
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ['dashboard-stats'],
@@ -122,8 +133,10 @@ const DashboardPage = () => {
           <p className="text-muted-foreground/80 mt-1 font-semibold">Real-time academic performance & attendance tracking.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="lg" className="rounded-2xl px-8 border-indigo-100 hover:bg-primary/5 hover:text-primary transition-all font-bold"> Audit Log </Button>
-          <Button size="lg" className="rounded-2xl px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 font-bold border-b-4 border-indigo-700 active:border-b-0 active:translate-y-1 transition-all"> Refresh Dash </Button>
+          <Button size="lg" onClick={handleRefresh} className="rounded-2xl px-8 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 font-bold border-b-4 border-indigo-700 active:border-b-0 active:translate-y-1 transition-all gap-2">
+            <RefreshCw className="w-4 h-4" />
+            Refresh
+          </Button>
         </div>
       </header>
 
@@ -218,7 +231,7 @@ const DashboardPage = () => {
             </h2>
             <p className="text-muted-foreground/70 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Latest verified classroom captures</p>
           </div>
-          <Button variant="ghost" size="lg" className="rounded-2xl border border-indigo-50 hover:bg-slate-50 transition-all px-10 font-bold text-xs uppercase tracking-widest">
+          <Button variant="ghost" size="lg" onClick={() => navigate('/reports')} className="rounded-2xl border border-indigo-50 hover:bg-slate-50 transition-all px-10 font-bold text-xs uppercase tracking-widest cursor-pointer">
             Full History
           </Button>
         </div>
@@ -269,7 +282,7 @@ const DashboardPage = () => {
                     </div>
                   </td>
                   <td className="py-7 text-right">
-                    <Button variant="ghost" size="icon" className="rounded-2xl w-12 h-12 bg-slate-50/50 hover:bg-primary hover:text-white hover:scale-110 active:scale-90 transition-all shadow-sm group-hover:shadow-primary/20">
+                    <Button variant="ghost" size="icon" onClick={() => navigate('/reports')} className="rounded-2xl w-12 h-12 bg-slate-50/50 hover:bg-primary hover:text-white hover:scale-110 active:scale-90 transition-all shadow-sm group-hover:shadow-primary/20 cursor-pointer">
                       <ArrowUpRight className="w-6 h-6" />
                     </Button>
                   </td>
