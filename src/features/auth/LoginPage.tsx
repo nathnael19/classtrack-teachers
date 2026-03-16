@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   Lock, 
   Mail, 
@@ -128,7 +128,7 @@ const LoginPage = () => {
           
           <div className="px-10 py-6 bg-slate-900/[0.02] border-t border-white/40 text-center">
             <p className="text-xs font-bold text-slate-400">
-              New Commander? <button className="text-primary hover:underline">Establish Liaison</button>
+              New Commander? <Link to="/register" className="text-primary hover:underline">Establish Liaison</Link>
             </p>
           </div>
         </div>
