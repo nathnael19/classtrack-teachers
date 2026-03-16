@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import CryptoJS from 'crypto-js';
 import { 
   Users, 
   MapPin, 
@@ -60,6 +61,12 @@ const LiveSessionPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [rotationProgress, setRotationProgress] = useState(0);
+  const [activeToken, setActiveToken] = useState("");
+  const [qrTimeLeft, setQrTimeLeft] = useState(120);
+  const prevAttendanceCount = useRef(0);
+
+  const ROTATION_INTERVAL = 120; // seconds — 2 minutes
 
   // 1. Fetch Active Session
   const { data: session, isLoading: isLoadingSession, error: sessionError } = useQuery<ActiveSession>({
@@ -78,7 +85,7 @@ const LiveSessionPage = () => {
     retry: 1,
   });
 
-  // 2. Fetch Live Attendance (Poll every 5s)
+  // 2. Fetch Live Attendance — polls every 3s for real-time updates
   const { data: attendance = [] } = useQuery<AttendanceRecord[]>({
     queryKey: ['session-attendance', session?.id],
     queryFn: async () => {
@@ -87,7 +94,7 @@ const LiveSessionPage = () => {
       return res.data;
     },
     enabled: !!session?.id,
-    refetchInterval: 5000,
+    refetchInterval: 3000,
   });
 
   // 3. Mutation: Stop Session
@@ -106,11 +113,42 @@ const LiveSessionPage = () => {
     }
   });
 
-  // Timer Hook
+  // Toast handler when new students scan in
   useEffect(() => {
-    const interval = setInterval(() => setCurrentTime(new Date()), 1000);
+    if (attendance.length > prevAttendanceCount.current && prevAttendanceCount.current !== 0) {
+      const newest = attendance[attendance.length - 1];
+      toast.success(`📡 ${newest?.student_name || 'A student'} just checked in!`, {
+        description: newest?.student_code ? `ID: ${newest.student_code}` : undefined,
+      });
+    }
+    prevAttendanceCount.current = attendance.length;
+  }, [attendance.length]);
+
+  // Timer & Token Rotation Hook (2-minute rotation)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      setCurrentTime(now);
+      
+      if (session?.qr_code_content) {
+        const timestamp = Math.floor(now.getTime() / 1000);
+        const timeStep = Math.floor(timestamp / ROTATION_INTERVAL);
+        
+        // Generate HMAC-SHA256 token for this 2-minute window
+        const hmac = CryptoJS.HmacSHA256(timeStep.toString(), session.qr_code_content);
+        const token = hmac.toString(CryptoJS.enc.Hex).toUpperCase().slice(0, 8);
+        setActiveToken(token);
+        
+        // Calculate progress and time remaining within the 120s window
+        const secondsInWindow = timestamp % ROTATION_INTERVAL;
+        const elapsed = secondsInWindow + (now.getMilliseconds() / 1000);
+        const progress = (elapsed / ROTATION_INTERVAL) * 100;
+        setRotationProgress(progress);
+        setQrTimeLeft(Math.ceil(ROTATION_INTERVAL - elapsed));
+      }
+    }, 500);
     return () => clearInterval(interval);
-  }, []);
+  }, [session?.qr_code_content]);
 
   const getTimeLeft = () => {
     if (!session?.end_time) return 0;
@@ -185,18 +223,35 @@ const LiveSessionPage = () => {
               <div className="relative group p-6 bg-white rounded-[2.5rem] shadow-2xl border border-indigo-50 transition-all hover:scale-105 duration-500">
                 <div className="absolute inset-0 bg-primary/5 rounded-[2.5rem] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                 <QRCodeSVG 
-                  value={session.qr_code_content} 
+                  value={JSON.stringify({
+                    s: session.id,
+                    t: activeToken,
+                    ts: Math.floor(currentTime.getTime() / 1000)
+                  })} 
                   size={260}
                   level="H"
                   includeMargin={true}
                   className="relative z-10"
                 />
+                {/* Rotation Progress Bar */}
+                <div className="absolute inset-0 pointer-events-none rounded-[2.5rem] overflow-hidden">
+                   <div 
+                     className="absolute bottom-0 left-0 h-2 bg-gradient-to-r from-primary to-indigo-400 transition-all duration-500 ease-linear rounded-full"
+                     style={{ width: `${rotationProgress}%` }}
+                   />
+                </div>
               </div>
               
               <div className="text-center space-y-2 my-10 relative">
-                <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] mb-3 ml-1">Session Key</h3>
-                <div className="text-5xl font-black tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-600 to-indigo-800 tabular-nums">
-                  {session.qr_code_content.split('-').pop()?.slice(-4).toUpperCase() || 'LOCK'}
+                <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] mb-3 ml-1">Dynamic Auth Token</h3>
+                <div className="text-5xl font-black tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-600 to-indigo-800 tabular-nums font-mono">
+                  {activeToken || 'SYST'}
+                </div>
+                <div className="flex items-center justify-center gap-2 mt-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest tabular-nums">
+                    Rotates in {Math.floor(qrTimeLeft / 60)}:{String(qrTimeLeft % 60).padStart(2, '0')}
+                  </span>
                 </div>
               </div>
 
