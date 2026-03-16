@@ -1,7 +1,6 @@
 import {
   MoreHorizontal,
   Eye,
-  Edit2,
   Trash2,
   Users,
   Calendar,
@@ -32,10 +31,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/services/api';
 import { cn } from '@/lib/utils';
 import { CreateCourseModal } from './components/CreateCourseModal';
+import { EditCourseModal } from './components/EditCourseModal';
+import { toast } from 'sonner';
 
 interface Course {
   id: number;
@@ -49,6 +51,8 @@ interface Course {
 
 const CoursesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // --- Queries ---
   const { data: courses = [], isLoading } = useQuery<Course[]>({
@@ -56,9 +60,31 @@ const CoursesPage = () => {
     queryFn: async () => (await api.get('/courses/')).data,
   });
 
+  // --- Mutations ---
+  const decommissionModule = useMutation({
+    mutationFn: async (id: number) => {
+      return (await api.delete(`/courses/${id}`)).data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['courses'] });
+      toast.success('Module decommissioned from active service.');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || 'Decommissioning protocol failed.');
+    }
+  });
+
+  const handleOpenInNewTab = (courseId: number) => {
+    window.open(`/analytics?course_id=${courseId}`, '_blank');
+  };
+
+  const handleViewAnalytics = (courseId: number) => {
+    navigate(`/analytics?course_id=${courseId}`);
+  };
+
   // --- Filtered Data ---
   const filteredCourses = useMemo(() => {
-    return courses.filter(course => 
+    return courses.filter((course: Course) => 
       course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.code.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -205,21 +231,37 @@ const CoursesPage = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-64 rounded-[1.5rem] border-indigo-50/50 backdrop-blur-2xl bg-white/90 p-3 shadow-2xl animate-in zoom-in-95 duration-200">
                         <DropdownMenuLabel className="px-4 py-3 text-[10px] font-black uppercase text-muted-foreground/40 tracking-[0.3em]">Operational Menu</DropdownMenuLabel>
-                        <DropdownMenuItem className="rounded-xl gap-4 py-4 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group/item">
+                        
+                        <DropdownMenuItem 
+                          onClick={() => handleViewAnalytics(course.id)}
+                          className="rounded-xl gap-4 py-4 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group/item"
+                        >
                           <Eye className="w-5 h-5 text-muted-foreground group-hover/item:text-primary transition-colors" /> 
                           <span className="font-black text-sm uppercase tracking-wider">Analytics View</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="rounded-xl gap-4 py-4 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group/item">
-                          <Edit2 className="w-5 h-5 text-muted-foreground group-hover/item:text-primary transition-colors" /> 
-                          <span className="font-black text-sm uppercase tracking-wider">Modify Params</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="rounded-xl gap-4 py-4 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group/item">
+
+                        <EditCourseModal course={course} />
+
+                        <DropdownMenuItem 
+                          onClick={() => handleOpenInNewTab(course.id)}
+                          className="rounded-xl gap-4 py-4 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group/item"
+                        >
                           <ExternalLink className="w-5 h-5 text-muted-foreground group-hover/item:text-primary transition-colors" /> 
                           <span className="font-black text-sm uppercase tracking-wider">Open in New Tab</span>
                         </DropdownMenuItem>
+
                         <DropdownMenuSeparator className="my-3 bg-indigo-50/50" />
-                        <DropdownMenuItem className="rounded-xl gap-4 py-4 cursor-pointer text-destructive hover:bg-destructive/5 focus:bg-destructive/5">
-                          <Trash2 className="w-5 h-5" /> 
+                        
+                        <DropdownMenuItem 
+                          onClick={() => decommissionModule.mutate(course.id)}
+                          disabled={decommissionModule.isPending}
+                          className="rounded-xl gap-4 py-4 cursor-pointer text-destructive hover:bg-destructive/5 focus:bg-destructive/5"
+                        >
+                          {decommissionModule.isPending ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-5 h-5" />
+                          )}
                           <span className="font-black text-sm uppercase tracking-wider">Decommission Module</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
