@@ -1,15 +1,18 @@
 import {
-  Plus,
-  Search,
   MoreHorizontal,
   Eye,
   Edit2,
   Trash2,
   Users,
-  Calendar
+  Calendar,
+  Loader2,
+  BookOpen,
+  Search,
+  Filter,
+  Download,
+  ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -28,164 +31,214 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { useEffect, useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import api from '@/services/api';
+import { cn } from '@/lib/utils';
+import { CreateCourseModal } from './components/CreateCourseModal';
 
 interface Course {
   id: number;
   name: string;
   code: string;
   lecturer_id: number;
-  students?: number; // Optional for now
-  sessions?: number; // Optional for now
-  status?: string;   // Optional for now
+  students?: number;
+  sessions?: number;
+  status?: 'Active' | 'Archived';
 }
 
 const CoursesPage = () => {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await api.get('/courses/');
-        setCourses(response.data);
-      } catch (error) {
-        console.error('Failed to fetch courses:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // --- Queries ---
+  const { data: courses = [], isLoading } = useQuery<Course[]>({
+    queryKey: ['courses'],
+    queryFn: async () => (await api.get('/courses/')).data,
+  });
 
-    fetchCourses();
-  }, []);
+  // --- Filtered Data ---
+  const filteredCourses = useMemo(() => {
+    return courses.filter(course => 
+      course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      course.code.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [courses, searchQuery]);
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh] gap-4">
+      <div className="flex flex-col items-center justify-center h-[70vh] gap-6">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-8 h-8 bg-primary/10 rounded-full animate-pulse" />
-          </div>
+          <Loader2 className="w-16 h-16 animate-spin text-primary" />
+          <div className="absolute inset-0 bg-primary/20 blur-2xl animate-pulse" />
         </div>
-        <p className="text-muted-foreground font-bold tracking-widest uppercase text-xs">Syncing Academia...</p>
+        <div className="flex flex-col items-center gap-1">
+          <p className="text-muted-foreground font-black tracking-[0.3em] uppercase text-[10px]">Curriculum Pipeline</p>
+          <span className="text-sm font-bold opacity-40">Syncing database records...</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="relative animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Background Decorative Blobs */}
-      <div className="absolute top-0 -left-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10" />
-      <div className="absolute bottom-20 -right-20 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl -z-10" />
+    <div className="relative animate-in fade-in slide-in-from-bottom-6 duration-1000 space-y-10">
+      {/* Dynamic Background Elements */}
+      <div className="absolute -top-40 -left-40 w-[35rem] h-[35rem] bg-primary/5 rounded-full blur-[120px] -z-10 animate-pulse" />
+      <div className="absolute bottom-40 -right-40 w-[30rem] h-[30rem] bg-emerald-500/5 rounded-full blur-[100px] -z-10" />
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-emerald-600 bg-clip-text text-transparent">Academic Modules</h1>
-          <p className="text-muted-foreground mt-2 text-lg">Manage your course catalog and student engagement.</p>
-        </div>
-        <Button className="w-full md:w-auto gap-3 rounded-full px-8 h-12 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95 font-bold">
-          <Plus className="w-5 h-5" />
-          Add New Course
-        </Button>
-      </div>
-
-      <div className="glass-card rounded-[2.5rem] overflow-hidden">
-        <div className="p-8 border-b border-white/20 bg-white/10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-          <div className="relative w-full md:w-96 group">
-            <Search className="w-5 h-5 text-muted-foreground absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors" />
-            <Input
-              placeholder="Filter by course title or code..."
-              className="pl-12 h-12 bg-white/40 border-none rounded-2xl shadow-inner focus-visible:ring-2 focus-visible:ring-primary/20 placeholder:text-muted-foreground/50 font-medium"
-            />
-          </div>
+      <header className="flex flex-col md:flex-row md:items-end justify-between gap-8 pb-4">
+        <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" className="hidden md:flex rounded-xl h-10 px-6 border-primary/10 hover:bg-primary/5 font-bold">Filter</Button>
-            <Button variant="outline" size="sm" className="hidden md:flex rounded-xl h-10 px-6 border-primary/10 hover:bg-primary/5 font-bold">Export</Button>
+             <div className="w-1.5 h-10 bg-gradient-to-b from-primary to-indigo-600 rounded-full" />
+             <h1 className="text-5xl font-black tracking-tighter text-foreground leading-none">Modules<span className="text-primary/40 text-3xl ml-2 font-black italic">PRO</span></h1>
+          </div>
+          <p className="text-muted-foreground font-semibold text-lg max-w-xl">
+            Surgical control over your academic curriculum and student engagement vectors.
+          </p>
+        </div>
+        <CreateCourseModal />
+      </header>
+
+      <div className="glass-card rounded-[3rem] overflow-hidden border-indigo-50/30 shadow-2xl shadow-indigo-500/5">
+        <div className="p-10 border-b border-indigo-50/50 bg-white/40 backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-10">
+          <div className="relative w-full md:w-[28rem] group">
+            <Search className="w-5 h-5 text-muted-foreground/40 absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-all duration-300" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Query by title or module code..."
+              className="pl-14 h-14 bg-white/60 border-indigo-50 rounded-2xl shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 placeholder:text-muted-foreground/40 text-sm font-black"
+            />
+            {searchQuery && (
+              <div className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-black text-primary/40 uppercase tracking-widest">
+                Searching...
+              </div>
+            )}
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <Button variant="outline" className="rounded-2xl h-14 px-8 border-indigo-100 hover:bg-primary/5 gap-3 font-black text-xs uppercase tracking-widest group transition-all">
+              <Filter className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              Intelligence
+            </Button>
+            <Button variant="outline" className="rounded-2xl h-14 px-8 border-indigo-100 hover:bg-primary/5 gap-3 font-black text-xs uppercase tracking-widest group transition-all">
+              <Download className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              Export Data
+            </Button>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto min-h-[400px]">
           <Table>
-            <TableHeader className="bg-muted/5">
-              <TableRow className="hover:bg-transparent border-b border-border/20">
-                <TableHead className="px-8 py-6 font-black uppercase text-xs tracking-widest text-muted-foreground w-[350px]">Course Module</TableHead>
-                <TableHead className="px-8 py-6 font-black uppercase text-xs tracking-widest text-muted-foreground">Internal Code</TableHead>
-                <TableHead className="px-8 py-6 font-black uppercase text-xs tracking-widest text-muted-foreground">Enrollment</TableHead>
-                <TableHead className="px-8 py-6 font-black uppercase text-xs tracking-widest text-muted-foreground">Sessions</TableHead>
-                <TableHead className="px-8 py-6 font-black uppercase text-xs tracking-widest text-muted-foreground">Lifecycle</TableHead>
-                <TableHead className="px-8 py-6 font-black uppercase text-xs tracking-widest text-muted-foreground text-right">Settings</TableHead>
+            <TableHeader className="bg-slate-50/50 border-b border-indigo-50/50">
+              <TableRow className="hover:bg-transparent border-none">
+                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40 w-[400px]">Strategic Module</TableHead>
+                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Identifier</TableHead>
+                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Unit Core</TableHead>
+                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Temporal</TableHead>
+                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Status</TableHead>
+                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {courses.map((course) => (
-                <tr key={course.id} className="group hover:bg-primary/[0.03] transition-all duration-300 border-b border-border/10">
-                  <TableCell className="px-8 py-6">
-                    <div className="flex flex-col">
-                      <span className="font-black text-base group-hover:text-primary transition-colors">{course.name}</span>
-                      <span className="text-xs text-muted-foreground mt-0.5 font-medium opacity-60 md:hidden">{course.code}</span>
+            <TableBody className="divide-y divide-slate-50">
+              {filteredCourses.map((course) => (
+                <tr key={course.id} className="group hover:bg-indigo-50/30 transition-all duration-500 cursor-pointer">
+                  <TableCell className="px-10 py-10">
+                    <div className="flex items-center gap-6">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-50 to-white border border-indigo-100/50 flex items-center justify-center text-primary shadow-sm group-hover:scale-110 transition-transform duration-500">
+                        <BookOpen className="w-6 h-6" />
+                      </div>
+                      <div className="flex flex-col gap-1.5 min-w-0">
+                        <span className="font-black text-xl text-foreground leading-none group-hover:text-primary transition-colors truncate">
+                          {course.name}
+                        </span>
+                        <div className="flex items-center gap-2 opacity-40 group-hover:opacity-100 transition-all">
+                           <span className="text-[10px] font-black uppercase tracking-widest bg-muted px-2 py-0.5 rounded-md">ID-{course.id}</span>
+                           <span className="w-1 h-1 rounded-full bg-slate-300" />
+                           <span className="text-[10px] font-black uppercase tracking-[0.2em]">Academic Term 2024</span>
+                        </div>
+                      </div>
                     </div>
                   </TableCell>
-                  <TableCell className="px-8 py-6 hidden md:table-cell">
-                    <div className="inline-flex px-3 py-1 bg-muted/30 rounded-lg font-mono text-xs font-bold text-muted-foreground border border-border/20">
+                  <TableCell className="px-10 py-10">
+                    <div className="inline-flex px-4 py-1.5 bg-slate-100/50 rounded-xl font-mono text-xs font-black text-foreground border border-slate-200/50 group-hover:bg-primary group-hover:text-white transition-all">
                       {course.code}
                     </div>
                   </TableCell>
-                  <TableCell className="px-8 py-6">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-indigo-50 rounded-lg text-indigo-500">
+                  <TableCell className="px-10 py-10">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-indigo-50/50 flex items-center justify-center text-primary">
                         <Users className="w-4 h-4" />
                       </div>
-                      <span className="font-bold">{course.students || 0}</span>
+                      <div className="flex flex-col">
+                        <span className="font-black text-lg">{course.students || 0}</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Active Students</span>
+                      </div>
                     </div>
                   </TableCell>
-                  <TableCell className="px-8 py-6">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-emerald-50 rounded-lg text-emerald-500">
+                  <TableCell className="px-10 py-10">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50/50 flex items-center justify-center text-emerald-500">
                         <Calendar className="w-4 h-4" />
                       </div>
-                      <span className="font-bold">{course.sessions || 0}</span>
+                      <div className="flex flex-col">
+                        <span className="font-black text-lg">{course.sessions || 0}</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Total Sessions</span>
+                      </div>
                     </div>
                   </TableCell>
-                  <TableCell className="px-8 py-6">
-                    <Badge variant={(course.status || 'Active') === 'Active' ? 'default' : 'secondary'} className={`rounded-full px-4 py-1 font-bold text-[10px] uppercase tracking-wider ${(course.status || 'Active') === 'Active' ? 'bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 border-emerald-500/20' : 'bg-muted text-muted-foreground border-transparent'}`}>
+                  <TableCell className="px-10 py-10">
+                    <Badge className={cn(
+                      "rounded-full px-5 py-2 font-black text-[9px] uppercase tracking-[0.2em] border-none shadow-sm",
+                      (course.status || 'Active') === 'Active' 
+                        ? "bg-emerald-100 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white"
+                        : "bg-slate-100 text-slate-400"
+                    )}>
                       {course.status || 'Active'}
                     </Badge>
                   </TableCell>
-                  <TableCell className="px-8 py-6 text-right">
+                  <TableCell className="px-10 py-10 text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full hover:bg-primary/10 hover:text-primary transition-all">
-                          <MoreHorizontal className="w-5 h-5" />
+                        <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl hover:bg-primary hover:text-white transition-all shadow-sm group-hover:shadow-primary/20">
+                          <MoreHorizontal className="w-6 h-6" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56 rounded-2xl border-primary/10 backdrop-blur-xl bg-white/80 p-2 shadow-2xl">
-                        <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase text-muted-foreground tracking-widest">Course Menu</DropdownMenuLabel>
-                        <DropdownMenuItem className="rounded-xl gap-3 py-3 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group">
-                          <Eye className="w-4 h-4 text-muted-foreground group-hover:text-primary" /> 
-                          <span className="font-bold">View History</span>
+                      <DropdownMenuContent align="end" className="w-64 rounded-[1.5rem] border-indigo-50/50 backdrop-blur-2xl bg-white/90 p-3 shadow-2xl animate-in zoom-in-95 duration-200">
+                        <DropdownMenuLabel className="px-4 py-3 text-[10px] font-black uppercase text-muted-foreground/40 tracking-[0.3em]">Operational Menu</DropdownMenuLabel>
+                        <DropdownMenuItem className="rounded-xl gap-4 py-4 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group/item">
+                          <Eye className="w-5 h-5 text-muted-foreground group-hover/item:text-primary transition-colors" /> 
+                          <span className="font-black text-sm uppercase tracking-wider">Analytics View</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="rounded-xl gap-3 py-3 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group">
-                          <Edit2 className="w-4 h-4 text-muted-foreground group-hover:text-primary" /> 
-                          <span className="font-bold">Modify Details</span>
+                        <DropdownMenuItem className="rounded-xl gap-4 py-4 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group/item">
+                          <Edit2 className="w-5 h-5 text-muted-foreground group-hover/item:text-primary transition-colors" /> 
+                          <span className="font-black text-sm uppercase tracking-wider">Modify Params</span>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="my-2 bg-primary/5" />
-                        <DropdownMenuItem className="rounded-xl gap-3 py-3 cursor-pointer text-destructive hover:bg-destructive/5 focus:bg-destructive/5 group">
-                          <Trash2 className="w-4 h-4" /> 
-                          <span className="font-bold">Remove Course</span>
+                        <DropdownMenuItem className="rounded-xl gap-4 py-4 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group/item">
+                          <ExternalLink className="w-5 h-5 text-muted-foreground group-hover/item:text-primary transition-colors" /> 
+                          <span className="font-black text-sm uppercase tracking-wider">Open in New Tab</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="my-3 bg-indigo-50/50" />
+                        <DropdownMenuItem className="rounded-xl gap-4 py-4 cursor-pointer text-destructive hover:bg-destructive/5 focus:bg-destructive/5">
+                          <Trash2 className="w-5 h-5" /> 
+                          <span className="font-black text-sm uppercase tracking-wider">Decommission Module</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
                 </tr>
               ))}
-              {courses.length === 0 && (
+              {filteredCourses.length === 0 && searchQuery && (
                 <tr>
-                  <TableCell colSpan={6} className="h-64 text-center">
-                    <div className="flex flex-col items-center justify-center gap-3 opacity-30">
-                       <Plus className="w-12 h-12" />
-                       <span className="font-bold text-lg">No curriculum items found</span>
+                  <TableCell colSpan={6} className="h-96 text-center">
+                    <div className="flex flex-col items-center justify-center gap-6 opacity-30 group animate-in fade-in zoom-in duration-500">
+                       <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+                         <Search className="w-10 h-10" />
+                       </div>
+                       <div className="flex flex-col gap-2">
+                         <span className="font-black text-2xl uppercase tracking-widest text-foreground">Zero Vectors Found</span>
+                         <p className="text-sm font-bold">Your search query returned no active modules.</p>
+                       </div>
+                       <Button variant="outline" onClick={() => setSearchQuery('')} className="rounded-xl px-10 border-indigo-100 font-black uppercase text-[10px] tracking-widest">Reset Discovery</Button>
                     </div>
                   </TableCell>
                 </tr>
@@ -194,13 +247,26 @@ const CoursesPage = () => {
           </Table>
         </div>
 
-        <div className="p-8 border-t border-white/20 bg-muted/10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <p className="text-sm font-bold text-muted-foreground">
-            Displaying <span className="text-primary font-black px-2 py-1 bg-primary/10 rounded-md">{courses.length}</span> active modules
-          </p>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" disabled className="rounded-xl h-10 px-6 border-primary/10 font-bold opacity-50">Previous</Button>
-            <Button variant="outline" size="sm" className="rounded-xl h-10 px-6 border-primary/10 hover:border-primary/30 hover:bg-primary/5 font-bold transition-all">Next</Button>
+        <div className="p-10 border-t border-indigo-50/50 bg-slate-50/30 backdrop-blur-sm flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="flex items-center gap-6">
+            <div className="flex flex-col">
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/40 leading-none mb-2">Total Capacity</span>
+              <p className="text-sm font-bold text-muted-foreground flex items-center gap-3">
+                Monitoring <span className="text-primary font-black px-4 py-1.5 bg-primary/10 rounded-xl text-lg shadow-sm">{filteredCourses.length}</span> live modules
+              </p>
+            </div>
+            <div className="w-[1px] h-12 bg-indigo-50" />
+            <div className="flex flex-col">
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/40 leading-none mb-2">System Status</span>
+              <p className="text-xs font-black text-emerald-500 flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                Operational
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="lg" disabled className="rounded-2xl h-14 px-10 border-indigo-100 font-black uppercase text-[10px] tracking-widest opacity-50 shadow-sm">Previous</Button>
+            <Button variant="outline" size="lg" className="rounded-2xl h-14 px-10 border-indigo-100 hover:border-primary/30 hover:bg-primary/5 font-black uppercase text-[10px] tracking-widest transition-all shadow-sm active:translate-y-1">Next Phase</Button>
           </div>
         </div>
       </div>
