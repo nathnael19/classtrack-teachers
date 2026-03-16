@@ -28,17 +28,41 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
+import { useEffect, useState } from 'react';
+import api from '@/services/api';
 
-const courses = [
-  { id: '1', name: 'Computer Science 101', code: 'CS101', students: 120, sessions: 24, status: 'Active' },
-  { id: '2', name: 'Machine Learning', code: 'CS402', students: 50, sessions: 18, status: 'Active' },
-  { id: '3', name: 'Database Management', code: 'CS301', students: 85, sessions: 20, status: 'Active' },
-  { id: '4', name: 'Software Engineering', code: 'CS305', students: 95, sessions: 22, status: 'Active' },
-  { id: '5', name: 'Intro to AI', code: 'CS205', students: 60, sessions: 15, status: 'Archived' },
-  { id: '6', name: 'Data Structures', code: 'CS201', students: 110, sessions: 25, status: 'Active' },
-];
+interface Course {
+  id: number;
+  name: string;
+  code: string;
+  lecturer_id: number;
+  students?: number; // Optional for now
+  sessions?: number; // Optional for now
+  status?: string;   // Optional for now
+}
 
 const CoursesPage = () => {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await api.get('/courses/');
+        setCourses(response.data);
+      } catch (error) {
+        console.error('Failed to fetch courses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-64">Loading courses...</div>;
+  }
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -93,18 +117,18 @@ const CoursesPage = () => {
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-muted-foreground" />
-                    <span>{course.students}</span>
+                    <span>{course.students || 0}</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-muted-foreground" />
-                    <span>{course.sessions}</span>
+                    <span>{course.sessions || 0}</span>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={course.status === 'Active' ? 'default' : 'secondary'} className={course.status === 'Active' ? 'bg-green-500/10 text-green-600 hover:bg-green-500/20 border-transparent' : ''}>
-                    {course.status}
+                  <Badge variant={(course.status || 'Active') === 'Active' ? 'default' : 'secondary'} className={(course.status || 'Active') === 'Active' ? 'bg-green-500/10 text-green-600 hover:bg-green-500/20 border-transparent' : ''}>
+                    {course.status || 'Active'}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
