@@ -15,8 +15,8 @@ const TopNav = () => {
           <Menu className="w-5 h-5" aria-hidden />
         </button>
         <div className="md:hidden font-bold flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold" aria-hidden>G</div>
-          <span>GeoAttend</span>
+          <div className="w-6 h-6 rounded-lg bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold" aria-hidden>C</div>
+          <span className="tracking-tight">ClassTrack</span>
         </div>
 
         <div className="hidden md:block relative">
@@ -27,7 +27,7 @@ const TopNav = () => {
             type="search"
             placeholder="Search courses, sessions..."
             autoComplete="off"
-            className="w-56 lg:w-64 pl-9 pr-4 py-2 text-sm bg-muted/50 border border-transparent rounded-full focus:bg-background focus:border-primary/30 focus:ring-2 focus:ring-primary/20 transition-all"
+            className="w-56 lg:w-64 pl-9 pr-4 py-2 text-sm bg-muted/50 border border-transparent rounded-full focus:bg-background focus:border-primary/30 focus:ring-2 focus:ring-primary/20 transition-all font-sans"
             aria-label="Search courses and sessions"
           />
         </div>
