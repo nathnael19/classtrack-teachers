@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   Search, 
   Download, 
@@ -8,7 +8,12 @@ import {
   Calendar,
   ChevronDown,
   Loader2,
-  Clock
+  Clock,
+  Filter,
+  Zap,
+  ArrowUpRight,
+  Database,
+  ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,6 +40,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
 import api from '@/services/api';
 
 // --- Types ---
@@ -46,162 +52,193 @@ interface ReportSession {
   present: number;
   total: number;
   rate: string;
-  lecturer?: string;
+}
+
+interface Course {
+  id: number;
+  name: string;
+  code: string;
 }
 
 const ReportsPage = () => {
-  const [reports, setReports] = useState<ReportSession[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCourse, setSelectedCourse] = useState('all');
   const [isExporting, setIsExporting] = useState(false);
 
-  useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const res = await api.get('/analytics/sessions-report');
-        setReports(res.data);
-      } catch (error) {
-        console.error('Error fetching reports:', error);
-        toast.error('Failed to load reports.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchReports();
-  }, []);
+  // --- Queries ---
+  const { data: courses = [] } = useQuery<Course[]>({
+    queryKey: ['courses-list'],
+    queryFn: async () => (await api.get('/courses')).data,
+  });
+
+  const { data: reports = [], isLoading } = useQuery<ReportSession[]>({
+    queryKey: ['reports-list', searchTerm, selectedCourse],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (searchTerm) params.append('q', searchTerm);
+      if (selectedCourse !== 'all') params.append('course_id', selectedCourse);
+      
+      return (await api.get(`/analytics/sessions-report?${params.toString()}`)).data;
+    },
+  });
 
   const handleExport = (type: string) => {
     setIsExporting(true);
     const promise = new Promise(resolve => setTimeout(resolve, 1500));
     toast.promise(promise, {
-      loading: `Preparing ${type} file...`,
-      success: `Report exported as ${type}!`,
+      loading: `Preparing ${type} export logic...`,
+      success: `Reports compiled successfully as ${type}!`,
       error: 'Failed to export report.',
     });
     promise.finally(() => setIsExporting(false));
   };
 
-  if (loading) {
+  if (isLoading && reports.length === 0) {
     return (
-      <div className="flex h-[80vh] items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="flex flex-col h-[70vh] items-center justify-center gap-6">
+        <div className="relative">
+          <Loader2 className="w-16 h-16 animate-spin text-primary opacity-20" />
+          <Database className="w-8 h-8 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+        </div>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Synchronizing Records Hub...</p>
       </div>
     );
   }
 
   return (
-    <div className="relative animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Background Decorative Blobs */}
-      <div className="absolute top-0 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10" />
-      <div className="absolute bottom-40 -left-20 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl -z-10" />
+    <div className="relative animate-in fade-in duration-700 max-w-7xl mx-auto px-4 pb-20">
+      {/* Structural Backdrop */}
+      <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] -z-10" />
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-emerald-600 bg-clip-text text-transparent">Attendance Reports</h1>
-          <p className="text-muted-foreground mt-2 text-lg">In-depth insights and historical data exports.</p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-10 mb-16 pt-8">
+        <div className="space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em]">
+            <Zap className="w-3 h-3 fill-current" />
+            Live Historical Stream
+          </div>
+          <h1 className="text-6xl font-black tracking-tighter text-slate-900 leading-tight">
+            Reports <span className="italic text-primary">Hub</span>
+          </h1>
+          <p className="text-slate-500 text-xl font-medium max-w-xl">
+            Multi-dimensional lookup and forensic analysis of institutional attendance parameters.
+          </p>
         </div>
-        <div className="flex gap-3">
+
+        <div className="flex gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button disabled={isExporting} variant="outline" className="rounded-full px-6 border-primary/20 hover:bg-primary/5 hover:text-primary transition-all gap-3 shadow-sm">
-                <Download className="w-5 h-5" />
-                <span className="font-bold">Export Data</span>
-                <ChevronDown className="w-4 h-4 opacity-50" />
+              <Button disabled={isExporting} className="rounded-3xl h-14 px-8 bg-slate-900 hover:bg-slate-800 text-white transition-all gap-4 shadow-2xl shadow-slate-900/20 border-none group">
+                <Download className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
+                <span className="font-black uppercase tracking-widest text-xs">Export Intelligence</span>
+                <ChevronDown className="w-4 h-4 opacity-40" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 rounded-2xl border-primary/10 backdrop-blur-xl bg-white/80 p-2 shadow-2xl">
-              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase text-muted-foreground tracking-widest">Format Options</DropdownMenuLabel>
-              <DropdownMenuItem className="rounded-xl gap-3 py-3 cursor-pointer hover:bg-emerald-50 focus:bg-emerald-50 group" onClick={() => handleExport('CSV')}>
-                <div className="p-2 bg-emerald-100 rounded-lg text-emerald-600 group-hover:scale-110 transition-transform">
-                  <FileSpreadsheet className="w-4 h-4" />
-                </div>
-                <span className="font-bold">Spreadsheet (CSV)</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-xl gap-3 py-3 cursor-pointer hover:bg-indigo-50 focus:bg-indigo-50 group" onClick={() => handleExport('Excel')}>
-                <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600 group-hover:scale-110 transition-transform">
-                  <FileSpreadsheet className="w-4 h-4" />
-                </div>
-                <span className="font-bold">Excel (XLSX)</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-xl gap-3 py-3 cursor-pointer hover:bg-rose-50 focus:bg-rose-50 group" onClick={() => handleExport('PDF')}>
-                <div className="p-2 bg-rose-100 rounded-lg text-rose-600 group-hover:scale-110 transition-transform">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <span className="font-bold">Document (PDF)</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-xl gap-3 py-3 cursor-pointer hover:bg-blue-50 focus:bg-blue-50 group" onClick={() => handleExport('JSON')}>
-                <div className="p-2 bg-blue-100 rounded-lg text-blue-600 group-hover:scale-110 transition-transform">
-                  <FileJson className="w-4 h-4" />
-                </div>
-                <span className="font-bold">Data Object (JSON)</span>
-              </DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-64 rounded-[2rem] border-primary/10 backdrop-blur-2xl bg-white/90 p-3 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.15)]">
+              <DropdownMenuLabel className="px-4 py-3 text-[10px] font-black uppercase text-slate-400 tracking-[0.3em]">Format Architecture</DropdownMenuLabel>
+              {[
+                { label: 'Spreadsheet (CSV)', type: 'CSV', icon: FileSpreadsheet, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                { label: 'Excel (XLSX)', type: 'XLSX', icon: FileSpreadsheet, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                { label: 'Document (PDF)', type: 'PDF', icon: FileText, color: 'text-rose-500', bg: 'bg-rose-500/10' },
+                { label: 'Data Object (JSON)', type: 'JSON', icon: FileJson, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+              ].map((opt) => (
+                <DropdownMenuItem key={opt.type} className="rounded-2xl gap-4 py-4 cursor-pointer focus:bg-slate-100 group transition-all" onClick={() => handleExport(opt.type)}>
+                  <div className={`p-2.5 ${opt.bg} ${opt.color} rounded-xl group-hover:scale-110 transition-transform`}>
+                    <opt.icon className="w-4 h-4" />
+                  </div>
+                  <span className="font-bold text-slate-900 tracking-tight">{opt.label}</span>
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
 
-      <div className="glass-card rounded-[2.5rem] overflow-hidden">
-        <div className="p-8 border-b border-white/20 bg-white/10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-          <div className="flex flex-1 items-center gap-6">
-            <div className="relative flex-1 max-w-sm group">
-              <Search className="w-5 h-5 text-muted-foreground absolute left-4 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors" />
+      <div className="glass-card rounded-[3.5rem] overflow-hidden border-none bg-white/40 shadow-2xl shadow-indigo-500/5">
+        <div className="p-10 border-b border-slate-100 bg-white/20 backdrop-blur-md flex flex-col lg:flex-row lg:items-center justify-between gap-10">
+          <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-6">
+            <div className="relative flex-1 max-w-md group">
+              <Search className="w-5 h-5 text-slate-400 absolute left-5 top-1/2 -translate-y-1/2 group-focus-within:text-primary transition-colors" />
               <Input 
-                placeholder="Search courses, dates..." 
-                className="pl-12 h-12 bg-white/40 border-none rounded-2xl shadow-inner focus-visible:ring-2 focus-visible:ring-primary/20 placeholder:text-muted-foreground/50 font-medium" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search module code, name, or room..." 
+                className="pl-14 h-16 bg-white border-none rounded-3xl shadow-xl shadow-slate-200/50 focus-visible:ring-2 focus-visible:ring-primary/20 placeholder:text-slate-300 font-bold text-slate-900 tracking-tight" 
               />
             </div>
-            <Select defaultValue="all">
-              <SelectTrigger className="w-[200px] h-12 border-none bg-white/40 rounded-2xl shadow-inner focus:ring-2 focus:ring-primary/20 font-bold">
-                <SelectValue placeholder="All Courses" />
-              </SelectTrigger>
-              <SelectContent className="rounded-2xl border-primary/10 backdrop-blur-xl bg-white/80">
-                <SelectItem value="all" className="rounded-xl font-bold">All Courses</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center gap-3">
-             <div className="flex items-center gap-2 px-6 py-3 bg-primary/10 rounded-2xl text-xs font-black text-primary uppercase tracking-widest shadow-sm">
-              <Calendar className="w-4 h-4" />
-              Full History
+            
+            <div className="flex items-center gap-4">
+              <div className="p-4 bg-white rounded-2xl shadow-lg shadow-slate-200/50">
+                <Filter className="w-5 h-5 text-slate-400" />
+              </div>
+              <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+                <SelectTrigger className="w-[240px] h-16 border-none bg-white rounded-3xl shadow-xl shadow-slate-200/50 focus:ring-2 focus:ring-primary/20 font-black uppercase text-[10px] tracking-widest text-slate-600 px-6">
+                  <SelectValue placeholder="All Operations" />
+                </SelectTrigger>
+                <SelectContent className="rounded-3xl border-primary/10 backdrop-blur-2xl bg-white/90 p-2">
+                  <SelectItem value="all" className="rounded-2xl font-black uppercase text-[10px] tracking-widest py-3 cursor-pointer">All Operations</SelectItem>
+                  {courses.map(course => (
+                    <SelectItem key={course.id} value={String(course.id)} className="rounded-2xl font-black uppercase text-[10px] tracking-widest py-3 cursor-pointer">
+                      {course.code}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+          </div>
+          
+          <div className="flex items-center gap-4 px-8 py-4 bg-emerald-500/10 rounded-3xl text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em] border border-emerald-500/20">
+             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+             Live Indexing Active
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-muted/5">
-              <TableRow className="hover:bg-transparent border-b border-border/20">
-                <TableHead className="px-8 py-6 font-black uppercase text-xs tracking-widest text-muted-foreground">Course Module</TableHead>
-                <TableHead className="px-8 py-6 font-black uppercase text-xs tracking-widest text-muted-foreground">Session Timestamp</TableHead>
-                <TableHead className="px-8 py-6 font-black uppercase text-xs tracking-widest text-muted-foreground hidden md:table-cell">Facility</TableHead>
-                <TableHead className="px-8 py-6 font-black uppercase text-xs tracking-widest text-muted-foreground">Performance</TableHead>
-                <TableHead className="px-8 py-6 font-black uppercase text-xs tracking-widest text-muted-foreground text-right">Options</TableHead>
+            <TableHeader className="bg-slate-50/50">
+              <TableRow className="hover:bg-transparent border-none">
+                <TableHead className="px-10 py-8 font-black uppercase text-[9px] tracking-[0.3em] text-slate-400">Tactical Module</TableHead>
+                <TableHead className="px-10 py-8 font-black uppercase text-[9px] tracking-[0.3em] text-slate-400">Temporal Stamp</TableHead>
+                <TableHead className="px-10 py-8 font-black uppercase text-[9px] tracking-[0.3em] text-slate-400 hidden md:table-cell">Coordinate Hub</TableHead>
+                <TableHead className="px-10 py-8 font-black uppercase text-[9px] tracking-[0.3em] text-slate-400">Integrity Vector</TableHead>
+                <TableHead className="px-10 py-8 font-black uppercase text-[9px] tracking-[0.3em] text-slate-400 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {reports.map((report) => (
-                <tr key={report.id} className="group hover:bg-primary/[0.03] transition-all duration-300 border-b border-border/10">
-                  <TableCell className="px-8 py-6">
-                    <div className="font-black text-base group-hover:text-primary transition-colors">{report.course}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5 font-medium opacity-60">ID: CT-{report.id}</div>
-                  </TableCell>
-                  <TableCell className="px-8 py-6 text-muted-foreground font-bold whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                       <Clock className="w-4 h-4 opacity-30" />
-                       {new Date(report.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                <TableRow key={report.id} className="group hover:bg-white/60 transition-all duration-500 border-b border-slate-50">
+                  <TableCell className="px-10 py-8">
+                    <div className="font-black text-lg group-hover:text-primary transition-colors tracking-tighter text-slate-900">{report.course}</div>
+                    <div className="flex items-center gap-2 mt-1">
+                       <span className="text-[9px] font-black px-2 py-0.5 bg-slate-100 rounded text-slate-400 uppercase tracking-widest leading-none">V-0{report.id}</span>
+                       <span className="text-[9px] font-bold text-slate-300 uppercase tracking-tighter">Verified Protocol</span>
                     </div>
                   </TableCell>
-                  <TableCell className="px-8 py-6 hidden md:table-cell font-black text-xs text-muted-foreground/60 uppercase tracking-wide">
-                    {report.classroom ?? 'Remote / N/A'}
+                  <TableCell className="px-10 py-8 text-slate-500 font-bold whitespace-nowrap">
+                    <div className="flex flex-col">
+                       <div className="flex items-center gap-2 text-slate-900">
+                          <Calendar className="w-4 h-4 text-primary" />
+                          <span className="tracking-tight">{new Date(report.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                       </div>
+                       <span className="text-[10px] text-slate-400 mt-1 pl-6">TIMESTAMP: {new Date(report.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
                   </TableCell>
-                  <TableCell className="px-8 py-6">
-                    <div className="flex items-center gap-6">
-                      <div className="flex flex-col gap-1">
-                         <span className="font-black text-lg text-glow leading-none">{report.rate}</span>
-                         <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-40">{report.present} / {report.total}</span>
+                  <TableCell className="px-10 py-8 hidden md:table-cell">
+                    <div className="flex items-center gap-3">
+                       <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center">
+                          <Clock className="w-4 h-4 text-slate-400" />
+                       </div>
+                       <span className="font-black text-[11px] text-slate-500 uppercase tracking-widest">{report.classroom ?? 'Remote Data Link'}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-10 py-8">
+                    <div className="flex items-center gap-8">
+                      <div className="flex flex-col">
+                         <span className="font-black text-2xl text-slate-900 tracking-tighter leading-none">{report.rate}</span>
+                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2 italic shadow-primary">{report.present} / {report.total} UNITS</span>
                       </div>
-                      <div className="w-24 h-2.5 bg-muted/40 rounded-full overflow-hidden hidden sm:block shadow-inner ring-1 ring-black/5">
+                      <div className="w-32 h-3 bg-slate-100 rounded-full overflow-hidden hidden sm:block shadow-inner p-0.5">
                         <div 
-                          className={`h-full rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-primary to-emerald-400`} 
+                          className={`h-full rounded-full transition-all duration-1000 ease-out bg-primary group-hover:shadow-[0_0_15px_rgba(var(--primary),0.5)]`} 
                           style={{width: report.rate}}
                         >
                           <div className="w-full h-full bg-white/20 animate-pulse" />
@@ -209,19 +246,24 @@ const ReportsPage = () => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="px-8 py-6 text-right whitespace-nowrap">
-                    <Button variant="ghost" size="sm" className="rounded-full w-10 h-10 p-0 hover:bg-primary hover:text-white transition-all shadow-sm">
-                      <FileText className="w-5 h-5" />
+                  <TableCell className="px-10 py-8 text-right whitespace-nowrap">
+                    <Button variant="ghost" className="rounded-2xl h-12 w-12 p-0 hover:bg-primary hover:text-white hover:rotate-12 transition-all shadow-sm">
+                      <ArrowUpRight className="w-5 h-5" />
                     </Button>
                   </TableCell>
-                </tr>
+                </TableRow>
               ))}
               {reports.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-64 text-center">
-                    <div className="flex flex-col items-center justify-center gap-3 opacity-30">
-                       <FileText className="w-12 h-12" />
-                       <span className="font-bold text-lg">No sequence of data found</span>
+                  <TableCell colSpan={5} className="h-96 text-center border-none hover:bg-transparent">
+                    <div className="flex flex-col items-center justify-center gap-6 opacity-20 group">
+                       <div className="p-8 rounded-[3rem] bg-slate-100 group-hover:scale-110 transition-transform duration-700">
+                          <Database className="w-20 h-20 text-slate-400" />
+                       </div>
+                       <div className="space-y-2">
+                          <span className="font-black text-2xl uppercase tracking-tighter text-slate-900">Zero Data Sequences</span>
+                          <p className="font-bold text-xs uppercase tracking-[0.3em] text-slate-400">No matching telemetry found in active indexed registers</p>
+                       </div>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -230,15 +272,22 @@ const ReportsPage = () => {
           </Table>
         </div>
 
-        <div className="p-8 border-t border-white/20 bg-muted/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="text-sm font-bold text-muted-foreground">
-            Analyzing <span className="text-primary font-black px-2 py-1 bg-primary/10 rounded-md">{reports.length}</span> historical sessions
+        <div className="p-10 border-t border-slate-100 bg-slate-50/50 backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="flex items-center gap-4">
+             <div className="px-6 py-3 bg-white rounded-2xl shadow-lg shadow-slate-200/50 flex items-center gap-4 border border-white">
+                <span className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Active Records</span>
+                <span className="text-xl font-black text-primary leading-none tabular-nums">{reports.length}</span>
+             </div>
+             <div className="px-6 py-3 bg-white rounded-2xl shadow-lg shadow-slate-200/50 flex items-center gap-2 border border-white">
+                <ExternalLink className="w-4 h-4 text-slate-300" />
+                <span className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Total History</span>
+             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             {[1, 2, 3].map(i => (
-              <div key={i} className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold cursor-pointer transition-all ${i === 1 ? 'bg-primary text-white shadow-lg' : 'hover:bg-primary/5 text-muted-foreground hover:text-primary'}`}>
+              <Button key={i} variant="outline" className={`w-12 h-12 rounded-2xl border-none shadow-xl transition-all font-black text-xs ${i === 1 ? 'bg-primary text-white shadow-primary/20' : 'bg-white text-slate-400 hover:bg-primary/5 hover:text-primary'}`}>
                 {i}
-              </div>
+              </Button>
             ))}
           </div>
         </div>
