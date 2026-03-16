@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
   BarChart,
   Bar,
@@ -11,28 +10,29 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell,
-  Legend
+  Cell
 } from 'recharts';
 import {
   TrendingUp,
   Calendar,
   Award,
-  ArrowDown,
   Loader2,
   Activity,
   Clock,
-
+  Zap,
+  ShieldCheck,
+  BrainCircuit,
+  PieChart as PieChartIcon
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import api from '@/services/api';
 
 // --- Types ---
 interface ChartDataPoint {
   name: string;
   rate: number;
-  rate2?: number;
+  rate2: number;
 }
-// ... rest of the file stays same until chart lines ...
 
 interface CourseDistribution {
   name: string;
@@ -48,224 +48,350 @@ interface DashboardStats {
   is_positive: boolean;
 }
 
-const AnalyticsPage = () => {
-  const [trendData, setTrendData] = useState<ChartDataPoint[]>([]);
-  const [distributionData, setDistributionData] = useState<CourseDistribution[]>([]);
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+interface EngagementPoint {
+  name: string;
+  value: number;
+  color: string;
+}
 
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const [trendRes, distRes, statsRes] = await Promise.all([
-          api.get('/analytics/weekly-trend'),
-          api.get('/analytics/course-distribution'),
-          api.get('/analytics/dashboard'),
-        ]);
-        setTrendData(trendRes.data);
-        setDistributionData(distRes.data);
-        setStats(statsRes.data);
-      } catch (error) {
-        console.error('Error fetching analytics:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAnalytics();
-  }, []);
+interface PeakPeriod {
+  time: string;
+  volume: number;
+  icon: string;
+  color: string;
+}
+
+const AnalyticsPage = () => {
+  // --- Queries ---
+  const { data: stats, isLoading: isLoadingStats } = useQuery<DashboardStats>({
+    queryKey: ['analytics-dashboard'],
+    queryFn: async () => (await api.get('/analytics/dashboard')).data,
+  });
+
+  const { data: trendData = [], isLoading: isLoadingTrend } = useQuery<ChartDataPoint[]>({
+    queryKey: ['analytics-trend'],
+    queryFn: async () => (await api.get('/analytics/weekly-trend')).data,
+  });
+
+  const { data: distributionData = [], isLoading: isLoadingDist } = useQuery<CourseDistribution[]>({
+    queryKey: ['analytics-dist'],
+    queryFn: async () => (await api.get('/analytics/course-distribution')).data,
+  });
+
+  const { data: engagementData = [], isLoading: isLoadingEngagement } = useQuery<EngagementPoint[]>({
+    queryKey: ['analytics-engagement'],
+    queryFn: async () => (await api.get('/analytics/engagement-profile')).data,
+  });
+
+  const { data: peakPeriods = [], isLoading: isLoadingPeak } = useQuery<PeakPeriod[]>({
+    queryKey: ['analytics-peak'],
+    queryFn: async () => (await api.get('/analytics/peak-periods')).data,
+  });
+
+  const isLoading = isLoadingStats || isLoadingTrend || isLoadingDist || isLoadingEngagement || isLoadingPeak;
 
   const metrics = [
-    { title: 'Avg. Attendance', value: `${stats?.avg_attendance_rate ?? 0}%`, icon: TrendingUp, color: 'text-emerald-600', bg: 'bg-emerald-100' },
-    { title: 'Total Courses', value: String(stats?.total_courses ?? 0), icon: Calendar, color: 'text-indigo-600', bg: 'bg-indigo-100' },
-    { title: 'Top Performer', value: distributionData[0]?.name ?? 'N/A', icon: Award, color: 'text-amber-600', bg: 'bg-amber-100' },
-    { title: 'Total Sessions', value: String(stats?.active_sessions_today ?? 0), icon: ArrowDown, color: 'text-rose-600', bg: 'bg-rose-100' },
+    { title: 'Efficiency Index', value: `${stats?.avg_attendance_rate ?? 0}%`, label: stats?.attendance_change, icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+    { title: 'Module Volume', value: String(stats?.total_courses ?? 0), label: 'Active Curriculums', icon: Calendar, color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' },
+    { title: 'Top Performance', value: distributionData[0]?.name ?? '0.0', label: 'Unit Identifier', icon: Award, color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
+    { title: 'Session Vectors', value: String(stats?.active_sessions_today ?? 0), label: 'Daily Operations', icon: Activity, color: 'text-rose-500', bg: 'bg-rose-500/10', border: 'border-rose-500/20' },
   ];
 
-  const participationData = [
-    { name: 'On Time', value: 85, color: '#10b981' },
-    { name: 'Late', value: 10, color: '#f59e0b' },
-    { name: 'Absent', value: 5, color: '#ef4444' },
-  ];
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="flex h-[80vh] items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="flex flex-col h-[70vh] items-center justify-center gap-6">
+        <div className="relative">
+          <Loader2 className="w-16 h-16 animate-spin text-primary opacity-20" />
+          <BrainCircuit className="w-8 h-8 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+        </div>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Aggregating Intelligence Vectors...</p>
       </div>
     );
   }
 
   return (
-    <div className="relative animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Background Decorative Blobs */}
-      <div className="absolute top-0 -left-20 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10" />
-      <div className="absolute bottom-0 -right-20 w-80 h-80 bg-emerald-500/5 rounded-full blur-3xl -z-10" />
+    <div className="relative animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-7xl mx-auto px-4 pb-20">
+      {/* Dynamic Grid Background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] -z-10" />
 
-      <div className="mb-10">
-        <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-emerald-500 bg-clip-text text-transparent">Analytics Insights</h1>
-        <p className="text-muted-foreground mt-2 text-lg">Detailed visualization of attendance performance metrics.</p>
+      <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-4">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em]">
+            <Zap className="w-3 h-3 fill-current" />
+            Live Intelligence Stream
+          </div>
+          <h1 className="text-6xl font-black tracking-tighter text-slate-900 leading-tight">
+            Data <span className="italic text-primary">Nexus</span>
+          </h1>
+          <p className="text-slate-500 text-xl font-medium max-w-xl">
+            Real-time multi-dimensional analysis of institutional attendance performance and student engagement.
+          </p>
+        </div>
+        <div className="flex items-center gap-4 bg-white/50 backdrop-blur-xl p-2 rounded-3xl border border-white shadow-xl">
+           <div className="p-4 bg-indigo-900 rounded-2xl text-white shadow-lg shadow-indigo-500/20">
+              <ShieldCheck className="w-6 h-6" />
+           </div>
+           <div className="pr-6">
+              <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">System Integrity</span>
+              <div className="flex items-center gap-2">
+                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                 <span className="font-black text-slate-900 tracking-tight">Active & Secure</span>
+              </div>
+           </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
         {metrics.map((metric, i) => (
-          <div key={i} className="glass-card p-6 flex flex-col group cursor-pointer hover:border-primary/20 transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`p-3 rounded-2xl ${metric.bg} ${metric.color} transition-transform group-hover:scale-110 duration-300`}>
-                <metric.icon className="w-6 h-6" />
+          <div key={i} className={`glass-card p-8 group relative overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/10 border-none bg-white/40`}>
+            {/* Hover Decor */}
+            <div className={`absolute top-0 right-0 w-24 h-24 ${metric.bg} rounded-full blur-3xl -mr-10 -mt-10 opacity-0 group-hover:opacity-100 transition-opacity`} />
+            
+            <div className="relative space-y-6">
+              <div className="flex items-center justify-between">
+                <div className={`p-4 rounded-2xl ${metric.bg} ${metric.color} shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                  <metric.icon className="w-6 h-6" />
+                </div>
+                <div className="h-1 w-12 bg-slate-100 rounded-full overflow-hidden">
+                   <div className={`h-full ${metric.bg} translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-1000 delay-100`} />
+                </div>
               </div>
-              <Activity className="w-4 h-4 text-muted-foreground/30" />
+              <div>
+                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">{metric.title}</h3>
+                <div className="flex items-end gap-3">
+                  <span className="text-4xl font-black tracking-tighter text-slate-900">{metric.value}</span>
+                  <span className={`text-[10px] font-bold mb-1.5 ${metric.color} opacity-60`}>/ LIVE</span>
+                </div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 flex items-center gap-1.5">
+                   <span className={`w-1 h-1 rounded-full ${metric.bg}`} />
+                   {metric.label}
+                </p>
+              </div>
             </div>
-            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{metric.title}</h3>
-            <div className="text-3xl font-bold mt-2 tracking-tight text-glow">{metric.value}</div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-        <div className="glass-card p-8 rounded-3xl">
-          <div className="mb-8">
-            <h2 className="text-xl font-bold tracking-tight">Attendance by Course</h2>
-            <p className="text-sm text-muted-foreground mt-1">Total student volume per active course module.</p>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mb-10">
+        <div className="lg:col-span-12 glass-card p-12 rounded-[3.5rem] bg-white/60">
+           <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
+              <div>
+                <h2 className="text-3xl font-black tracking-tight text-slate-900 uppercase italic">Attendance Spectrum</h2>
+                <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Temporal Efficiency Comparison</p>
+              </div>
+              <div className="flex gap-4 p-1.5 bg-slate-100/50 rounded-2xl backdrop-blur-md">
+                 <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm">
+                    <div className="w-2 h-2 rounded-full bg-primary" />
+                    <span className="text-[10px] font-black uppercase">Current Week</span>
+                 </div>
+                 <div className="flex items-center gap-2 px-4 py-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span className="text-[10px] font-black uppercase text-slate-400">Previous Phase</span>
+                 </div>
+              </div>
+           </div>
+           
+           <div className="h-[28rem] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={trendData}>
+                <defs>
+                   <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.2} />
+                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                   </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="hsl(var(--muted-foreground))" opacity={0.1} />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }} 
+                  dy={20}
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#64748b', fontSize: 10, fontWeight: 900 }} 
+                  dx={-20} 
+                  domain={[0, 100]} 
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(16px)',
+                    borderRadius: '24px',
+                    border: '1px solid rgba(226, 232, 240, 0.8)',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
+                    padding: '16px'
+                  }}
+                  itemStyle={{ fontSize: '12px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="rate2" 
+                  stroke="#10b981" 
+                  strokeWidth={2} 
+                  strokeDasharray="8 8"
+                  dot={false}
+                  animationDuration={2000}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="rate" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={6} 
+                  dot={{ r: 0 }} 
+                  activeDot={{ r: 8, strokeWidth: 4, fill: 'white', stroke: 'hsl(var(--primary))' }} 
+                  animationDuration={1500} 
+                />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
-          <div className="h-80">
+        </div>
+
+        <div className="lg:col-span-8 glass-card p-12 rounded-[3.5rem] bg-indigo-900 text-white relative overflow-hidden">
+           <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-primary/20 rounded-full blur-[100px] -mr-40 -mt-40 animate-pulse" />
+           
+           <div className="relative mb-16">
+              <h2 className="text-3xl font-black tracking-tight uppercase italic">Institutional Distribution</h2>
+              <p className="text-white/40 font-bold uppercase tracking-widest text-[10px] mt-2">Attendance Volume per Registered Module</p>
+           </div>
+           
+           <div className="relative h-[25rem] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={distributionData}>
                 <defs>
-                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="barGradientNexus" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="hsl(var(--primary))" />
-                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.6} />
+                    <stop offset="100%" stopColor="#818cf8" />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} dx={-10} domain={[0, 'auto']} />
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="white" opacity={0.05} />
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 900 }} 
+                  dy={15} 
+                />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 900 }} 
+                  dx={-15} 
+                />
                 <Tooltip
-                  cursor={{ fill: 'hsl(var(--primary) / 0.05)', radius: 8 }}
+                  cursor={{ fill: 'white', opacity: 0.05, radius: 20 }}
                   contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(8px)',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(255,255,255,0.4)',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: '24px',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                    padding: '16px'
                   }}
                 />
-                <Bar dataKey="students" fill="url(#barGradient)" radius={[8, 8, 0, 0]} barSize={40} animationDuration={1500} />
+                <Bar 
+                  dataKey="students" 
+                  fill="url(#barGradientNexus)" 
+                  radius={[16, 16, 16, 16]} 
+                  barSize={50} 
+                  animationDuration={2000} 
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="glass-card p-8 rounded-3xl">
-          <div className="mb-8">
-            <h2 className="text-xl font-bold tracking-tight">Attendance Trajectory</h2>
-            <p className="text-sm text-muted-foreground mt-1">Visualizing participation rates over the past week.</p>
-          </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} dx={-10} domain={[0, 100]} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    backdropFilter: 'blur(8px)',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(255,255,255,0.4)',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-                  }}
-                />
-                <Legend verticalAlign="top" height={36} iconType="circle" />
-                <Line type="monotone" dataKey="rate" stroke="#10b981" strokeWidth={4} dot={{ r: 6, fill: 'white', strokeWidth: 2 }} activeDot={{ r: 8, strokeWidth: 0, fill: '#10b981' }} animationDuration={1000} />
-                <Line type="monotone" dataKey="rate2" stroke="hsl(var(--primary))" strokeWidth={4} dot={{ r: 6, fill: 'white', strokeWidth: 2 }} activeDot={{ r: 8, strokeWidth: 0, fill: 'hsl(var(--primary))' }} animationDuration={1200} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="glass-card p-8 rounded-3xl lg:col-span-1">
-          <div className="mb-6">
-            <h2 className="text-xl font-bold tracking-tight text-center">Engagement Profile</h2>
-            <p className="text-xs text-muted-foreground mt-1 text-center">Student arrival status breakdown.</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="h-64 w-full">
+        <div className="lg:col-span-4 glass-card p-12 rounded-[3.5rem] bg-white/60">
+           <div className="mb-12 text-center">
+              <div className="inline-flex p-4 rounded-3xl bg-primary/10 text-primary mb-6">
+                 <PieChartIcon className="w-8 h-8" />
+              </div>
+              <h2 className="text-2xl font-black tracking-tight text-slate-900 uppercase">Engagement</h2>
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2"> Arrival Protocol Accuracy </p>
+           </div>
+           
+           <div className="flex flex-col items-center">
+            <div className="h-72 w-full relative">
+              <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-2">
+                 <span className="text-4xl font-black text-slate-900 tracking-tighter">82%</span>
+                 <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">On Protocol</span>
+              </div>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={participationData}
+                    data={engagementData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={65}
-                    outerRadius={85}
-                    paddingAngle={8}
+                    innerRadius={75}
+                    outerRadius={95}
+                    paddingAngle={10}
                     dataKey="value"
                     animationDuration={1500}
+                    stroke="none"
                   >
-                    {participationData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                    {engagementData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                      backdropFilter: 'blur(8px)',
-                      borderRadius: '12px',
-                      border: '1px solid rgba(255,255,255,0.4)',
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+                     contentStyle={{
+                      backgroundColor: 'white',
+                      borderRadius: '20px',
+                      border: 'none',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
+                      fontWeight: 900
                     }}
                   />
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="grid grid-cols-1 gap-3 w-full mt-4 px-4">
-              {participationData.map((item, i) => (
-                <div key={i} className="flex items-center justify-between p-2 rounded-xl bg-muted/20">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                    <span className="text-sm font-bold">{item.name}</span>
+            <div className="grid grid-cols-1 gap-4 w-full mt-10">
+              {engagementData.map((item, i) => (
+                <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100/50 group hover:border-primary/20 transition-all">
+                  <div className="flex items-center gap-4">
+                    <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: item.color }} />
+                    <span className="text-[11px] font-black uppercase tracking-wider text-slate-500">{item.name}</span>
                   </div>
-                  <span className="text-sm font-black tabular-nums">{item.value}%</span>
+                  <span className="text-sm font-black text-slate-900 tabular-nums">{item.value}%</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
+      </div>
 
-        <div className="glass-card p-8 rounded-3xl lg:col-span-2">
-          <div className="mb-8">
-            <h2 className="text-xl font-bold tracking-tight">Daily Peak Periods</h2>
-            <p className="text-sm text-muted-foreground mt-1">Average student arrival volume by time segment.</p>
+      <div className="glass-card p-12 rounded-[3.5rem] bg-white/60">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
+          <div>
+            <h2 className="text-3xl font-black tracking-tight text-slate-900 uppercase italic">Peak Velocity Periods</h2>
+            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Institutional Arrival Frequency Mapping</p>
           </div>
-          <div className="space-y-6">
-            {[
-              { time: '08:00 AM', volume: 95, icon: Clock, color: 'from-emerald-400 to-emerald-600' },
-              { time: '10:00 AM', volume: 88, icon: Clock, color: 'from-blue-400 to-blue-600' },
-              { time: '12:00 PM', volume: 65, icon: Clock, color: 'from-amber-400 to-amber-600' },
-              { time: '02:00 PM', volume: 72, icon: Clock, color: 'from-indigo-400 to-indigo-600' },
-              { time: '04:00 PM', volume: 45, icon: Clock, color: 'from-rose-400 to-rose-600' },
-            ].map((item, i) => (
-              <div key={i} className="group">
-                <div className="flex justify-between items-center text-sm font-bold mb-2">
-                  <div className="flex items-center gap-2">
-                    <item.icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                    <span>{item.time}</span>
-                  </div>
-                  <span className="text-glow transition-all group-hover:scale-110">{item.volume}% Average</span>
-                </div>
-                <div className="w-full h-3 bg-muted/30 rounded-full relative overflow-hidden shadow-inner border border-white/5">
-                  <div
-                    className={`absolute inset-y-0 left-0 bg-gradient-to-r ${item.color} rounded-full transition-all duration-1000 ease-out`}
-                    style={{ width: `${item.volume}%` }}
-                  >
-                    <div className="absolute inset-0 bg-white/20 animate-pulse" />
-                  </div>
+          <div className="p-3 bg-slate-100 rounded-2xl">
+             <Clock className="w-6 h-6 text-slate-400" />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
+          {peakPeriods.map((item, i) => (
+            <div key={i} className="space-y-6 group">
+              <div className="flex flex-col gap-1">
+                 <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-black uppercase text-slate-400">{item.time}</span>
+                    <span className="text-lg font-black text-slate-900">{item.volume}%</span>
+                 </div>
+              </div>
+              <div className="h-48 w-full bg-slate-100/50 rounded-3xl relative overflow-hidden border border-slate-100">
+                <div
+                  className={`absolute bottom-0 inset-x-0 bg-gradient-to-t ${item.color} transition-all duration-1000 ease-out flex items-start justify-center pt-4`}
+                  style={{ height: `${item.volume}%` }}
+                >
+                  <Activity className="w-4 h-4 text-white/40 animate-pulse" />
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
