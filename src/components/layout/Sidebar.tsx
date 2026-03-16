@@ -10,7 +10,8 @@ import {
   Settings,
   ChevronRight,
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  LogOut
 } from 'lucide-react';
 import { useUIStore } from '@/store/uiStore';
 import { useAuthStore } from '@/store/authStore';
@@ -18,7 +19,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 const navItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
   { icon: BookOpen, label: 'Courses', path: '/courses' },
   { icon: Camera, label: 'Sessions', path: '/sessions/new' },
   { icon: Radio, label: 'Live Session', path: '/sessions/live' },
@@ -30,7 +31,7 @@ const navItems = [
 
 const Sidebar = () => {
   const { sidebarCollapsed, toggleSidebar, isMobileMenuOpen, setMobileMenuOpen } = useUIStore();
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
 
   const getInitials = (name: string) => {
     return name
@@ -140,6 +141,23 @@ const Sidebar = () => {
                 <div className="flex items-center gap-3 w-full px-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">
                   <PanelLeftClose className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                   <span className="animate-in fade-in duration-500">Collapse</span>
+                </div>
+              )}
+            </Button>
+
+            {/* Logout Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={logout}
+              className="flex w-full h-12 rounded-2xl bg-destructive/10 hover:bg-destructive/20 text-destructive hover:text-destructive transition-all border border-transparent group"
+            >
+              {sidebarCollapsed ? (
+                <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              ) : (
+                <div className="flex items-center gap-3 w-full px-4 text-xs font-bold uppercase tracking-widest">
+                  <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                  <span className="animate-in fade-in duration-500">Log out</span>
                 </div>
               )}
             </Button>
