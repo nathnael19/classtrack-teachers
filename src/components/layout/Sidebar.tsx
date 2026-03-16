@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  BookOpen, 
-  Camera, 
-  Radio, 
-  BarChart3, 
-  FileText, 
-  MapPin, 
+import {
+  LayoutDashboard,
+  BookOpen,
+  Camera,
+  Radio,
+  BarChart3,
+  FileText,
+  MapPin,
   Settings,
   ChevronRight,
   PanelLeftClose,
@@ -45,7 +45,7 @@ const Sidebar = () => {
     <>
       {/* Mobile Overlay */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden animate-in fade-in duration-300"
           onClick={() => setMobileMenuOpen(false)}
         />
@@ -68,11 +68,11 @@ const Sidebar = () => {
           )}>
             <div className="relative group/logo">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-indigo-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-primary/30 transition-all duration-300 group-hover/logo:scale-110 group-hover/logo:rotate-3 active:scale-95" aria-hidden>
-                C
+                <img src="/logo_mark.png" alt="Class Track Logo" />
               </div>
               <div className="absolute -inset-1 bg-primary/20 rounded-2xl blur opacity-0 group-hover/logo:opacity-100 transition-opacity duration-500" />
             </div>
-            
+
             {!sidebarCollapsed && (
               <div className="flex flex-col animate-in fade-in slide-in-from-left-2 duration-500">
                 <h2 className="text-2xl font-bold tracking-tight text-foreground leading-none">ClassTrack</h2>
@@ -118,7 +118,7 @@ const Sidebar = () => {
                 {!sidebarCollapsed && (
                   <ChevronRight className="w-4 h-4 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-40 group-hover:translate-x-0" />
                 )}
-                
+
                 {/* Active Reflection Effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
               </NavLink>
@@ -159,7 +159,7 @@ const Sidebar = () => {
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full shadow-sm" />
                 </div>
-                
+
                 {!sidebarCollapsed && (
                   <div className="flex flex-col min-w-0 animate-in fade-in slide-in-from-left-2 duration-500">
                     <span className="text-sm font-black text-foreground truncate group-hover:text-primary transition-colors">
@@ -171,7 +171,7 @@ const Sidebar = () => {
                   </div>
                 )}
               </div>
-              
+
               {!sidebarCollapsed && (
                 <div className="mt-4 pt-4 border-t border-border/20 flex items-center justify-between text-[9px] font-black text-muted-foreground/30 uppercase tracking-[0.3em] px-1 animate-in fade-in duration-700">
                   <span>v4.2.0</span>
