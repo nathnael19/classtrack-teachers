@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import api from '@/services/api';
+import { useAuthStore } from '@/store/authStore';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -37,6 +38,9 @@ const LoginPage = () => {
 
       const { access_token } = response.data;
       localStorage.setItem('geoattend_token', access_token);
+      
+      // Update global auth state before navigating
+      await useAuthStore.getState().fetchUser();
 
       toast.success('Access Granted. Welcome back, Admin.');
       navigate('/dashboard');
