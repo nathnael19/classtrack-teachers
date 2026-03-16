@@ -39,8 +39,9 @@ const LoginPage = () => {
       const { access_token } = response.data;
       localStorage.setItem('geoattend_token', access_token);
       
-      // Update global auth state before navigating
-      await useAuthStore.getState().fetchUser();
+      // Update global auth state with user data and token
+      const responseMe = await api.get('/users/me');
+      useAuthStore.getState().login(responseMe.data, access_token);
 
       toast.success('Access Granted. Welcome back, Admin.');
       navigate('/dashboard');
