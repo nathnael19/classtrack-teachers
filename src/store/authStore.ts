@@ -1,24 +1,28 @@
 import { create } from 'zustand';
+import api from '@/services/api';
 
 interface User {
   id: string;
   name: string;
   email: string;
-  role: 'lecturer' | 'admin';
+  role: 'student' | 'lecturer' | 'admin';
 }
 
 interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
+  fetchUser: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  user: { id: '1', name: 'Dr. Smith', email: 'smith@university.edu', role: 'lecturer' }, // Mock authenticated user
-  token: 'mock-token', // Mock token for development
-  isAuthenticated: true, 
+  user: null,
+  token: localStorage.getItem('geoattend_token'),
+  isAuthenticated: !!localStorage.getItem('geoattend_token'),
+  isLoading: false,
   login: (user, token) => {
     localStorage.setItem('geoattend_token', token);
     set({ user, token, isAuthenticated: true });
@@ -26,5 +30,17 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     localStorage.removeItem('geoattend_token');
     set({ user: null, token: null, isAuthenticated: false });
+  },
+  fetchUser: async () => {
+    set({ isLoading: true });
+    try {
+      const response = await api.get('/users/me');
+      set({ user: response.data, isAuthenticated: true });
+    } catch (error) {
+      localStorage.removeItem('geoattend_token');
+      set({ user: null, token: null, isAuthenticated: false });
+    } finally {
+      set({ isLoading: false });
+    }
   },
 }));
