@@ -28,31 +28,74 @@ import {
 } from '@/components/ui/form';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { useEffect, useState } from 'react';
+import api from '@/services/api';
 
 const formSchema = z.object({
   courseId: z.string().min(1, 'Please select a course'),
-  classroomId: z.string().min(1, 'Please select a classroom'),
+  room: z.string().min(1, 'Please select a classroom'),
   duration: z.string().min(1, 'Duration is required'),
   radius: z.string().min(1, 'Geofence radius is required'),
 });
 
+interface Course {
+  id: number;
+  name: string;
+  code: string;
+}
+
 const SessionCreationPage = () => {
   const navigate = useNavigate();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       courseId: '',
-      classroomId: '',
+      room: '',
       duration: '60',
       radius: '50',
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    toast.success('Attendance session started successfully!');
-    // Pass session data via state or use global store in real app
-    navigate('/sessions/live');
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await api.get('/courses/');
+        setCourses(response.data);
+      } catch (error) {
+        console.error('Failed to fetch courses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      const startTime = new Date();
+      const endTime = new Date(startTime.getTime() + parseInt(values.duration) * 60000);
+      
+      const payload = {
+        course_id: parseInt(values.courseId),
+        room: values.room,
+        start_time: startTime.toISOString(),
+        end_time: endTime.toISOString(),
+        qr_code_content: `SESSION-${values.courseId}-${startTime.getTime()}`,
+        latitude: 0, // In a real app, this would come from geolocation or classroom data
+        longitude: 0,
+        geofence_radius: parseFloat(values.radius),
+      };
+
+      await api.post('/sessions/', payload);
+      toast.success('Attendance session started successfully!');
+      navigate('/sessions/live');
+    } catch (error) {
+      console.error('Failed to create session:', error);
+      toast.error('Failed to start session. Please try again.');
+    }
   };
 
   return (
@@ -86,9 +129,11 @@ const SessionCreationPage = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="cs101">Computer Science 101</SelectItem>
-                              <SelectItem value="ml402">Machine Learning</SelectItem>
-                              <SelectItem value="db301">Database Management</SelectItem>
+                              {courses.map((course) => (
+                                <SelectItem key={course.id} value={course.id.toString()}>
+                                  {course.name} ({course.code})
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -97,7 +142,7 @@ const SessionCreationPage = () => {
                     />
                     <FormField
                       control={form.control}
-                      name="classroomId"
+                      name="room"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Classroom</FormLabel>
@@ -108,9 +153,9 @@ const SessionCreationPage = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="lh1">Lecture Hall 1 (Main Building)</SelectItem>
-                              <SelectItem value="lab3">Computer Lab 3 (East Wing)</SelectItem>
-                              <SelectItem value="r204">Room 204 (North Block)</SelectItem>
+                              <SelectItem value="LH1">Lecture Hall 1</SelectItem>
+                              <SelectItem value="Lab3">Computer Lab 3</SelectItem>
+                              <SelectItem value="R204">Room 204</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
