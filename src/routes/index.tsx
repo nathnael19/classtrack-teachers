@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import DashboardPage from "@/features/dashboard/DashboardPage";
 import CoursesPage from "@/features/courses/CoursesPage";
@@ -12,7 +12,16 @@ import SettingsPage from "@/features/settings/SettingsPage";
 import LoginPage from "@/features/auth/LoginPage";
 import RegisterPage from "@/features/auth/RegisterPage";
 import LandingPage from "@/features/landing/LandingPage";
-import { Navigate } from "react-router-dom";
+import { useAuthStore } from "@/store/authStore";
+
+/** Redirects unauthenticated users to /login */
+const ProtectedRoute = () => {
+  const { isAuthenticated, token } = useAuthStore();
+  if (!isAuthenticated && !token) {
+    return <Navigate to="/login" replace />;
+  }
+  return <Outlet />;
+};
 
 export const router = createBrowserRouter([
   {
@@ -20,19 +29,25 @@ export const router = createBrowserRouter([
     element: <LandingPage />,
   },
   {
-    path: "/",
-    element: <MainLayout />,
+    // Protected layout: redirects to /login if not authenticated
+    element: <ProtectedRoute />,
     children: [
-      { index: true, element: <Navigate to="/dashboard" replace /> },
-      { path: "dashboard", element: <DashboardPage /> },
-      { path: "courses", element: <CoursesPage /> },
-      { path: "courses/:id", element: <CourseDetailsPage /> },
-      { path: "sessions/new", element: <SessionCreationPage /> },
-      { path: "sessions/live", element: <LiveSessionPage /> },
-      { path: "analytics", element: <AnalyticsPage /> },
-      { path: "reports", element: <ReportsPage /> },
-      { path: "classrooms", element: <ClassroomsPage /> },
-      { path: "settings", element: <SettingsPage /> },
+      {
+        path: "/",
+        element: <MainLayout />,
+        children: [
+          { index: true, element: <Navigate to="/dashboard" replace /> },
+          { path: "dashboard", element: <DashboardPage /> },
+          { path: "courses", element: <CoursesPage /> },
+          { path: "courses/:id", element: <CourseDetailsPage /> },
+          { path: "sessions/new", element: <SessionCreationPage /> },
+          { path: "sessions/live", element: <LiveSessionPage /> },
+          { path: "analytics", element: <AnalyticsPage /> },
+          { path: "reports", element: <ReportsPage /> },
+          { path: "classrooms", element: <ClassroomsPage /> },
+          { path: "settings", element: <SettingsPage /> },
+        ],
+      },
     ],
   },
   {
