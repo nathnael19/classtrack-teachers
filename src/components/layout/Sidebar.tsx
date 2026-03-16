@@ -67,10 +67,10 @@ const Sidebar = () => {
             sidebarCollapsed ? "justify-center" : "gap-4"
           )}>
             <div className="relative group/logo">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary via-indigo-600 to-indigo-700 text-white flex items-center justify-center font-bold text-xl shadow-lg shadow-primary/30 transition-all duration-300 group-hover/logo:scale-110 group-hover/logo:rotate-3 active:scale-95" aria-hidden>
-                <img src="/logo_mark.png" alt="Class Track Logo" />
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/10 to-indigo-500/10 border border-white/20 backdrop-blur-md flex items-center justify-center p-2 shadow-inner group-hover/logo:scale-110 group-hover/logo:rotate-3 active:scale-95 transition-all duration-300 shadow-lg shadow-primary/10" aria-hidden>
+                <img src="/logo_mark.png" alt="Class Track Logo" className="w-full h-full object-contain filter drop-shadow-sm" />
               </div>
-              <div className="absolute -inset-1 bg-primary/20 rounded-2xl blur opacity-0 group-hover/logo:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -inset-1 bg-primary/20 rounded-2xl blur opacity-0 group-hover/logo:opacity-100 transition-opacity duration-500 pointer-events-none" />
             </div>
 
             {!sidebarCollapsed && (
