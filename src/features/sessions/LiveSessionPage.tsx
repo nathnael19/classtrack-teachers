@@ -51,6 +51,8 @@ interface ActiveSession {
   latitude: number;
   longitude: number;
   geofence_radius: number;
+  topic?: string;
+  notes?: string;
   course?: {
     name: string;
     code: string;
@@ -227,11 +229,19 @@ const LiveSessionPage = () => {
               </div>
               <div>
                 <CardTitle className="text-2xl font-black tracking-tighter uppercase italic text-slate-900">
-                  {session.course?.name || 'Academic Module'}
+                  {session.topic || session.course?.name || 'Academic Module'}
                 </CardTitle>
                 <CardDescription className="font-bold text-xs uppercase tracking-widest text-slate-400 mt-1">
                   {session.course?.code || 'CS-XXX'} • {session.room}
                 </CardDescription>
+                {session.notes && (
+                  <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-100/50">
+                    <p className="text-[10px] items-center gap-2 flex font-black text-slate-400 uppercase tracking-widest mb-1">
+                      <Signal className="w-3 h-3 text-primary" /> Operational Directives
+                    </p>
+                    <p className="text-sm font-semibold text-slate-700 italic">"{session.notes}"</p>
+                  </div>
+                )}
               </div>
             </CardHeader>
             <CardContent className="flex flex-col items-center p-10 bg-gradient-to-b from-white to-slate-50/50">
