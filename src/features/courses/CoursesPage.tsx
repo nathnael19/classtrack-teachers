@@ -148,18 +148,18 @@ const CoursesPage = () => {
           <Table>
             <TableHeader className="bg-slate-50/50 border-b border-indigo-50/50">
               <TableRow className="hover:bg-transparent border-none">
-                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40 w-[400px]">Strategic Module</TableHead>
-                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Identifier</TableHead>
-                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Unit Core</TableHead>
-                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Temporal</TableHead>
-                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Status</TableHead>
-                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40 text-right">Actions</TableHead>
+                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40 w-auto min-w-[200px]">Strategic Module</TableHead>
+                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40">Identifier</TableHead>
+                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40 text-center">Unit Core</TableHead>
+                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40 text-center">Temporal</TableHead>
+                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40 text-center">Status</TableHead>
+                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="divide-y divide-slate-50">
               {filteredCourses.map((course) => (
                 <tr key={course.id} className="group hover:bg-indigo-50/30 transition-all duration-500 cursor-pointer">
-                  <TableCell className="px-10 py-10">
+                  <TableCell className="px-2 lg:px-6 py-10">
                     <div className="flex items-center gap-6">
                       <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-50 to-white border border-indigo-100/50 flex items-center justify-center text-primary shadow-sm group-hover:scale-110 transition-transform duration-500">
                         <BookOpen className="w-6 h-6" />
@@ -177,13 +177,13 @@ const CoursesPage = () => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="px-10 py-10">
+                  <TableCell className="px-2 lg:px-6 py-10">
                     <div className="inline-flex px-4 py-1.5 bg-slate-100/50 rounded-xl font-mono text-xs font-black text-foreground border border-slate-200/50 group-hover:bg-primary group-hover:text-white transition-all">
                       {course.code}
                     </div>
                   </TableCell>
-                  <TableCell className="px-10 py-10">
-                    <div className="flex items-center gap-4">
+                  <TableCell className="px-2 lg:px-6 py-10">
+                    <div className="flex items-center justify-center gap-4">
                       <div className="w-10 h-10 rounded-xl bg-indigo-50/50 flex items-center justify-center text-primary">
                         <Users className="w-4 h-4" />
                       </div>
@@ -193,8 +193,8 @@ const CoursesPage = () => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="px-10 py-10">
-                    <div className="flex items-center gap-4">
+                  <TableCell className="px-2 lg:px-6 py-10">
+                    <div className="flex items-center justify-center gap-4">
                       <div className="w-10 h-10 rounded-xl bg-emerald-50/50 flex items-center justify-center text-emerald-500">
                         <Calendar className="w-4 h-4" />
                       </div>
@@ -204,7 +204,7 @@ const CoursesPage = () => {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="px-10 py-10">
+                  <TableCell className="px-2 lg:px-6 py-10 text-center">
                     <Badge className={cn(
                       "rounded-full px-5 py-2 font-black text-[9px] uppercase tracking-[0.2em] border-none shadow-sm",
                       (course.status || 'Active') === 'Active' 
@@ -214,7 +214,7 @@ const CoursesPage = () => {
                       {course.status || 'Active'}
                     </Badge>
                   </TableCell>
-                  <TableCell className="px-10 py-10 text-right">
+                  <TableCell className="px-2 lg:px-6 py-10 text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl hover:bg-primary hover:text-white transition-all shadow-sm group-hover:shadow-primary/20">
