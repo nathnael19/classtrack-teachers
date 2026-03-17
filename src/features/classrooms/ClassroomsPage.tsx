@@ -45,11 +45,13 @@ interface Room {
   latitude: number;
   longitude: number;
   geofence_radius: number;
-  sessions_count?: number; // Optional metadata
+  capacity: number;
+  sessions_count?: number; 
 }
 
 const ClassroomsPage = () => {
   const queryClient = useQueryClient();
+  const [editingRoomId, setEditingRoomId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState<number | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -76,7 +78,7 @@ const ClassroomsPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rooms'] });
       setIsCreateModalOpen(false);
-      setFormData({ name: '', building: '', latitude: 0, longitude: 0, geofence_radius: 50, capacity: 30 });
+      resetForm();
       toast.success('Node provisioned successfully');
     },
     onError: (error: any) => {
@@ -85,9 +87,48 @@ const ClassroomsPage = () => {
     }
   });
 
+  const updateRoomMutation = useMutation({
+    mutationFn: async (data: typeof formData & { id: number }) => {
+      const { id, ...payload } = data;
+      return await api.put(`/rooms/${id}`, payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rooms'] });
+      setIsCreateModalOpen(false);
+      resetForm();
+      toast.success('Facility specs updated');
+    },
+    onError: (error: any) => {
+      console.error("Update error:", error);
+      toast.error('Failed to update facility');
+    }
+  });
+
+  const resetForm = () => {
+    setFormData({ name: '', building: '', latitude: 0, longitude: 0, geofence_radius: 50, capacity: 30 });
+    setEditingRoomId(null);
+  };
+
   const handleCreateRoom = (e: React.FormEvent) => {
     e.preventDefault();
-    createRoomMutation.mutate(formData);
+    if (editingRoomId) {
+      updateRoomMutation.mutate({ ...formData, id: editingRoomId });
+    } else {
+      createRoomMutation.mutate(formData);
+    }
+  };
+
+  const handleEditClick = (room: Room) => {
+    setFormData({
+      name: room.name,
+      building: room.building || '',
+      latitude: room.latitude,
+      longitude: room.longitude,
+      geofence_radius: room.geofence_radius,
+      capacity: room.capacity || 30,
+    });
+    setEditingRoomId(room.id);
+    setIsCreateModalOpen(true);
   };
 
   // 1. Fetch live rooms
@@ -102,6 +143,7 @@ const ClassroomsPage = () => {
   // 2. Mutation: Delete Room
   const deleteRoomMutation = useMutation({
     mutationFn: async (id: number) => {
+      setIsDeleting(id);
       return await api.delete(`/rooms/${id}`);
     },
     onSuccess: () => {
@@ -171,7 +213,7 @@ const ClassroomsPage = () => {
                 <div className="p-2 bg-primary/10 rounded-xl text-primary border border-primary/20">
                   <Target className="w-5 h-5" />
                 </div>
-                New Classroom
+                {editingRoomId ? "Update Classroom" : "New Classroom"}
               </DialogTitle>
               <DialogDescription className="text-muted-foreground font-medium">
                 Register a new classroom for attendance tracking.
@@ -243,10 +285,12 @@ const ClassroomsPage = () => {
               </div>
               <Button 
                 type="submit" 
-                disabled={createRoomMutation.isPending}
+                disabled={createRoomMutation.isPending || updateRoomMutation.isPending}
                 className="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 text-white font-black tracking-widest uppercase transition-all shadow-lg shadow-primary/20"
               >
-                {createRoomMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : "Add Classroom"}
+                {(createRoomMutation.isPending || updateRoomMutation.isPending) ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : editingRoomId ? "Update Specs" : "Add Classroom"}
               </Button>
             </form>
           </DialogContent>
@@ -305,7 +349,10 @@ const ClassroomsPage = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-60 rounded-[2rem] border-indigo-50/50 backdrop-blur-3xl bg-white/90 p-3 shadow-2xl ring-1 ring-black/5 mt-2">
                               <DropdownMenuLabel className="px-4 py-3 text-[9px] font-black uppercase text-slate-400 tracking-[0.3em]">Protocol Options</DropdownMenuLabel>
-                              <DropdownMenuItem className="rounded-2xl gap-4 py-4 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group">
+                              <DropdownMenuItem 
+                                className="rounded-2xl gap-4 py-4 cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group"
+                                onClick={() => handleEditClick(room)}
+                              >
                                 <Edit2 className="w-4 h-4 text-slate-400 group-hover:text-primary" /> 
                                 <span className="font-black text-xs uppercase tracking-widest">Update Specs</span>
                               </DropdownMenuItem>
