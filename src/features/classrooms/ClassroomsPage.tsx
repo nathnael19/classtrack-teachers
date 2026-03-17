@@ -207,42 +207,45 @@ const ClassroomsPage = () => {
               PROVISION NODE
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[480px] rounded-[2rem] border-border/40 bg-background/95 backdrop-blur-3xl">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-black text-foreground flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-xl text-primary border border-primary/20">
-                  <Target className="w-5 h-5" />
-                </div>
-                {editingRoomId ? "Update Classroom" : "New Classroom"}
-              </DialogTitle>
-              <DialogDescription className="text-muted-foreground font-medium">
-                Register a new classroom for attendance tracking.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleCreateRoom} className="space-y-6 mt-4">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="roomName" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Room Name</Label>
-                  <Input 
-                    id="roomName" 
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="e.g. EC-101" 
-                    className="h-14 bg-muted/50 border-border focus-visible:ring-primary/50 rounded-xl font-mono"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="building" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Building / Sector</Label>
-                  <Input 
-                    id="building" 
-                    value={formData.building}
-                    onChange={(e) => setFormData(prev => ({ ...prev, building: e.target.value }))}
-                    placeholder="Engineering Block" 
-                    className="h-14 bg-muted/50 border-border focus-visible:ring-primary/50 rounded-xl"
-                    required
-                  />
-                </div>
+          <DialogContent className="w-[95vw] sm:max-w-[550px] rounded-[2rem] border-border/40 bg-background/95 backdrop-blur-3xl p-0 overflow-hidden">
+            <div className="max-h-[90vh] overflow-y-auto custom-scrollbar p-6 sm:p-8">
+              <DialogHeader className="mb-6">
+                <DialogTitle className="text-2xl font-black text-foreground flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-xl text-primary border border-primary/20">
+                    <Target className="w-5 h-5" />
+                  </div>
+                  {editingRoomId ? "Update Classroom" : "New Classroom"}
+                </DialogTitle>
+                <DialogDescription className="text-muted-foreground font-medium">
+                  Register a new classroom for attendance tracking.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCreateRoom} className="space-y-6">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="roomName" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Room Name</Label>
+                      <Input 
+                        id="roomName" 
+                        value={formData.name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="e.g. EC-101" 
+                        className="h-14 bg-muted/50 border-border focus-visible:ring-primary/50 rounded-xl font-mono"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="building" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Building / Sector</Label>
+                      <Input 
+                        id="building" 
+                        value={formData.building}
+                        onChange={(e) => setFormData(prev => ({ ...prev, building: e.target.value }))}
+                        placeholder="Engineering Block" 
+                        className="h-14 bg-muted/50 border-border focus-visible:ring-primary/50 rounded-xl"
+                        required
+                      />
+                    </div>
+                  </div>
                 <div className="space-y-4">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Satellite Location Selection</Label>
                   <MapSelector 
@@ -293,7 +296,8 @@ const ClassroomsPage = () => {
                 ) : editingRoomId ? "Update Specs" : "Add Classroom"}
               </Button>
             </form>
-          </DialogContent>
+          </div>
+        </DialogContent>
         </Dialog>
       </div>
 
