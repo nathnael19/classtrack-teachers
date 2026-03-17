@@ -80,7 +80,7 @@ const MapSelector = ({ onLocationSelect, initialLat, initialLng }: {
   };
 
   return (
-    <div className="w-full h-[350px] rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl relative group bg-slate-950">
+    <div className="w-full h-[250px] sm:h-[350px] rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl relative group bg-slate-950">
       <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-slate-950/80 to-transparent pointer-events-none z-[400]" />
       <MapContainer
         center={position || [9.03, 38.74]}
