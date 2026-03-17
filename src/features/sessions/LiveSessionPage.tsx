@@ -76,8 +76,11 @@ const LiveSessionPage = () => {
     queryFn: async () => {
       const res = await api.get('/sessions/active-lecturer');
       const sessionData = res.data;
-      const courseRes = await api.get(`/courses/${sessionData.course_id}`);
-      return { ...sessionData, course: courseRes.data };
+      if (sessionData?.course_id) {
+        const courseRes = await api.get(`/courses/${sessionData.course_id}`);
+        return { ...sessionData, course: courseRes.data };
+      }
+      return sessionData;
     },
     retry: 1,
   });
@@ -151,12 +154,17 @@ const LiveSessionPage = () => {
   const hasAutoTerminated = useRef(false);
   const timeLeft = (() => {
     if (!session?.end_time) return null;
-    // Force UTC parsing by appending 'Z' if missing
-    const endStr = session.end_time.endsWith('Z') ? session.end_time : `${session.end_time}Z`;
-    const end = new Date(endStr).getTime();
-    if (isNaN(end)) return null;
-    const now = currentTime.getTime();
-    return Math.max(0, Math.floor((end - now) / 1000));
+    try {
+      // Force UTC parsing by appending 'Z' if missing
+      const endStr = session.end_time.endsWith('Z') ? session.end_time : `${session.end_time}Z`;
+      const end = new Date(endStr).getTime();
+      if (isNaN(end)) return null;
+      const now = currentTime.getTime();
+      return Math.max(0, Math.floor((end - now) / 1000));
+    } catch (e) {
+      console.error("Error calculating timeLeft:", e);
+      return null;
+    }
   })();
 
   useEffect(() => {
@@ -285,9 +293,9 @@ const LiveSessionPage = () => {
                   <div className="text-[9px] font-black text-slate-400 mb-2 uppercase tracking-widest">Timer Status</div>
                   <div className={cn(
                     "text-3xl font-black tabular-nums tracking-tight",
-                    timeLeft < 300 ? 'text-red-500 animate-pulse' : 'text-slate-900'
+                    timeLeft !== null && timeLeft < 300 ? 'text-red-500 animate-pulse' : 'text-slate-900'
                   )}>
-                    {formatTime(timeLeft)}
+                    {formatTime(timeLeft ?? 0)}
                   </div>
                 </div>
                 <div className="flex flex-col items-center p-6 rounded-[2rem] bg-white border border-indigo-50 shadow-sm transition-all hover:shadow-md">
