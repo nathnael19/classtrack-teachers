@@ -42,6 +42,8 @@ const formSchema = z.object({
   room: z.string().min(1, 'Please select a classroom'),
   duration: z.string().min(1, 'Duration is required'),
   radius: z.string().min(1, 'Geofence radius is required'),
+  topic: z.string().optional(),
+  notes: z.string().optional(),
 });
 
 interface Course {
@@ -116,6 +118,8 @@ const SessionCreationPage = () => {
       room: '',
       duration: '60',
       radius: '50',
+      topic: '',
+      notes: '',
     },
   });
 
@@ -150,6 +154,8 @@ const SessionCreationPage = () => {
       latitude: selectedRoom?.latitude || 0,
       longitude: selectedRoom?.longitude || 0,
       geofence_radius: parseFloat(values.radius),
+      topic: values.topic,
+      notes: values.notes,
     };
 
     createSessionMutation.mutate(payload);
@@ -303,6 +309,47 @@ const SessionCreationPage = () => {
                             </div>
                           </FormControl>
                           <FormDescription className="text-[9px] font-bold text-slate-300 uppercase tracking-widest mt-3 ml-2">Satellite authorization threshold.</FormDescription>
+                          <FormMessage className="text-[9px] font-black uppercase tracking-widest text-destructive" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-4">
+                    <FormField
+                      control={form.control}
+                      name="topic"
+                      render={({ field }) => (
+                        <FormItem className="space-y-4">
+                          <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1">Session Topic / Curriculum</FormLabel>
+                          <FormControl>
+                            <div className="relative group">
+                              <Input 
+                                placeholder="e.g. Introduction to Quantum Mechanics" 
+                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-bold text-slate-900 placeholder:text-slate-300 transition-all group-hover:bg-white" 
+                                {...field} 
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage className="text-[9px] font-black uppercase tracking-widest text-destructive" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="notes"
+                      render={({ field }) => (
+                        <FormItem className="space-y-4">
+                          <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1">Operational Directives</FormLabel>
+                          <FormControl>
+                            <div className="relative group">
+                              <Input 
+                                placeholder="e.g. Bring lab coats, read chapter 4..." 
+                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-bold text-slate-900 placeholder:text-slate-300 transition-all group-hover:bg-white" 
+                                {...field} 
+                              />
+                            </div>
+                          </FormControl>
                           <FormMessage className="text-[9px] font-black uppercase tracking-widest text-destructive" />
                         </FormItem>
                       )}
