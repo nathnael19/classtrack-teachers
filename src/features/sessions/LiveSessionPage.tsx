@@ -69,7 +69,7 @@ const LiveSessionPage = () => {
   const ROTATION_INTERVAL = 120; // seconds — 2 minutes
 
   // 1. Fetch Active Session
-  const { data: session, isLoading: isLoadingSession, error: sessionError } = useQuery<ActiveSession>({
+  const { data: session, isLoading: isLoadingSession, isFetching: isFetchingSession, error: sessionError } = useQuery<ActiveSession>({
     queryKey: ['active-session'],
     queryFn: async () => {
       const res = await api.get('/sessions/active-lecturer');
@@ -145,20 +145,40 @@ const LiveSessionPage = () => {
     return () => clearInterval(interval);
   }, [session?.qr_code_content]);
 
-  const getTimeLeft = () => {
-    if (!session?.end_time) return 0;
-    const end = new Date(session.end_time).getTime();
+  // Handle Automatic Session Termination
+  const hasAutoTerminated = useRef(false);
+  const timeLeft = (() => {
+    if (!session?.end_time) return null;
+    // Force UTC parsing by appending 'Z' if missing
+    const endStr = session.end_time.endsWith('Z') ? session.end_time : `${session.end_time}Z`;
+    const end = new Date(endStr).getTime();
+    if (isNaN(end)) return null;
     const now = currentTime.getTime();
     return Math.max(0, Math.floor((end - now) / 1000));
-  };
+  })();
+
+  useEffect(() => {
+    // Only terminate if we have a valid timeLeft of 0, AND we are NOT currently fetching/loading data
+    // This prevents stale cache from accidentally triggering termination for an old session
+    if (
+      timeLeft === 0 && 
+      session?.id && 
+      !isLoadingSession && 
+      !isFetchingSession &&
+      !hasAutoTerminated.current && 
+      !stopSessionMutation.isPending
+    ) {
+      hasAutoTerminated.current = true;
+      toast.info("Session time expired. Terminating protocol...");
+      stopSessionMutation.mutate();
+    }
+  }, [timeLeft, session?.id, isLoadingSession, isFetchingSession, stopSessionMutation]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
-
-  const timeLeft = getTimeLeft();
 
   if (isLoadingSession) {
     return (
