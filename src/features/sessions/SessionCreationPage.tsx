@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -33,7 +34,7 @@ import {
 } from '@/components/ui/form';
 import { CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/services/api';
 
 const formSchema = z.object({
@@ -57,6 +58,14 @@ interface Room {
   longitude: number;
 }
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  default_session_duration: number;
+  default_session_radius: number;
+}
+
 interface SessionContext {
   last_course: string;
   success_rate: string;
@@ -65,6 +74,7 @@ interface SessionContext {
 }
 
 const SessionCreationPage = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   // --- Queries ---
@@ -90,6 +100,8 @@ const SessionCreationPage = () => {
     },
     onSuccess: () => {
       toast.success('Attendance session started successfully!');
+      queryClient.invalidateQueries({ queryKey: ['active-session'] });
+      queryClient.invalidateQueries({ queryKey: ['sessions'] });
       navigate('/sessions/live');
     },
     onError: () => {
@@ -106,6 +118,21 @@ const SessionCreationPage = () => {
       radius: '50',
     },
   });
+
+  const { data: user } = useQuery<User>({
+    queryKey: ['user-me'],
+    queryFn: async () => (await api.get('/users/me')).data,
+  });
+
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        ...form.getValues(),
+        duration: user.default_session_duration.toString(),
+        radius: user.default_session_radius.toString(),
+      });
+    }
+  }, [user, form.reset]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const startTime = new Date();
