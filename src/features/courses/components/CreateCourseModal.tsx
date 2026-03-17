@@ -36,6 +36,7 @@ import api from '@/services/api';
 const courseSchema = z.object({
   name: z.string().min(3, 'Course name must be at least 3 characters'),
   code: z.string().min(2, 'Course code must be at least 2 characters'),
+  description: z.string().optional(),
 });
 
 type CourseFormValues = z.infer<typeof courseSchema>;
@@ -49,6 +50,7 @@ export const CreateCourseModal = () => {
     defaultValues: {
       name: '',
       code: '',
+      description: '',
     },
   });
 
@@ -163,6 +165,28 @@ export const CreateCourseModal = () => {
                           <div className="absolute inset-y-0 right-6 flex items-center">
                              <Zap className="w-4 h-4 text-slate-200 group-focus-within:text-emerald-500 transition-colors" />
                           </div>
+                        </div>
+                      </FormControl>
+                      <FormMessage className="text-[10px] uppercase font-black tracking-widest text-destructive ml-1" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <div className="flex items-center justify-between ml-1">
+                        <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Contextual Description</FormLabel>
+                      </div>
+                      <FormControl>
+                        <div className="relative group">
+                          <textarea 
+                            placeholder="Optional context or syllabus summary..." 
+                            className="w-full min-h-[100px] rounded-2xl bg-slate-50 border-slate-100 p-6 shadow-inner focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/5 font-bold text-slate-900 transition-all group-hover:bg-white group-hover:border-primary/20 placeholder:text-slate-300 resize-none"
+                            {...field} 
+                          />
                         </div>
                       </FormControl>
                       <FormMessage className="text-[10px] uppercase font-black tracking-widest text-destructive ml-1" />
