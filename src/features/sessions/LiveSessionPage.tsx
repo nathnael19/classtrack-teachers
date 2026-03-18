@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import CryptoJS from 'crypto-js';
 import { 
@@ -13,7 +13,10 @@ import {
   Signal,
   ArrowRightLeft,
   Activity,
-  Sparkles
+  Sparkles,
+  Search,
+  Plus,
+  UserCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -26,11 +29,27 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/services/api';
 import { cn } from '@/lib/utils';
+interface SessionStudent {
+  id: number;
+  name: string;
+  student_id: string; // Student code
+  status: string | null;
+  timestamp: string | null;
+}
 
 interface AttendanceRecord {
   id: number;
@@ -66,6 +85,8 @@ const LiveSessionPage = () => {
   const [rotationProgress, setRotationProgress] = useState(0);
   const [activeToken, setActiveToken] = useState("");
   const [qrTimeLeft, setQrTimeLeft] = useState(120);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isManageOpen, setIsManageOpen] = useState(false);
   const prevAttendanceCount = useRef(0);
 
   const ROTATION_INTERVAL = 120; // seconds — 2 minutes
@@ -97,7 +118,46 @@ const LiveSessionPage = () => {
     refetchInterval: 3000,
   });
 
-  // 3. Mutation: Stop Session
+  // 3. Fetch All Enrolled Students (for manual marking)
+  const { data: enrolledStudents = [], isLoading: isLoadingEnrolled } = useQuery<SessionStudent[]>({
+    queryKey: ['session-students', session?.id],
+    queryFn: async () => {
+      if (!session?.id) return [];
+      const res = await api.get(`/sessions/${session.id}/students`);
+      return res.data;
+    },
+    enabled: !!session?.id && isManageOpen,
+  });
+
+  // 4. Mutation: Manual Mark
+  const manualMarkMutation = useMutation({
+    mutationFn: async ({ studentId, status }: { studentId: number, status: string }) => {
+      if (!session?.id) return;
+      return await api.post('/attendance/manual', {
+        session_id: session.id,
+        student_id: studentId,
+        status: status,
+      });
+    },
+    onSuccess: () => {
+      toast.success('Attendance recorded manually.');
+      queryClient.invalidateQueries({ queryKey: ['session-attendance', session?.id] });
+      queryClient.invalidateQueries({ queryKey: ['session-students', session?.id] });
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.detail || 'Failed to record attendance.');
+    }
+  });
+
+  // Filtered enrolled students for search
+  const filteredStudents = useMemo(() => {
+    return enrolledStudents.filter(s => 
+      s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      s.student_id?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [enrolledStudents, searchQuery]);
+
+  // 5. Mutation: Stop Session
   const stopSessionMutation = useMutation({
     mutationFn: async () => {
       if (!session?.id) return;
@@ -392,7 +452,96 @@ const LiveSessionPage = () => {
                     <TableHead className="py-6 px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Student Identity</TableHead>
                     <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Credential ID</TableHead>
                     <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Time-Stamp</TableHead>
-                    <TableHead className="text-right px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Status</TableHead>
+                    <TableHead className="text-right px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      <div className="flex items-center justify-end gap-4">
+                        Status
+                        <Dialog open={isManageOpen} onOpenChange={setIsManageOpen}>
+                          <DialogTrigger asChild>
+                            <Button size="sm" variant="outline" className="h-8 rounded-lg border-primary/20 bg-primary/5 text-primary text-[9px] font-black uppercase transition-all hover:bg-primary hover:text-white">
+                              <Plus className="w-3 h-3 mr-1" /> Manage
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-3xl rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl">
+                            <div className="p-8 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+                              <DialogHeader>
+                                <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-3">
+                                  <UserCheck className="w-8 h-8 text-primary" />
+                                  Manual Override Protocol
+                                </DialogTitle>
+                                <DialogDescription className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-2">
+                                  Mark attendance for students without smartphone hardware.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="mt-8 relative">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                                <Input 
+                                  placeholder="IDENTIFY STUDENT BY NAME OR CREDENTIAL..." 
+                                  className="bg-white/10 border-white/10 h-14 pl-12 rounded-2xl font-black text-xs uppercase tracking-[0.2em] placeholder:text-slate-600 focus-visible:ring-primary/50"
+                                  value={searchQuery}
+                                  onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                              </div>
+                            </div>
+                            <div className="bg-white p-4 max-h-[500px] overflow-auto custom-scrollbar">
+                              <Table>
+                                <TableHeader>
+                                  <TableRow className="border-none hover:bg-transparent bg-slate-50/50">
+                                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400 py-4">Student</TableHead>
+                                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400">ID</TableHead>
+                                    <TableHead className="text-right text-[9px] font-black uppercase tracking-widest text-slate-400">Action</TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {isLoadingEnrolled ? (
+                                    <TableRow>
+                                      <TableCell colSpan={3} className="text-center py-20">
+                                        <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary opacity-20" />
+                                      </TableCell>
+                                    </TableRow>
+                                  ) : filteredStudents.length === 0 ? (
+                                    <TableRow>
+                                      <TableCell colSpan={3} className="text-center py-20 text-slate-400 font-bold italic text-sm">
+                                        No matching identity found in enrollment records.
+                                      </TableCell>
+                                    </TableRow>
+                                  ) : filteredStudents.map((s) => (
+                                    <TableRow key={s.id} className="group border-b border-slate-50">
+                                      <TableCell className="py-4">
+                                        <div className="flex items-center gap-3">
+                                          <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-black text-slate-500 text-xs shadow-sm">
+                                            {s.name.charAt(0)}
+                                          </div>
+                                          <span className="font-black text-slate-800 text-sm">{s.name}</span>
+                                        </div>
+                                      </TableCell>
+                                      <TableCell className="font-mono text-[10px] font-black text-slate-400">
+                                        {s.student_id || 'N/A'}
+                                      </TableCell>
+                                      <TableCell className="text-right">
+                                        {s.status === 'present' ? (
+                                          <Badge className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 border-none px-4 py-2 rounded-xl font-black tracking-widest text-[9px] uppercase">
+                                            VERIFIED
+                                          </Badge>
+                                        ) : (
+                                          <Button 
+                                            size="sm" 
+                                            className="rounded-xl h-10 px-4 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-primary/20"
+                                            onClick={() => manualMarkMutation.mutate({ studentId: s.id, status: 'present' })}
+                                            disabled={manualMarkMutation.isPending}
+                                          >
+                                            {manualMarkMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : "Mark Present"}
+                                          </Button>
+                                        )}
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
