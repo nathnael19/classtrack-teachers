@@ -110,20 +110,20 @@ const CourseDetailsPage = () => {
             <Badge variant="outline" className="rounded-md border-primary/20 text-primary font-mono text-[10px] uppercase tracking-widest px-3 py-1 bg-primary/5">
               Ref: {course.code}
             </Badge>
-            <h1 className="text-5xl font-black tracking-tight text-[#1E3A8A] font-['FiraCode']">
+            <h1 className="text-5xl font-black tracking-tight text-foreground">
               {course.name}
             </h1>
-            <p className="text-muted-foreground font-['FiraSans'] font-medium">
+            <p className="text-muted-foreground font-semibold">
               Real-time academic performance and student engagement analytics.
             </p>
           </div>
           
           <div className="flex items-center gap-3">
-             <Button variant="outline" className="rounded-2xl h-14 px-8 border-indigo-100 font-black text-xs uppercase tracking-widest gap-2">
+             <Button variant="outline" className="rounded-2xl h-14 px-8 border-border hover:bg-primary/5 font-black text-xs uppercase tracking-widest gap-2">
                <Download className="w-4 h-4" />
                Export Report
              </Button>
-             <Button className="rounded-2xl h-14 px-8 shadow-lg shadow-primary/20 font-black text-xs uppercase tracking-widest gap-2 bg-[#1E40AF] hover:bg-[#1E3A8A]">
+             <Button className="rounded-2xl h-14 px-8 shadow-lg shadow-primary/20 font-black text-xs uppercase tracking-widest gap-2 bg-primary hover:bg-primary/90">
                <Calendar className="w-4 h-4" />
                Schedule Session
              </Button>
