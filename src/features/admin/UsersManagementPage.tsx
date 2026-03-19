@@ -7,13 +7,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
   Search, Plus, MoreHorizontal, Pencil, Trash2, 
-  Users, UserCheck, UserX, Shield, Filter, 
+  Users, UserCheck, UserX, Shield,
   Download, Mail, Calendar, CheckCircle2, Clock
 } from "lucide-react";
 import {
@@ -58,7 +58,7 @@ const AnimatedNumber = ({ value }: { value: number }) => {
 const GlassCard = ({ children, className = "", noHover = false }: { children: React.ReactNode, className?: string, noHover?: boolean }) => (
   <Card className={cn(
     "relative overflow-hidden border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-md shadow-xl transition-all duration-500",
-    !noHover && "hover:shadow-2xl hover:bg-white/50 dark:hover:bg-black/50 hover:border-white/40 dark:hover:border-white/20",
+    !noHover && "hover:shadow-2xl hover:bg-white/50 dark:hover:bg-black/50 hover:border-white/40 dark:hover:border-white/20 hover:-translate-y-1",
     className
   )}>
     <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent dark:from-white/5 dark:via-transparent dark:to-transparent pointer-events-none" />
@@ -83,13 +83,13 @@ const UsersManagementPage = () => {
   return (
     <div className="relative space-y-8 font-sans p-2">
       {/* Background Decorative Orbs */}
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px] -z-10 pointer-events-none animate-pulse" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-amber-500/5 rounded-full blur-[100px] -z-10 pointer-events-none animate-pulse" />
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px] -z-10 pointer-events-none animate-pulse duration-[10s] will-change-transform" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-amber-500/5 rounded-full blur-[100px] -z-10 pointer-events-none animate-pulse duration-[15s] will-change-transform" />
 
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-2">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-600 dark:from-white dark:via-slate-200 dark:to-indigo-400">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-600 dark:from-white dark:via-slate-200 dark:to-indigo-400 pb-1">
             User Directory
           </h1>
           <p className="text-muted-foreground font-medium flex items-center gap-2">
