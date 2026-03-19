@@ -97,6 +97,15 @@ const AcademicManagementPage = () => {
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         {activeTab === "courses" && (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <button 
+              onClick={() => navigate("/admin/academic/courses/new")}
+              className="border-2 border-dashed border-white/20 rounded-[2rem] p-6 flex flex-col items-center justify-center gap-3 text-muted-foreground hover:border-amber-500 hover:text-amber-600 hover:bg-amber-500/5 transition-all group min-h-[180px]"
+            >
+              <div className="w-12 h-12 rounded-full bg-white/10 dark:bg-black/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Plus className="w-6 h-6" />
+              </div>
+              <span className="text-sm font-black uppercase tracking-widest">Register New Course</span>
+            </button>
             {[
               { code: "CS101", name: "Introduction to Computer Science", credits: 3, students: 120, status: "Active" },
               { code: "SWE204", name: "Software Architecture & Design", credits: 4, students: 85, status: "Active" },
@@ -125,20 +134,20 @@ const AcademicManagementPage = () => {
                 </div>
               </GlassCard>
             ))}
-            <button 
-              onClick={() => navigate("/admin/academic/courses/new")}
-              className="border-2 border-dashed border-white/20 rounded-[2rem] p-6 flex flex-col items-center justify-center gap-3 text-muted-foreground hover:border-amber-500 hover:text-amber-600 hover:bg-amber-500/5 transition-all group"
-            >
-              <div className="w-12 h-12 rounded-full bg-white/10 dark:bg-black/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Plus className="w-6 h-6" />
-              </div>
-              <span className="text-sm font-black uppercase tracking-widest">Register Course</span>
-            </button>
           </div>
         )}
 
         {activeTab === "departments" && (
           <div className="grid gap-6 md:grid-cols-2">
+            <button 
+              onClick={() => navigate("/admin/academic/departments/new")}
+              className="border-2 border-dashed border-white/20 rounded-[2.5rem] p-6 flex flex-col items-center justify-center gap-3 text-muted-foreground hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-500/5 transition-all group min-h-[200px]"
+            >
+              <div className="w-12 h-12 rounded-full bg-white/10 dark:bg-black/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Plus className="w-6 h-6" />
+              </div>
+              <span className="text-sm font-black uppercase tracking-widest">Register New Department</span>
+            </button>
             {[
               { name: "School of Computer Science", head: "Dr. Alice Morgan", staff: 42, color: "from-indigo-500 to-blue-600" },
               { name: "Faculty of Applied Mathematics", head: "Prof. Robert Chen", staff: 28, color: "from-rose-500 to-orange-600" },
@@ -171,15 +180,6 @@ const AcademicManagementPage = () => {
                 </div>
               </GlassCard>
             ))}
-            <button 
-              onClick={() => navigate("/admin/academic/departments/new")}
-              className="border-2 border-dashed border-white/20 rounded-[2.5rem] p-6 flex flex-col items-center justify-center gap-3 text-muted-foreground hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-500/5 transition-all group"
-            >
-              <div className="w-12 h-12 rounded-full bg-white/10 dark:bg-black/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Plus className="w-6 h-6" />
-              </div>
-              <span className="text-sm font-black uppercase tracking-widest">Register Department</span>
-            </button>
           </div>
         )}
 
@@ -195,7 +195,17 @@ const AcademicManagementPage = () => {
                     <input className="w-full bg-white/20 dark:bg-black/20 border border-white/10 rounded-xl h-10 pl-10 text-sm focus:outline-none focus:border-amber-500/50 transition-all font-bold" placeholder="Search rooms..." />
                  </div>
               </div>
-              <div className="p-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+               <div className="p-6">
+                  <button 
+                    onClick={() => navigate("/admin/academic/rooms/new")}
+                    className="mb-8 w-full border-2 border-dashed border-white/20 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 text-muted-foreground hover:border-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/5 transition-all group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-white/10 dark:bg-black/20 flex items-center justify-center group-hover:scale-110 transition-transform text-emerald-500">
+                      <Plus className="w-5 h-5" />
+                    </div>
+                    <span className="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Add New Facility Node / Register Room</span>
+                  </button>
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                  {[
                    { name: "Block A - Hall 101", cap: 150, type: "Lecture Hall", status: "Available" },
                    { name: "Block C - Lab 03", cap: 30, type: "Computer Lab", status: "In Use" },
@@ -226,12 +236,23 @@ const AcademicManagementPage = () => {
                        </div>
                     </div>
                  ))}
-              </div>
-           </GlassCard>
+                  </div>
+               </div>
+            </GlassCard>
         )}
 
         {activeTab === "terms" && (
            <div className="flex flex-col gap-6">
+              <button 
+                onClick={() => navigate("/admin/academic/terms/new")}
+                className="mb-4 border-2 border-dashed border-white/20 rounded-[2.5rem] p-8 flex flex-col items-center justify-center gap-4 text-muted-foreground hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-500/5 transition-all group w-full"
+              >
+                <div className="w-14 h-14 rounded-full bg-white/10 dark:bg-black/20 flex items-center justify-center group-hover:scale-110 transition-transform text-indigo-500">
+                  <Plus className="w-7 h-7" />
+                </div>
+                <span className="text-sm font-black uppercase tracking-widest">Initialize New Academic Cycle / Register Term</span>
+              </button>
+              <div className="flex flex-col gap-6">
               {[
                 { name: "Spring 2026", duration: "Jan 10 - May 24", status: "Current", active: true },
                 { name: "Fall 2025", duration: "Sep 01 - Dec 15", status: "Completed", active: false },
@@ -273,6 +294,7 @@ const AcademicManagementPage = () => {
                   </div>
                 </GlassCard>
               ))}
+              </div>
            </div>
         )}
       </div>
