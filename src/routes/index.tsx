@@ -12,6 +12,9 @@ import SettingsPage from "@/features/settings/SettingsPage";
 import LoginPage from "@/features/auth/LoginPage";
 import RegisterPage from "@/features/auth/RegisterPage";
 import LandingPage from "@/features/landing/LandingPage";
+import AdminDashboardPage from "@/features/admin/AdminDashboardPage";
+import UsersManagementPage from "@/features/admin/UsersManagementPage";
+import AcademicManagementPage from "@/features/admin/AcademicManagementPage";
 import { useAuthStore } from "@/store/authStore";
 
 /** Redirects unauthenticated users to /login */
@@ -44,6 +47,9 @@ export const router = createBrowserRouter([
           { path: "reports", element: <ReportsPage /> },
           { path: "classrooms", element: <ClassroomsPage /> },
           { path: "settings", element: <SettingsPage /> },
+          { path: "admin/dashboard", element: <AdminDashboardPage /> },
+          { path: "admin/users", element: <UsersManagementPage /> },
+          { path: "admin/academic", element: <AcademicManagementPage /> },
         ],
       },
     ],
