@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import { 
   User, 
   Shield, 
@@ -11,9 +12,17 @@ import {
   RefreshCw,
   Camera,
   Mail,
-  Fingerprint
+  Fingerprint,
+  Phone,
+  Briefcase,
+  MapPin,
+  Calendar,
+  Globe,
+  GraduationCap,
+  HeartPulse,
+  Award,
+  Clock
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CardContent } from '@/components/ui/card';
@@ -28,6 +37,20 @@ interface UserProfile {
   role: string;
   default_session_duration: number;
   default_session_radius: number;
+  enrollment_year?: number;
+  program?: string;
+  academic_standing?: string;
+  title?: string;
+  bio?: string;
+  office_location?: string;
+  office_hours?: string;
+  website_url?: string;
+  linkedin_url?: string;
+  phone_number?: string;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
+  gender?: string;
+  date_of_birth?: string;
 }
 
 const SettingsPage = () => {
@@ -54,11 +77,25 @@ const SettingsPage = () => {
     }
   });
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Partial<UserProfile>>({
     name: '',
     email: '',
     default_session_duration: 60,
     default_session_radius: 50,
+    phone_number: '',
+    emergency_contact_name: '',
+    emergency_contact_phone: '',
+    gender: '',
+    date_of_birth: '',
+    enrollment_year: new Date().getFullYear(),
+    program: '',
+    academic_standing: '',
+    title: '',
+    bio: '',
+    office_location: '',
+    office_hours: '',
+    website_url: '',
+    linkedin_url: ''
   });
 
   const [passwords, setPasswords] = useState({
@@ -69,19 +106,53 @@ const SettingsPage = () => {
   useEffect(() => {
     if (profile) {
       setFormData({
-        name: profile.name,
-        email: profile.email,
-        default_session_duration: profile.default_session_duration,
-        default_session_radius: profile.default_session_radius,
+        name: profile.name || '',
+        email: profile.email || '',
+        default_session_duration: profile.default_session_duration || 60,
+        default_session_radius: profile.default_session_radius || 50,
+        phone_number: profile.phone_number || '',
+        emergency_contact_name: profile.emergency_contact_name || '',
+        emergency_contact_phone: profile.emergency_contact_phone || '',
+        gender: profile.gender || '',
+        date_of_birth: profile.date_of_birth ? profile.date_of_birth.substring(0, 10) : '',
+        enrollment_year: profile.enrollment_year || new Date().getFullYear(),
+        program: profile.program || '',
+        academic_standing: profile.academic_standing || '',
+        title: profile.title || '',
+        bio: profile.bio || '',
+        office_location: profile.office_location || '',
+        office_hours: profile.office_hours || '',
+        website_url: profile.website_url || '',
+        linkedin_url: profile.linkedin_url || ''
       });
     }
   }, [profile]);
 
   const handleSaveProfile = () => {
-    updateProfile.mutate({
-      name: formData.name,
-      email: formData.email
-    });
+    const activeUpdate: Partial<UserProfile> = {
+      name: formData.name || '',
+      email: formData.email || '',
+      phone_number: formData.phone_number,
+      emergency_contact_name: formData.emergency_contact_name,
+      emergency_contact_phone: formData.emergency_contact_phone,
+      gender: formData.gender,
+      date_of_birth: formData.date_of_birth || undefined,
+    };
+    
+    if (profile?.role === 'student') {
+      activeUpdate.enrollment_year = formData.enrollment_year;
+      activeUpdate.program = formData.program;
+      activeUpdate.academic_standing = formData.academic_standing;
+    } else if (profile?.role === 'lecturer' || profile?.role === 'admin') {
+      activeUpdate.title = formData.title;
+      activeUpdate.bio = formData.bio;
+      activeUpdate.office_location = formData.office_location;
+      activeUpdate.office_hours = formData.office_hours;
+      activeUpdate.website_url = formData.website_url;
+      activeUpdate.linkedin_url = formData.linkedin_url;
+    }
+    
+    updateProfile.mutate(activeUpdate);
   };
 
   const handleSaveOrchestration = () => {
@@ -163,7 +234,7 @@ const SettingsPage = () => {
                 <div className="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-indigo-500/20 blur-2xl rounded-full opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-700" />
                 <div className="w-32 h-32 rounded-[2.5rem] bg-gradient-to-br from-primary via-indigo-600 to-indigo-800 flex items-center justify-center text-4xl font-black text-white shadow-2xl relative z-10 overflow-hidden group-hover/avatar:scale-105 transition-transform duration-700">
                   <div className="absolute inset-0 bg-white/10 animate-pulse" />
-                  {formData.name.split(' ').map(n => n[0]).join('') || 'ID'}
+                  {(formData.name || '').split(' ').map(n => n[0]).join('') || 'ID'}
                   {isRotating && <div className="absolute inset-0 bg-primary/40 backdrop-blur-sm flex items-center justify-center animate-in fade-in"><Loader2 className="w-10 h-10 animate-spin" /></div>}
                 </div>
                 <Button 
@@ -210,7 +281,166 @@ const SettingsPage = () => {
                   />
                 </div>
               </div>
+
+              {/* Shared Additional Fields */}
+              <div className="space-y-4">
+                <Label htmlFor="phone" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Comms Link (Phone)</Label>
+                <div className="relative group">
+                  <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors" />
+                  <Input 
+                    id="phone" 
+                    type="tel" 
+                    value={formData.phone_number}
+                    onChange={(e) => setFormData({...formData, phone_number: e.target.value})}
+                    placeholder="+1 234 567 8900"
+                    className="h-16 pl-16 bg-white/60 border-none rounded-3xl shadow-xl shadow-slate-200/50 focus-visible:ring-2 focus-visible:ring-primary/20 font-bold text-lg text-slate-900 transition-all" 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <Label htmlFor="dob" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Origin Date (DOB)</Label>
+                <div className="relative group">
+                  <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors" />
+                  <Input 
+                    id="dob" 
+                    type="date" 
+                    value={formData.date_of_birth}
+                    onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
+                    className="h-16 pl-16 bg-white/60 border-none rounded-3xl shadow-xl shadow-slate-200/50 focus-visible:ring-2 focus-visible:ring-primary/20 font-bold text-lg text-slate-900 transition-all" 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <Label htmlFor="em_name" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Emergency Proxy name</Label>
+                <div className="relative group">
+                  <HeartPulse className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors" />
+                  <Input 
+                    id="em_name" 
+                    type="text" 
+                    value={formData.emergency_contact_name}
+                    onChange={(e) => setFormData({...formData, emergency_contact_name: e.target.value})}
+                    placeholder="Proxy Name"
+                    className="h-16 pl-16 bg-white/60 border-none rounded-3xl shadow-xl shadow-slate-200/50 focus-visible:ring-2 focus-visible:ring-primary/20 font-bold text-lg text-slate-900 transition-all" 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <Label htmlFor="em_phone" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Emergency Proxy link</Label>
+                <div className="relative group">
+                  <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors" />
+                  <Input 
+                    id="em_phone" 
+                    type="tel" 
+                    value={formData.emergency_contact_phone}
+                    onChange={(e) => setFormData({...formData, emergency_contact_phone: e.target.value})}
+                    placeholder="+1 999 999 9999"
+                    className="h-16 pl-16 bg-white/60 border-none rounded-3xl shadow-xl shadow-slate-200/50 focus-visible:ring-2 focus-visible:ring-primary/20 font-bold text-lg text-slate-900 transition-all" 
+                  />
+                </div>
+              </div>
             </div>
+
+            {/* Role Specific Fields */}
+            {profile?.role === 'student' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-6 border-t border-slate-100/50">
+                <div className="space-y-4">
+                  <Label htmlFor="program" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Academic Protocol (Program)</Label>
+                  <div className="relative group">
+                    <GraduationCap className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
+                    <Input 
+                      id="program" 
+                      type="text" 
+                      value={formData.program}
+                      onChange={(e) => setFormData({...formData, program: e.target.value})}
+                      placeholder="e.g. Computer Science"
+                      className="h-16 pl-16 bg-white/60 border-none rounded-3xl shadow-xl shadow-slate-200/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 font-bold text-lg text-slate-900 transition-all" 
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Label htmlFor="academic_standing" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Current Standing</Label>
+                  <div className="relative group">
+                    <Award className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
+                    <Input 
+                      id="academic_standing" 
+                      type="text" 
+                      value={formData.academic_standing}
+                      onChange={(e) => setFormData({...formData, academic_standing: e.target.value})}
+                      placeholder="Good Standing"
+                      className="h-16 pl-16 bg-white/60 border-none rounded-3xl shadow-xl shadow-slate-200/50 focus-visible:ring-2 focus-visible:ring-indigo-500/20 font-bold text-lg text-slate-900 transition-all" 
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {(profile?.role === 'lecturer' || profile?.role === 'admin') && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-6 border-t border-slate-100/50">
+                <div className="space-y-4">
+                  <Label htmlFor="title" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Academic Rank/Title</Label>
+                  <div className="relative group">
+                    <Briefcase className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-purple-500 transition-colors" />
+                    <Input 
+                      id="title" 
+                      type="text" 
+                      value={formData.title}
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      placeholder="e.g. Associate Professor"
+                      className="h-16 pl-16 bg-white/60 border-none rounded-3xl shadow-xl shadow-slate-200/50 focus-visible:ring-2 focus-visible:ring-purple-500/20 font-bold text-lg text-slate-900 transition-all" 
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Label htmlFor="office_location" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Command Center (Office Location)</Label>
+                  <div className="relative group">
+                    <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-purple-500 transition-colors" />
+                    <Input 
+                      id="office_location" 
+                      type="text" 
+                      value={formData.office_location}
+                      onChange={(e) => setFormData({...formData, office_location: e.target.value})}
+                      placeholder="Building A, Room 302"
+                      className="h-16 pl-16 bg-white/60 border-none rounded-3xl shadow-xl shadow-slate-200/50 focus-visible:ring-2 focus-visible:ring-purple-500/20 font-bold text-lg text-slate-900 transition-all" 
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <Label htmlFor="office_hours" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Active Frequencies (Office Hours)</Label>
+                  <div className="relative group">
+                    <Clock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-purple-500 transition-colors" />
+                    <Input 
+                      id="office_hours" 
+                      type="text" 
+                      value={formData.office_hours}
+                      onChange={(e) => setFormData({...formData, office_hours: e.target.value})}
+                      placeholder="Mon/Wed 2:00 PM - 4:00 PM"
+                      className="h-16 pl-16 bg-white/60 border-none rounded-3xl shadow-xl shadow-slate-200/50 focus-visible:ring-2 focus-visible:ring-purple-500/20 font-bold text-lg text-slate-900 transition-all" 
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <Label htmlFor="linkedin" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">External Link (LinkedIn)</Label>
+                  <div className="relative group">
+                    <Globe className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-purple-500 transition-colors" />
+                    <Input 
+                      id="linkedin" 
+                      type="url" 
+                      value={formData.linkedin_url}
+                      onChange={(e) => setFormData({...formData, linkedin_url: e.target.value})}
+                      placeholder="https://linkedin.com/in/username"
+                      className="h-16 pl-16 bg-white/60 border-none rounded-3xl shadow-xl shadow-slate-200/50 focus-visible:ring-2 focus-visible:ring-purple-500/20 font-bold text-lg text-slate-900 transition-all" 
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
           <div className="px-12 py-10 border-t border-slate-100 bg-slate-50/50 backdrop-blur-md flex justify-end items-center gap-6">
             {updateProfile.isPending && <span className="text-[10px] font-black text-primary animate-pulse tracking-widest uppercase">Transmitting...</span>}
