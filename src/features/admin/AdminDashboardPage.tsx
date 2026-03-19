@@ -5,8 +5,8 @@ import {
 } from 'recharts';
 import { 
   Users, BookOpen, Activity, AlertCircle, TrendingUp, 
-  Clock, Plus, MessageSquare, ShieldCheck, Server, Database, ServerCrash,
-  ArrowUpRight, ArrowDownRight, Zap, Globe, Cpu
+  Clock, Plus, ShieldCheck, Server, Database, ServerCrash,
+  ArrowUpRight, Zap, Globe, Cpu
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +61,7 @@ const AnimatedNumber = ({ value }: { value: number }) => {
 
 const GlassCard = ({ children, className = "", noHover = false }: { children: React.ReactNode, className?: string, noHover?: boolean }) => (
   <Card className={cn(
-    "relative overflow-hidden border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-xl transition-all duration-500",
+    "relative overflow-hidden border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-md shadow-xl transition-all duration-500",
     !noHover && "hover:shadow-2xl hover:bg-white/50 dark:hover:bg-black/50 hover:border-white/40 dark:hover:border-white/20 hover:-translate-y-1",
     className
   )}>
@@ -73,10 +73,10 @@ const GlassCard = ({ children, className = "", noHover = false }: { children: Re
 const AdminDashboardPage = () => {
   return (
     <div className="relative space-y-8 font-sans p-2">
-      {/* Background Decorative Orbs */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[120px] -z-10 pointer-events-none animate-pulse duration-[10s]" />
-      <div className="absolute bottom-[-200px] left-0 w-[600px] h-[600px] bg-amber-500/10 rounded-full blur-[120px] -z-10 pointer-events-none animate-pulse duration-[15s]" />
-      <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[800px] h-[400px] bg-emerald-500/5 rounded-full blur-[150px] -z-10 pointer-events-none" />
+      {/* Background Decorative Orbs - Optimized with will-change and reduced opacity */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[80px] -z-10 pointer-events-none animate-pulse duration-[10s] will-change-transform" />
+      <div className="absolute bottom-[-100px] left-0 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[80px] -z-10 pointer-events-none animate-pulse duration-[15s] will-change-transform" />
+      <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[600px] h-[300px] bg-emerald-500/5 rounded-full blur-[100px] -z-10 pointer-events-none" />
 
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -232,7 +232,7 @@ const AdminDashboardPage = () => {
                       cursor={{ stroke: '#6366f1', strokeWidth: 2, strokeDasharray: '5 5' }}
                       contentStyle={{ 
                         backgroundColor: 'rgba(255, 255, 255, 0.9)', 
-                        backdropFilter: 'blur(20px)',
+                        backdropFilter: 'blur(8px)',
                         borderRadius: '24px', 
                         border: '1px solid rgba(99, 102, 241, 0.3)', 
                         boxShadow: '0 25px 50px -12px rgba(99, 102, 241, 0.25)',
@@ -277,7 +277,7 @@ const AdminDashboardPage = () => {
                         cursor={{ fill: 'currentColor', opacity: 0.03 }}
                         contentStyle={{ 
                           backgroundColor: 'rgba(255, 255, 255, 0.9)', 
-                          backdropFilter: 'blur(16px)',
+                          backdropFilter: 'blur(8px)',
                           borderRadius: '16px', 
                           border: 'none', 
                           boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
