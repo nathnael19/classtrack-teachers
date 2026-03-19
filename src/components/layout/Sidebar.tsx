@@ -11,7 +11,10 @@ import {
   ChevronRight,
   PanelLeftClose,
   PanelLeftOpen,
-  LogOut
+  LogOut,
+  Shield,
+  Users,
+  GraduationCap
 } from 'lucide-react';
 import { useUIStore } from '@/store/uiStore';
 import { useAuthStore } from '@/store/authStore';
@@ -26,6 +29,13 @@ const navItems = [
   { icon: BarChart3, label: 'Analytics', path: '/analytics' },
   { icon: FileText, label: 'Reports', path: '/reports' },
   { icon: MapPin, label: 'Classrooms', path: '/classrooms' },
+  { icon: Settings, label: 'Settings', path: '/settings' },
+];
+
+const adminNavItems = [
+  { icon: Shield, label: 'Admin Dashboard', path: '/admin/dashboard' },
+  { icon: Users, label: 'User Mgmt', path: '/admin/users' },
+  { icon: GraduationCap, label: 'Academic Mgmt', path: '/admin/academic' },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
@@ -83,47 +93,93 @@ const Sidebar = () => {
           </div>
 
           {/* Navigation Section */}
-          <nav className="px-4 py-2 space-y-1.5 flex-1 overflow-y-auto custom-scrollbar" aria-label="Primary">
-            <div className={cn(
-              "text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.3em] mb-6 px-4 transition-all duration-500",
-              sidebarCollapsed && "opacity-0"
-            )}>
-              Menu
-            </div>
-            {navItems.map((item) => (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    "group flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-300 text-sm font-bold relative overflow-hidden",
-                    isActive
-                      ? "bg-primary text-white shadow-lg shadow-primary/30 translate-x-1"
-                      : "text-muted-foreground/80 hover:bg-primary/5 hover:text-primary"
-                  )
-                }
-              >
+          <nav className="px-4 py-2 pb-4 space-y-1.5 flex-1 min-h-0 overflow-y-auto custom-scrollbar" aria-label="Primary">
+            {user?.role !== 'admin' && (
+              <>
                 <div className={cn(
-                  "flex items-center gap-4 relative z-10 transition-all duration-500",
-                  sidebarCollapsed && "justify-center w-full"
+                  "text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.3em] mb-6 px-4 transition-all duration-500",
+                  sidebarCollapsed && "opacity-0"
                 )}>
-                  <item.icon className={cn(
-                    "w-5 h-5 transition-all duration-300",
-                    "group-hover:scale-110 group-hover:rotate-6"
-                  )} aria-hidden />
-                  {!sidebarCollapsed && (
-                    <span className="animate-in fade-in slide-in-from-left-2 duration-500">{item.label}</span>
-                  )}
+                  Menu
                 </div>
-                {!sidebarCollapsed && (
-                  <ChevronRight className="w-4 h-4 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-40 group-hover:translate-x-0" />
-                )}
+                {navItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      cn(
+                        "group flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-300 text-sm font-bold relative overflow-hidden",
+                        isActive
+                          ? "bg-primary text-white shadow-lg shadow-primary/30 translate-x-1"
+                          : "text-muted-foreground/80 hover:bg-primary/5 hover:text-primary"
+                      )
+                    }
+                  >
+                    <div className={cn(
+                      "flex items-center gap-4 relative z-10 transition-all duration-500",
+                      sidebarCollapsed && "justify-center w-full"
+                    )}>
+                      <item.icon className={cn(
+                        "w-5 h-5 transition-all duration-300",
+                        "group-hover:scale-110 group-hover:rotate-6"
+                      )} aria-hidden />
+                      {!sidebarCollapsed && (
+                        <span className="animate-in fade-in slide-in-from-left-2 duration-500">{item.label}</span>
+                      )}
+                    </div>
+                    {!sidebarCollapsed && (
+                      <ChevronRight className="w-4 h-4 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-40 group-hover:translate-x-0" />
+                    )}
 
-                {/* Active Reflection Effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-              </NavLink>
-            ))}
+                    {/* Active Reflection Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                  </NavLink>
+                ))}
+              </>
+            )}
+
+            {user?.role === 'admin' && (
+              <>
+                <div className={cn(
+                  "text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.3em] mb-6 px-4 transition-all duration-500",
+                  sidebarCollapsed && "opacity-0"
+                )}>
+                  Admin Section
+                </div>
+                {adminNavItems.map((item) => (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      cn(
+                        "group flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all duration-300 text-sm font-bold relative overflow-hidden",
+                        isActive
+                          ? "bg-primary text-white shadow-lg shadow-primary/30 translate-x-1"
+                          : "text-muted-foreground/80 hover:bg-primary/5 hover:text-primary"
+                      )
+                    }
+                  >
+                    <div className={cn(
+                      "flex items-center gap-4 relative z-10 transition-all duration-500",
+                      sidebarCollapsed && "justify-center w-full"
+                    )}>
+                      <item.icon className={cn(
+                        "w-5 h-5 transition-all duration-300",
+                        "group-hover:scale-110 group-hover:rotate-6"
+                      )} aria-hidden />
+                      {!sidebarCollapsed && (
+                        <span className="animate-in fade-in slide-in-from-left-2 duration-500">{item.label}</span>
+                      )}
+                    </div>
+                    {!sidebarCollapsed && (
+                      <ChevronRight className="w-4 h-4 opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-40 group-hover:translate-x-0" />
+                    )}
+                  </NavLink>
+                ))}
+              </>
+            )}
           </nav>
 
           {/* Bottom Actions & User Profile */}
