@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   User, 
@@ -51,11 +51,14 @@ interface UserProfile {
   emergency_contact_phone?: string;
   gender?: string;
   date_of_birth?: string;
+  profile_picture_url?: string;
 }
 
 const SettingsPage = () => {
   const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isRotating, setIsRotating] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   // --- Queries ---
   const { data: profile, isLoading } = useQuery<UserProfile>({
@@ -95,7 +98,8 @@ const SettingsPage = () => {
     office_location: '',
     office_hours: '',
     website_url: '',
-    linkedin_url: ''
+    linkedin_url: '',
+    profile_picture_url: ''
   });
 
   const [passwords, setPasswords] = useState({
@@ -176,9 +180,40 @@ const SettingsPage = () => {
   };
 
   const rotateAvatar = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate size (1MB limit as per UI)
+    if (file.size > 1024 * 1024) {
+      toast.error('Quantum Static overloaded: Keep payload under 1.0MB');
+      return;
+    }
+
+    const formDataUpload = new FormData();
+    formDataUpload.append('file', file);
+
+    setIsUploading(true);
     setIsRotating(true);
-    setTimeout(() => setIsRotating(false), 2000);
-    toast.info('Re-rendering identity visualizer...');
+    try {
+      const response = await api.post('/users/me/profile-picture', formDataUpload, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      setFormData(prev => ({ ...prev, profile_picture_url: response.data.profile_picture_url }));
+      queryClient.invalidateQueries({ queryKey: ['user-profile'] });
+      toast.success('Neural signature updated!');
+    } catch (error: any) {
+      toast.error(error.response?.data?.detail || 'Identity sync projection failed.');
+    } finally {
+      setIsUploading(false);
+      setIsRotating(false);
+    }
   };
 
   if (isLoading) {
@@ -234,11 +269,31 @@ const SettingsPage = () => {
                 <div className="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-indigo-500/20 blur-2xl rounded-full opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-700" />
                 <div className="w-32 h-32 rounded-[2.5rem] bg-gradient-to-br from-primary via-indigo-600 to-indigo-800 flex items-center justify-center text-4xl font-black text-white shadow-2xl relative z-10 overflow-hidden group-hover/avatar:scale-105 transition-transform duration-700">
                   <div className="absolute inset-0 bg-white/10 animate-pulse" />
-                  {(formData.name || '').split(' ').map(n => n[0]).join('') || 'ID'}
-                  {isRotating && <div className="absolute inset-0 bg-primary/40 backdrop-blur-sm flex items-center justify-center animate-in fade-in"><Loader2 className="w-10 h-10 animate-spin" /></div>}
+                  {profile?.profile_picture_url ? (
+                    <img 
+                      src={`${api.defaults.baseURL?.replace('/api/v1', '')}${profile.profile_picture_url}`} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    (formData.name || '').split(' ').map(n => n[0]).join('') || 'ID'
+                  )}
+                  {(isRotating || isUploading) && (
+                    <div className="absolute inset-0 bg-primary/40 backdrop-blur-sm flex items-center justify-center animate-in fade-in">
+                      <Loader2 className="w-10 h-10 animate-spin" />
+                    </div>
+                  )}
                 </div>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleFileUpload} 
+                  className="hidden" 
+                  accept="image/*"
+                />
                 <Button 
                   onClick={rotateAvatar}
+                  disabled={isUploading}
                   size="icon" 
                   className="absolute -bottom-2 -right-2 w-12 h-12 rounded-2xl bg-white border border-slate-100 text-slate-900 shadow-xl hover:bg-primary hover:text-white hover:rotate-90 transition-all duration-500 z-20"
                 >
