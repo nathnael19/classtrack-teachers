@@ -171,6 +171,15 @@ const AcademicManagementPage = () => {
                 </div>
               </GlassCard>
             ))}
+            <button 
+              onClick={() => navigate("/admin/academic/departments/new")}
+              className="border-2 border-dashed border-white/20 rounded-[2.5rem] p-6 flex flex-col items-center justify-center gap-3 text-muted-foreground hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-500/5 transition-all group"
+            >
+              <div className="w-12 h-12 rounded-full bg-white/10 dark:bg-black/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Plus className="w-6 h-6" />
+              </div>
+              <span className="text-sm font-black uppercase tracking-widest">Register Department</span>
+            </button>
           </div>
         )}
 
