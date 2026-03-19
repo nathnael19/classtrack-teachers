@@ -49,6 +49,7 @@ interface SessionStudent {
   student_id: string; // Student code
   status: string | null;
   timestamp: string | null;
+  section?: string;
 }
 
 interface AttendanceRecord {
@@ -58,6 +59,7 @@ interface AttendanceRecord {
   student_code: string;
   timestamp: string;
   status: string;
+  section?: string;
 }
 
 interface ActiveSession {
@@ -147,6 +149,7 @@ const LiveSessionPage = () => {
             student_code: message.student.student_id,
             timestamp: message.student.timestamp,
             status: message.student.status,
+            section: message.student.section,
           };
 
           // Optimistically update the query cache
@@ -506,10 +509,11 @@ const LiveSessionPage = () => {
               <Table>
                 <TableHeader className="bg-slate-50/80 sticky top-0 z-10 backdrop-blur-md border-b">
                   <TableRow className="border-none hover:bg-transparent">
-                    <TableHead className="py-6 px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">Student Identity</TableHead>
+                    <TableHead className="py-6 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Student Identity</TableHead>
+                    <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sec</TableHead>
                     <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Credential ID</TableHead>
                     <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Time-Stamp</TableHead>
-                    <TableHead className="text-right px-10 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <TableHead className="text-right px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">
                       <div className="flex items-center justify-end gap-4">
                         Status
                         <Dialog open={isManageOpen} onOpenChange={setIsManageOpen}>
@@ -544,6 +548,7 @@ const LiveSessionPage = () => {
                                 <TableHeader>
                                   <TableRow className="border-none hover:bg-transparent bg-slate-50/50">
                                     <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400 py-4">Student</TableHead>
+                                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400">Sec</TableHead>
                                     <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400">ID</TableHead>
                                     <TableHead className="text-right text-[9px] font-black uppercase tracking-widest text-slate-400">Action</TableHead>
                                   </TableRow>
@@ -570,6 +575,11 @@ const LiveSessionPage = () => {
                                           </div>
                                           <span className="font-black text-slate-800 text-sm">{s.name}</span>
                                         </div>
+                                      </TableCell>
+                                      <TableCell className="py-4">
+                                        <Badge variant="outline" className="text-[9px] font-black border-slate-200">
+                                          {s.section || '-'}
+                                        </Badge>
                                       </TableCell>
                                       <TableCell className="font-mono text-[10px] font-black text-slate-400">
                                         {s.student_id || 'N/A'}
@@ -604,7 +614,7 @@ const LiveSessionPage = () => {
                 <TableBody>
                   {attendance.map((student) => (
                     <TableRow key={student.id} className="group border-b border-indigo-50/30 transition-all hover:bg-primary/[0.02] animate-in slide-in-from-right-4 duration-500">
-                      <TableCell className="py-6 px-10">
+                      <TableCell className="py-6 px-6">
                         <div className="flex items-center gap-4">
                           <div className="relative">
                             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-sm font-black text-white shadow-lg shadow-primary/20 transition-transform group-hover:scale-110">
@@ -618,6 +628,11 @@ const LiveSessionPage = () => {
                           </div>
                         </div>
                       </TableCell>
+                      <TableCell className="py-6 px-6">
+                        <Badge variant="outline" className="bg-primary/5 text-primary border-primary/10 text-[9px] font-black">
+                          {student.section || 'ALL'}
+                        </Badge>
+                      </TableCell>
                       <TableCell className="font-mono text-[10px] font-black text-slate-400 tracking-tighter uppercase">
                         {student.student_code || 'S-UNKNOWN'}
                       </TableCell>
@@ -629,7 +644,7 @@ const LiveSessionPage = () => {
                           {new Date(student.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                         </div>
                       </TableCell>
-                      <TableCell className="text-right px-10">
+                      <TableCell className="text-right px-6">
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-[10px] font-black tracking-widest uppercase">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           {student.status}
