@@ -15,6 +15,7 @@ import LandingPage from "@/features/landing/LandingPage";
 import AdminDashboardPage from "@/features/admin/AdminDashboardPage";
 import UsersManagementPage from "@/features/admin/UsersManagementPage";
 import AcademicManagementPage from "@/features/admin/AcademicManagementPage";
+import AddCoursePage from "@/features/admin/AddCoursePage";
 import { useAuthStore } from "@/store/authStore";
 
 /** Redirects unauthenticated users to /login */
@@ -50,6 +51,7 @@ export const router = createBrowserRouter([
           { path: "admin/dashboard", element: <AdminDashboardPage /> },
           { path: "admin/users", element: <UsersManagementPage /> },
           { path: "admin/academic", element: <AcademicManagementPage /> },
+          { path: "admin/academic/courses/new", element: <AddCoursePage /> },
         ],
       },
     ],
