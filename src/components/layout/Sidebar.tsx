@@ -33,7 +33,7 @@ const navItems = [
 ];
 
 const adminNavItems = [
-  { icon: Shield, label: 'Admin Dashboard', path: '/admin/dashboard' },
+  { icon: Shield, label: 'Dashboard', path: '/admin/dashboard' },
   { icon: Users, label: 'User Mgmt', path: '/admin/users' },
   { icon: GraduationCap, label: 'Academic Mgmt', path: '/admin/academic' },
   { icon: Settings, label: 'Settings', path: '/settings' },
