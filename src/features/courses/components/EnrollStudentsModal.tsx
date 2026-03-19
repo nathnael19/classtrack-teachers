@@ -37,6 +37,7 @@ import { cn } from '@/lib/utils';
 interface StudentRow {
   name: string;
   student_id: string;
+  section?: string;
 }
 
 interface EnrollStudentsModalProps {
@@ -46,7 +47,7 @@ interface EnrollStudentsModalProps {
 
 export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModalProps) => {
   const [open, setOpen] = useState(false);
-  const [students, setStudents] = useState<StudentRow[]>([{ name: '', student_id: '' }]);
+  const [students, setStudents] = useState<StudentRow[]>([{ name: '', student_id: '', section: '' }]);
   const [ingestMode, setIngestMode] = useState(false);
   const [rawText, setRawText] = useState('');
   
@@ -67,7 +68,7 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
       });
       queryClient.invalidateQueries({ queryKey: ['courses'] });
       setOpen(false);
-      setStudents([{ name: '', student_id: '' }]);
+      setStudents([{ name: '', student_id: '', section: '' }]);
     },
     onError: (error: any) => {
       toast.error('Strategic Failure', {
@@ -77,12 +78,12 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
   });
 
   const addRow = () => {
-    setStudents([...students, { name: '', student_id: '' }]);
+    setStudents([...students, { name: '', student_id: '', section: '' }]);
   };
 
   const removeRow = (index: number) => {
     if (students.length === 1) {
-      setStudents([{ name: '', student_id: '' }]);
+      setStudents([{ name: '', student_id: '', section: '' }]);
       return;
     }
     setStudents(students.filter((_, i) => i !== index));
@@ -102,7 +103,8 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
       const parts = line.includes('\t') ? line.split('\t') : line.split(/[,;]/);
       return {
         name: parts[0]?.trim() || '',
-        student_id: parts[1]?.trim() || ''
+        student_id: parts[1]?.trim() || '',
+        section: parts[2]?.trim() || ''
       };
     });
 
@@ -219,8 +221,9 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
                  value={rawText}
                  onChange={(e) => setRawText(e.target.value)}
                  placeholder="Example:
-John Doe,S2024001
-Jane Smith,S2024002"
+// Format: Name, ID, Section
+John Doe,S2024001,A
+Jane Smith,S2024002,B"
                  className="w-full h-80 rounded-[2rem] bg-slate-50 border-2 border-dashed border-slate-200 p-8 font-mono text-sm focus:outline-none focus:border-primary/50 transition-all shadow-inner"
                />
                <div className="flex gap-4">
@@ -236,6 +239,7 @@ Jane Smith,S2024002"
                     <TableHead className="w-12"></TableHead>
                     <TableHead className="py-5 font-black uppercase text-[9px] tracking-[0.3em] text-slate-400">Student Full Identity</TableHead>
                     <TableHead className="py-5 font-black uppercase text-[9px] tracking-[0.3em] text-slate-400">System ID Credential</TableHead>
+                    <TableHead className="py-5 font-black uppercase text-[9px] tracking-[0.3em] text-slate-400">Section</TableHead>
                     <TableHead className="w-16"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -257,6 +261,14 @@ Jane Smith,S2024002"
                           onChange={(e) => updateRow(index, 'student_id', e.target.value)}
                           placeholder="e.g. STU-992-K"
                           className="h-12 rounded-xl border-none bg-transparent font-mono font-black focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-sm transition-all text-sm px-4 uppercase"
+                        />
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <Input
+                          value={row.section || ''}
+                          onChange={(e) => updateRow(index, 'section', e.target.value)}
+                          placeholder="e.g. A"
+                          className="h-12 rounded-xl border-none bg-transparent font-bold focus-visible:ring-0 focus-visible:bg-white focus-visible:shadow-sm transition-all text-sm px-4"
                         />
                       </TableCell>
                       <TableCell className="text-right py-4 pr-6">
