@@ -36,7 +36,7 @@ const adminNavItems = [
   { icon: Shield, label: 'Dashboard', path: '/admin/dashboard' },
   { icon: Users, label: 'User Mgmt', path: '/admin/users' },
   { icon: GraduationCap, label: 'Academic Mgmt', path: '/admin/academic' },
-  { icon: Settings, label: 'Settings', path: '/settings' },
+  { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
 
 const Sidebar = () => {
