@@ -13,7 +13,9 @@ import {
   Clock,
   ArrowUpRight,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  Plus,
+  Trash2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useState, useMemo } from 'react';
@@ -38,6 +40,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { AddScheduleDialog } from './components/AddScheduleDialog';
 
 interface StudentActivity {
   id: number;
@@ -48,6 +51,16 @@ interface StudentActivity {
   attendance_rate: number;
   last_seen: string | null;
   status: 'Consistent' | 'Moderate' | 'At Risk' | 'Inactive';
+  section: string | null;
+}
+
+interface CourseSchedule {
+  id: number;
+  section: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+  room: string;
 }
 
 interface CourseDetail {
@@ -59,19 +72,31 @@ interface CourseDetail {
   total_sessions: number;
   average_attendance: number;
   students: StudentActivity[];
+  schedules: CourseSchedule[];
 }
 
 const CourseDetailsPage = () => {
   const { id } = useParams();
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'students' | 'schedule'>('students');
 
-  const { data: course, isLoading } = useQuery<CourseDetail>({
+  const { data: course, isLoading, refetch } = useQuery<CourseDetail>({
     queryKey: ['course', id],
     queryFn: async () => {
       const { data } = await api.get(`/courses/${id}`);
       return data;
     },
   });
+
+  const handleDeleteSchedule = async (scheduleId: number) => {
+    if (!window.confirm("Are you sure you want to decommission this tactical slot?")) return;
+    try {
+      await api.delete(`/courses/schedules/${scheduleId}`);
+      refetch();
+    } catch (error) {
+      console.error('Failed to delete schedule:', error);
+    }
+  };
 
   const filteredStudents = useMemo(() => {
     if (!course?.students) return [];
@@ -123,12 +148,40 @@ const CourseDetailsPage = () => {
                <Download className="w-4 h-4" />
                Export Report
              </Button>
-             <Button className="rounded-2xl h-14 px-8 shadow-lg shadow-primary/20 font-black text-xs uppercase tracking-widest gap-2 bg-primary hover:bg-primary/90">
-               <Calendar className="w-4 h-4" />
-               Schedule Session
-             </Button>
+            <Button 
+              onClick={() => setActiveTab('schedule')}
+              className={cn(
+                "rounded-2xl h-14 px-8 font-black text-xs uppercase tracking-widest gap-2 transition-all",
+                activeTab === 'schedule' ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-white text-muted-foreground border border-indigo-50 hover:bg-slate-50"
+              )}
+            >
+              <Calendar className="w-4 h-4" />
+              Manage Schedule
+            </Button>
           </div>
         </div>
+      </div>
+
+      {/* Navigation Tabs */}
+      <div className="flex gap-4 mb-8">
+        <button 
+          onClick={() => setActiveTab('students')}
+          className={cn(
+            "px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all",
+            activeTab === 'students' ? "bg-white text-primary border border-primary/20 shadow-sm" : "text-muted-foreground hover:bg-white/50"
+          )}
+        >
+          Student Registry
+        </button>
+        <button 
+          onClick={() => setActiveTab('schedule')}
+          className={cn(
+            "px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all",
+            activeTab === 'schedule' ? "bg-white text-primary border border-primary/20 shadow-sm" : "text-muted-foreground hover:bg-white/50"
+          )}
+        >
+          Weekly Timetable
+        </button>
       </div>
 
       {/* KPI Section */}
@@ -181,153 +234,216 @@ const CourseDetailsPage = () => {
         ))}
       </div>
 
-      {/* Student Registry Table */}
-      <div className="bg-white rounded-[40px] border border-indigo-50 shadow-sm overflow-hidden flex flex-col">
-        {/* Table Header Controls */}
-        <div className="p-8 border-b border-indigo-50 flex items-center justify-between gap-6 bg-slate-50/30">
-          <div className="flex items-center gap-6 flex-1 max-w-2xl">
-            <div className="relative flex-1 group">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
-              <Input 
-                placeholder="Search tactical assets by name or ID..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-14 pl-14 pr-10 rounded-2xl border-indigo-100/50 bg-white focus:ring-4 focus:ring-primary/5 transition-all font-medium font-['FiraSans']"
-              />
+      {activeTab === 'students' ? (
+        <div className="bg-white rounded-[40px] border border-indigo-50 shadow-sm overflow-hidden flex flex-col">
+          {/* Table Header Controls */}
+          <div className="p-8 border-b border-indigo-50 flex items-center justify-between gap-6 bg-slate-50/30">
+            <div className="flex items-center gap-6 flex-1 max-w-2xl">
+              <div className="relative flex-1 group">
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
+                <Input 
+                  placeholder="Search tactical assets by name or ID..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="h-14 pl-14 pr-10 rounded-2xl border-indigo-100/50 bg-white focus:ring-4 focus:ring-primary/5 transition-all font-medium font-['FiraSans']"
+                />
+              </div>
+              <Button variant="outline" className="rounded-2xl h-14 px-8 border-indigo-100 hover:bg-primary/5 gap-3 font-black text-xs uppercase tracking-widest transition-all">
+                <Filter className="w-4 h-4 text-muted-foreground" />
+                Intelligence
+              </Button>
             </div>
-            <Button variant="outline" className="rounded-2xl h-14 px-8 border-indigo-100 hover:bg-primary/5 gap-3 font-black text-xs uppercase tracking-widest transition-all">
-              <Filter className="w-4 h-4 text-muted-foreground" />
-              Intelligence
-            </Button>
+            
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+              <Clock className="w-3 h-3" />
+              Last Sync: {format(new Date(), 'HH:mm')}
+            </div>
           </div>
-          
-          <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
-            <Clock className="w-3 h-3" />
-            Last Sync: {format(new Date(), 'HH:mm')}
-          </div>
-        </div>
 
-        {/* The Grid */}
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader className="bg-slate-50/50 border-b border-indigo-50/50">
-              <TableRow className="hover:bg-transparent border-none">
-                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40 w-[350px]">Student Asset</TableHead>
-                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">University ID</TableHead>
-                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Engagement</TableHead>
-                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Temporal Activity</TableHead>
-                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Status</TableHead>
-                <TableHead className="px-10 py-8 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40 text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody className="divide-y divide-slate-50">
-              {filteredStudents.map((student) => (
-                <TableRow key={student.id} className="group hover:bg-indigo-50/30 transition-all duration-300">
-                  <TableCell className="px-10 py-8">
-                    <div className="flex items-center gap-5">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 flex items-center justify-center text-primary shadow-sm group-hover:scale-110 transition-transform duration-500">
-                        <span className="font-black text-sm">{student.name.charAt(0)}</span>
-                      </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="font-black text-lg text-[#1E3A8A] font-['FiraCode'] leading-none">
-                          {student.name}
-                        </span>
-                        <div className="flex items-center gap-2 opacity-50">
-                           <Mail className="w-3 h-3" />
-                           <span className="text-[10px] font-black uppercase tracking-widest">Digital ID: {student.id}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-10 py-8">
-                    <div className="inline-flex px-4 py-2 bg-slate-100 rounded-xl font-mono text-xs font-black text-foreground border border-slate-200/50 group-hover:bg-[#1E40AF] group-hover:text-white transition-all">
-                      {student.student_id}
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-10 py-8">
-                    <div className="flex items-center gap-4">
-                      <div className="flex flex-col gap-1.5 w-full max-w-[120px]">
-                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-[#1E3A8A]">
-                          <span>Growth</span>
-                          <span>{Math.round(student.attendance_rate)}%</span>
-                        </div>
-                        <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                          <div 
-                            className={cn(
-                              "h-full transition-all duration-1000",
-                              student.attendance_rate >= 80 ? "bg-emerald-500" :
-                              student.attendance_rate >= 50 ? "bg-amber-500" : "bg-red-500"
-                            )}
-                            style={{ width: `${student.attendance_rate}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-10 py-8">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-muted-foreground/60">
-                        <Clock className="w-4 h-4" />
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-black text-sm text-foreground">
-                          {student.last_seen ? format(new Date(student.last_seen), 'MMM dd, HH:mm') : 'Never'}
-                        </span>
-                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Last Engagement</span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-10 py-8">
-                    <Badge className={cn(
-                      "rounded-full px-5 py-2 font-black text-[9px] uppercase tracking-[0.2em] border-none shadow-sm",
-                      student.status === 'Consistent' ? "bg-emerald-100 text-emerald-600" :
-                      student.status === 'Moderate' ? "bg-blue-100 text-blue-600" :
-                      student.status === 'At Risk' ? "bg-amber-100 text-amber-600" :
-                      "bg-red-100 text-red-600"
-                    )}>
-                      {student.status === 'Consistent' && <ShieldCheck className="w-3 h-3 mr-2 inline" />}
-                      {student.status === 'At Risk' && <AlertCircle className="w-3 h-3 mr-2 inline" />}
-                      {student.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="px-10 py-8 text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-slate-100">
-                          <MoreHorizontal className="h-5 w-5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-indigo-50 shadow-xl">
-                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2 py-2">Engagement Control</DropdownMenuLabel>
-                        <DropdownMenuItem className="rounded-xl p-3 gap-3 font-bold text-sm cursor-pointer">
-                          <Mail className="w-4 h-4" />
-                          Send Notification
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="rounded-xl p-3 gap-3 font-bold text-sm cursor-pointer">
-                          <TrendingUp className="w-4 h-4" />
-                          View Full History
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+          {/* The Grid */}
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader className="bg-slate-50/50 border-b border-indigo-50/50">
+                <TableRow className="hover:bg-transparent border-none">
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40 w-[300px]">Student Asset</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Sec</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">University ID</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Engagement</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Temporal Activity</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Status</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40 text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          
-          {filteredStudents.length === 0 && (
-            <div className="p-20 flex flex-col items-center justify-center text-center space-y-4">
-              <div className="w-20 h-20 rounded-[32px] bg-slate-50 flex items-center justify-center text-slate-200">
-                <Search className="w-10 h-10" />
+              </TableHeader>
+              <TableBody className="divide-y divide-slate-50">
+                {filteredStudents.map((student) => (
+                  <TableRow key={student.id} className="group hover:bg-indigo-50/30 transition-all duration-300">
+                    <TableCell className="px-6 py-6">
+                      <div className="flex items-center gap-5">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 flex items-center justify-center text-primary shadow-sm group-hover:scale-110 transition-transform duration-500">
+                          <span className="font-black text-sm">{student.name.charAt(0)}</span>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <span className="font-black text-lg text-[#1E3A8A] font-['FiraCode'] leading-none">
+                            {student.name}
+                          </span>
+                          <div className="flex items-center gap-2 opacity-50">
+                             <Mail className="w-3 h-3" />
+                             <span className="text-[10px] font-black uppercase tracking-widest">Digital ID: {student.id}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-6">
+                      <div className="inline-flex px-3 py-1 bg-primary/5 text-primary border border-primary/10 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                        {student.section || '-'}
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-6">
+                      <div className="inline-flex px-4 py-2 bg-slate-100 rounded-xl font-mono text-xs font-black text-foreground border border-slate-200/50 group-hover:bg-[#1E40AF] group-hover:text-white transition-all">
+                        {student.student_id}
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-6">
+                      <div className="flex items-center gap-4">
+                        <div className="flex flex-col gap-1.5 w-full max-w-[120px]">
+                          <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-[#1E3A8A]">
+                            <span>Growth</span>
+                            <span>{Math.round(student.attendance_rate)}%</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div 
+                              className={cn(
+                                "h-full transition-all duration-1000",
+                                student.attendance_rate >= 80 ? "bg-emerald-500" :
+                                student.attendance_rate >= 50 ? "bg-amber-500" : "bg-red-500"
+                              )}
+                              style={{ width: `${student.attendance_rate}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-muted-foreground/60">
+                          <Clock className="w-4 h-4" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-black text-sm text-foreground">
+                            {student.last_seen ? format(new Date(student.last_seen), 'MMM dd, HH:mm') : 'Never'}
+                          </span>
+                          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Last Engagement</span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-6">
+                      <Badge className={cn(
+                        "rounded-full px-5 py-2 font-black text-[9px] uppercase tracking-[0.2em] border-none shadow-sm",
+                        student.status === 'Consistent' ? "bg-emerald-100 text-emerald-600" :
+                        student.status === 'Moderate' ? "bg-blue-100 text-blue-600" :
+                        student.status === 'At Risk' ? "bg-amber-100 text-amber-600" :
+                        "bg-red-100 text-red-600"
+                      )}>
+                        {student.status === 'Consistent' && <ShieldCheck className="w-3 h-3 mr-2 inline" />}
+                        {student.status === 'At Risk' && <AlertCircle className="w-3 h-3 mr-2 inline" />}
+                        {student.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="px-6 py-6 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-slate-100">
+                            <MoreHorizontal className="h-5 w-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-indigo-50 shadow-xl">
+                          <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2 py-2">Engagement Control</DropdownMenuLabel>
+                          <DropdownMenuItem className="rounded-xl p-3 gap-3 font-bold text-sm cursor-pointer">
+                            <Mail className="w-4 h-4" />
+                            Send Notification
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="rounded-xl p-3 gap-3 font-bold text-sm cursor-pointer">
+                            <TrendingUp className="w-4 h-4" />
+                            View Full History
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            
+            {filteredStudents.length === 0 && (
+              <div className="p-20 flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-20 h-20 rounded-[32px] bg-slate-50 flex items-center justify-center text-slate-200">
+                  <Search className="w-10 h-10" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-foreground">No tactical matches found</h3>
+                  <p className="text-muted-foreground font-medium">Verify your intelligence query or search parameters.</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-black text-foreground">No tactical matches found</h3>
-                <p className="text-muted-foreground font-medium">Verify your intelligence query or search parameters.</p>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="space-y-8">
+          <div className="bg-white rounded-[40px] border border-indigo-50 shadow-sm p-8 flex flex-col items-center justify-center text-center py-20 bg-gradient-to-b from-white to-slate-50/50">
+            <div className="w-24 h-24 rounded-[36px] bg-primary/5 flex items-center justify-center text-primary mb-8 animate-pulse">
+              <Calendar className="w-10 h-10" />
+            </div>
+            <div className="max-w-md mx-auto space-y-4">
+              <h2 className="text-3xl font-black text-slate-900 leading-tight">Weekly Tactical Timetable</h2>
+              <p className="text-slate-500 font-medium leading-relaxed">Define consistent teaching slots for your sections. These will be visible to your students in their mobile dispatch.</p>
+              <AddScheduleDialog courseId={id!} onSuccess={() => refetch()} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {(course?.schedules || []).map((slot) => (
+              <div key={slot.id} className="bg-white p-8 rounded-[32px] border border-indigo-50 shadow-sm hover:shadow-md transition-all group">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="px-4 py-2 bg-primary/5 text-primary rounded-xl text-[10px] font-black uppercase tracking-[0.2em]">
+                    Section {slot.section}
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => handleDeleteSchedule(slot.id)}
+                    className="h-10 w-10 p-0 rounded-xl hover:bg-red-50 hover:text-red-500 text-slate-300 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-[#1E3A8A]">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-lg text-[#1E3A8A]">
+                        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][slot.day_of_week]}
+                      </h4>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        {slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                      <ShieldCheck className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-700">{slot.room}</h4>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Primary Classroom</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
