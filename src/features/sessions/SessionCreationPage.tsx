@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -44,7 +44,13 @@ const formSchema = z.object({
   radius: z.string().min(1, 'Geofence radius is required'),
   topic: z.string().optional(),
   notes: z.string().optional(),
+  section: z.string().optional(),
+  isScheduled: z.boolean(),
+  scheduledDate: z.string().optional(),
+  scheduledTime: z.string().optional(),
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface Course {
   id: number;
@@ -78,7 +84,8 @@ interface SessionContext {
 const SessionCreationPage = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-
+  const [searchParams] = useSearchParams();
+  const queryCourseId = searchParams.get('courseId');
   // --- Queries ---
   const { data: courses = [], isLoading: isLoadingCourses } = useQuery<Course[]>({
     queryKey: ['courses'],
@@ -111,15 +118,19 @@ const SessionCreationPage = () => {
     },
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      courseId: '',
+      courseId: queryCourseId || '',
       room: '',
       duration: '60',
       radius: '50',
       topic: '',
       notes: '',
+      section: '',
+      isScheduled: !!queryCourseId,
+      scheduledDate: new Date().toISOString().split('T')[0],
+      scheduledTime: new Date().toTimeString().slice(0, 5),
     },
   });
 
@@ -138,8 +149,13 @@ const SessionCreationPage = () => {
     }
   }, [user, form.reset]);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const startTime = new Date();
+  const onSubmit = async (values: FormValues) => {
+    let startTime: Date;
+    if (values.isScheduled && values.scheduledDate && values.scheduledTime) {
+      startTime = new Date(`${values.scheduledDate}T${values.scheduledTime}`);
+    } else {
+      startTime = new Date();
+    }
     const endTime = new Date(startTime.getTime() + parseInt(values.duration) * 60000);
     
     // Find the selected room to get its telemetry
@@ -156,6 +172,7 @@ const SessionCreationPage = () => {
       geofence_radius: parseFloat(values.radius),
       topic: values.topic,
       notes: values.notes,
+      section: values.section || null,
     };
 
     createSessionMutation.mutate(payload);
@@ -355,6 +372,87 @@ const SessionCreationPage = () => {
                       )}
                     />
                   </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-4">
+                    <FormField
+                      control={form.control}
+                      name="section"
+                      render={({ field }) => (
+                        <FormItem className="space-y-4">
+                          <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1">Target Section</FormLabel>
+                          <FormControl>
+                            <div className="relative group">
+                              <Input 
+                                placeholder="Leave empty for all sections" 
+                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-bold text-slate-900 placeholder:text-slate-300 transition-all group-hover:bg-white" 
+                                {...field} 
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage className="text-[9px] font-black uppercase tracking-widest text-destructive" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="isScheduled"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-[1.25rem] bg-slate-50 p-6 shadow-inner mt-8">
+                          <div className="space-y-0.5">
+                            <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Schedule Mode</FormLabel>
+                            <FormDescription className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Enable for future sessions</FormDescription>
+                          </div>
+                          <FormControl>
+                            <input
+                              type="checkbox"
+                              className="w-6 h-6 rounded-lg border-2 border-indigo-200 text-primary focus:ring-primary transition-all cursor-pointer"
+                              checked={field.value}
+                              onChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {form.watch('isScheduled') && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-4 animate-in slide-in-from-top-2 duration-300">
+                      <FormField
+                        control={form.control}
+                        name="scheduledDate"
+                        render={({ field }) => (
+                          <FormItem className="space-y-4">
+                            <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1">Schedule Date</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="date"
+                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-black text-slate-900" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage className="text-[9px] font-black uppercase tracking-widest text-destructive" />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="scheduledTime"
+                        render={({ field }) => (
+                          <FormItem className="space-y-4">
+                            <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1">Start Time</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="time"
+                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-black text-slate-900" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage className="text-[9px] font-black uppercase tracking-widest text-destructive" />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
                 </CardContent>
                 
                 <div className="px-12 py-10 border-t border-indigo-50/30 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-center gap-8">
