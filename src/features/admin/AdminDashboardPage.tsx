@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell 
 } from 'recharts';
 import { 
   Users, BookOpen, Activity, AlertCircle, TrendingUp, 
-  Clock, Plus, ShieldCheck, Server, Database, ServerCrash,
-  ArrowUpRight, Zap, Globe, Cpu
+  Plus, ShieldCheck, Server, Database, ServerCrash,
+  Zap, Globe, LayoutGrid, Layers, Hexagon
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,10 +27,10 @@ const activeCoursesData = [
 ];
 
 const recentActivity = [
-  { id: 1, action: "New course created", detail: "Dr. Smith published 'Advanced Physics'", time: "2 hours ago", icon: BookOpen, color: "text-blue-500", bg: "bg-blue-500/10" },
-  { id: 2, action: "User flagged", detail: "System detected suspicious login attempt", time: "4 hours ago", icon: AlertCircle, color: "text-rose-500", bg: "bg-rose-500/10" },
-  { id: 3, action: "Bulk import complete", detail: "Added 250 new student records", time: "Yesterday", icon: Users, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-  { id: 4, action: "System update", detail: "v2.1 deployed successfully", time: "Yesterday", icon: Server, color: "text-indigo-500", bg: "bg-indigo-500/10" },
+  { id: 1, action: "New course created", detail: "Dr. Smith published 'Advanced Physics'", time: "2h ago", icon: BookOpen, color: "text-blue-500", bg: "bg-blue-500/10" },
+  { id: 2, action: "User flagged", detail: "Suspicious login attempt from 192.168.1.1", time: "4h ago", icon: AlertCircle, color: "text-rose-500", bg: "bg-rose-500/10" },
+  { id: 3, action: "Bulk import", detail: "Added 250 new student records", time: "1d ago", icon: Users, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+  { id: 4, action: "System update", detail: "v2.1 kernel deployment successful", time: "1d ago", icon: Server, color: "text-indigo-500", bg: "bg-indigo-500/10" },
 ];
 
 const AnimatedNumber = ({ value }: { value: number }) => {
@@ -59,349 +58,249 @@ const AnimatedNumber = ({ value }: { value: number }) => {
   return <span>{displayValue.toLocaleString()}</span>;
 };
 
-const GlassCard = ({ children, className = "", noHover = false }: { children: React.ReactNode, className?: string, noHover?: boolean }) => (
-  <Card className={cn(
-    "relative overflow-hidden border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-md shadow-xl transition-all duration-500",
-    !noHover && "hover:shadow-2xl hover:bg-white/50 dark:hover:bg-black/50 hover:border-white/40 dark:hover:border-white/20 hover:-translate-y-1",
-    className
-  )}>
-    <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent dark:from-white/5 dark:via-transparent dark:to-transparent pointer-events-none" />
+const GlassCard = ({ children, className = "", noHover = false, style = {} }: { children: React.ReactNode, className?: string, noHover?: boolean, style?: React.CSSProperties }) => (
+  <div 
+    className={cn(
+      "relative overflow-hidden border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-2xl transition-all duration-500 rounded-[2.5rem]",
+      !noHover && "hover:shadow-primary/10 hover:border-white/40 dark:hover:border-white/20 hover:-translate-y-1.5 hover:scale-[1.01]",
+      className
+    )}
+    style={style}
+  >
+    <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none mix-blend-overlay" 
+         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
+    <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-black/5 dark:from-white/5 dark:via-transparent dark:to-black/20 pointer-events-none" />
     {children}
-  </Card>
+  </div>
+);
+
+const KPICard = ({ title, value, change, icon: Icon, colorClass, delay = "0ms" }: any) => (
+  <GlassCard className={cn("p-6 flex flex-col justify-between h-48 animate-in fade-in slide-in-from-bottom-4 group")} style={{ animationDelay: delay }}>
+    <div className="flex justify-between items-start">
+      <div className="p-3 bg-white/10 dark:bg-black/20 rounded-2xl border border-white/10 group-hover:scale-110 transition-transform duration-500">
+        <Icon className={cn("w-6 h-6", colorClass)} />
+      </div>
+      {change && (
+        <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 rounded-full text-[10px] font-black uppercase tracking-widest">
+           {change}
+        </Badge>
+      )}
+    </div>
+    <div>
+      <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground/60 mb-1">{title}</h3>
+      <div className="text-4xl font-black tracking-tighter font-mono">
+        <AnimatedNumber value={value} />
+      </div>
+    </div>
+  </GlassCard>
 );
 
 const AdminDashboardPage = () => {
   return (
-    <div className="relative space-y-8 font-sans p-2">
-      {/* Background Decorative Orbs - Optimized with will-change and reduced opacity */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[80px] -z-10 pointer-events-none animate-pulse duration-[10s] will-change-transform" />
-      <div className="absolute bottom-[-100px] left-0 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[80px] -z-10 pointer-events-none animate-pulse duration-[15s] will-change-transform" />
-      <div className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-[600px] h-[300px] bg-emerald-500/5 rounded-full blur-[100px] -z-10 pointer-events-none" />
-
+    <div className="relative min-h-screen p-4 md:p-8 space-y-8 font-sans overflow-hidden">
+      {/* Immersive Background Decorations */}
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -z-10 animate-pulse duration-[10s]" />
+      <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[100px] -z-10 animate-pulse delay-700 duration-[15s]" />
+      
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-col gap-2">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
+        <div className="space-y-4">
           <div className="flex items-center gap-3">
-             <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-                <Zap className="w-3 h-3 mr-1" /> System Live
-             </Badge>
-             <span className="text-xs font-bold text-muted-foreground/60 uppercase tracking-tighter">Region: US-EAST-1</span>
+             <div className="p-2.5 bg-primary/10 rounded-2xl border border-primary/20 text-primary backdrop-blur-md">
+                <LayoutGrid className="w-5 h-5" />
+             </div>
+             <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Command Nucleus</Badge>
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-600 dark:from-white dark:via-slate-200 dark:to-indigo-400 pb-1">
-            Command Center
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-indigo-600 dark:from-white dark:via-slate-200 dark:to-indigo-400">
+            System <span className="italic">Orchestra</span>
           </h1>
-          <p className="text-muted-foreground font-medium flex items-center gap-3">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-            </span>
-            Real-time analytics for ClassTrack Enterprise
+          <p className="text-xl font-medium text-muted-foreground/80 max-w-2xl leading-relaxed flex items-center gap-3">
+             <span className="relative flex h-3 w-3">
+               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+               <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+             </span>
+             Omniscient control over the ClassTrack enterprise ecosystem.
           </p>
         </div>
         
-        {/* Quick Actions */}
-        <div className="flex items-center gap-4 bg-white/20 dark:bg-black/20 p-2 rounded-[2rem] border border-white/20 backdrop-blur-md">
-          <Button variant="ghost" size="icon" className="w-11 h-11 rounded-2xl hover:bg-white/40 dark:hover:bg-black/40 text-muted-foreground hover:text-primary transition-all shadow-sm">
-            <Globe className="w-5 h-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="w-11 h-11 rounded-2xl hover:bg-white/40 dark:hover:bg-black/40 text-muted-foreground hover:text-primary transition-all shadow-sm">
-            <Cpu className="w-5 h-5" />
-          </Button>
-          <div className="w-[1px] h-8 bg-white/20 mx-1" />
-          <Button className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-lg shadow-indigo-500/25 border-t border-indigo-400/30 px-6 h-12 rounded-[1.5rem] font-bold">
-            <Plus className="w-4 h-4 mr-2" />
-            New User
-          </Button>
+        <div className="flex items-center gap-4 bg-white/20 dark:bg-black/40 p-2.5 rounded-[2.5rem] border border-white/20 backdrop-blur-2xl shadow-2xl">
+           <Button variant="ghost" size="icon" className="w-12 h-12 rounded-2xl hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-primary transition-all">
+             <Globe className="w-6 h-6" />
+           </Button>
+           <Button variant="ghost" size="icon" className="w-12 h-12 rounded-2xl hover:bg-white/40 dark:hover:bg-white/10 text-muted-foreground hover:text-primary transition-all">
+             <Layers className="w-6 h-6" />
+           </Button>
+           <div className="w-[1px] h-8 bg-white/20 mx-2" />
+           <Button className="h-14 px-8 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[1.8rem] font-black uppercase tracking-widest flex items-center gap-3 shadow-xl hover:scale-105 active:scale-95 transition-all">
+              <Plus className="w-5 h-5" />
+              <span>Provision User</span>
+           </Button>
         </div>
       </div>
 
-      {/* KPI Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {/* Total Users */}
-        <GlassCard className="group">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Total Users</CardTitle>
-            <div className="p-3 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-2xl group-hover:scale-110 group-hover:bg-indigo-500/20 transition-all duration-500 shadow-inner">
-              <Users className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl lg:text-5xl font-black tabular-nums tracking-tighter">
-              <AnimatedNumber value={1234} />
-            </div>
-            <div className="flex items-center gap-2 mt-3">
-              <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-lg flex items-center">
-                <ArrowUpRight className="w-3 h-3 mr-0.5" /> 20.4%
-              </span>
-              <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-40 italic">vs last month</span>
-            </div>
-          </CardContent>
-        </GlassCard>
+      {/* Main Bento Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 auto-rows-[minmax(180px,auto)]">
+        
+        {/* KPI: Users */}
+        <div className="lg:col-span-3">
+          <KPICard title="Total Nuclei" value={1234} change="+24.2%" icon={Users} colorClass="text-indigo-500" />
+        </div>
 
-        {/* Active Courses */}
-        <GlassCard className="group">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Active Courses</CardTitle>
-            <div className="p-3 bg-amber-500/10 dark:bg-amber-500/20 rounded-2xl group-hover:scale-110 group-hover:bg-amber-500/20 transition-all duration-500 shadow-inner">
-              <BookOpen className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl lg:text-5xl font-black tabular-nums tracking-tighter">
-              <AnimatedNumber value={56} />
-            </div>
-            <div className="flex items-center gap-2 mt-3">
-              <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-lg flex items-center">
-                <Plus className="w-3 h-3 mr-0.5" /> 5
-              </span>
-              <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-40 italic">New this term</span>
-            </div>
-          </CardContent>
-        </GlassCard>
+        {/* KPI: Courses */}
+        <div className="lg:col-span-3">
+          <KPICard title="Active Orbs" value={56} change="+5 New" icon={BookOpen} colorClass="text-amber-500" delay="100ms" />
+        </div>
 
-        {/* Active Sessions */}
-        <GlassCard className="group">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Live Sessions</CardTitle>
-            <div className="p-3 bg-blue-500/10 dark:bg-blue-500/20 rounded-2xl group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-500 shadow-inner">
-              <Activity className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+        {/* Global Performance: Area Chart */}
+        <GlassCard className="lg:col-span-6 lg:row-span-2 p-8 flex flex-col" noHover>
+          <div className="flex justify-between items-start mb-8">
+            <div className="space-y-1">
+               <h3 className="text-xl font-black tracking-tight">Enterprise Scaling</h3>
+               <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">Global Onboarding Velocity</p>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-baseline gap-3">
-              <div className="text-4xl lg:text-5xl font-black tabular-nums tracking-tighter">
-                <AnimatedNumber value={12} />
-              </div>
-              <span className="relative flex h-3 w-3 mb-1">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-              </span>
+            <div className="px-4 py-1.5 bg-emerald-500/10 rounded-full border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest text-emerald-500 flex items-center gap-2">
+               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+               Live Sync
             </div>
-            <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-40 italic mt-3 tracking-widest">Active nodes synchronized</p>
-          </CardContent>
-        </GlassCard>
-
-        {/* System Alerts */}
-        <GlassCard className="group bg-rose-500/5 hover:bg-rose-500/10 border-rose-500/20">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-600/60 dark:text-rose-400/60">Security Alerts</CardTitle>
-            <div className="p-3 bg-rose-500/10 dark:bg-rose-500/20 rounded-2xl group-hover:scale-110 group-hover:bg-rose-500/20 transition-all duration-500 shadow-inner">
-              <AlertCircle className="h-5 w-5 text-rose-600 dark:text-rose-400" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl lg:text-5xl font-black tabular-nums tracking-tighter text-rose-600 dark:text-rose-400 italic">
-              <AnimatedNumber value={2} />
-            </div>
-            <div className="flex items-center gap-2 mt-3">
-              <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-lg flex items-center animate-pulse">
-                Action Required
-              </span>
-            </div>
-          </CardContent>
-        </GlassCard>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-12">
-        {/* Analytics Charts - Left Column */}
-        <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
-          <GlassCard className="flex-1 overflow-visible">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col gap-1">
-                   <CardTitle className="font-black text-xl tracking-tight">Enterprise Scaling</CardTitle>
-                   <CardDescription>User onboarding trends across all departments</CardDescription>
-                </div>
-                <div className="px-4 py-1.5 bg-white/30 dark:bg-black/30 rounded-full border border-white/20 text-[10px] font-black uppercase tracking-[0.2em]">Live Data</div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[320px] w-full mt-6">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={userGrowthData} margin={{ top: 10, right: 10, bottom: 5, left: 0 }}>
-                    <defs>
-                      <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="opacity-10" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 13, fontWeight: 700 }} dy={10} stroke="currentColor" className="opacity-40" />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 13, fontWeight: 700 }} dx={-10} stroke="currentColor" className="opacity-40" />
-                    <Tooltip 
-                      cursor={{ stroke: '#6366f1', strokeWidth: 2, strokeDasharray: '5 5' }}
-                      contentStyle={{ 
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)', 
-                        backdropFilter: 'blur(8px)',
-                        borderRadius: '24px', 
-                        border: '1px solid rgba(99, 102, 241, 0.3)', 
-                        boxShadow: '0 25px 50px -12px rgba(99, 102, 241, 0.25)',
-                        padding: '16px',
-                        fontWeight: 'bold',
-                        color: '#1e1b4b'
-                      }}
-                      itemStyle={{ color: '#4f46e5' }}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="users" 
-                      stroke="#6366f1" 
-                      strokeWidth={5} 
-                      fillOpacity={1} 
-                      fill="url(#colorUsers)" 
-                      animationDuration={2000}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </GlassCard>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <GlassCard className="group">
-              <CardHeader className="pb-2">
-                <CardTitle className="font-black text-lg tracking-tight flex items-center gap-2">
-                   <TrendingUp className="w-5 h-5 text-amber-500" />
-                   Course Engagement
-                </CardTitle>
-                <CardDescription>Enrollment density by course</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[240px] w-full mt-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={activeCoursesData} layout="vertical" margin={{ top: 0, right: 30, bottom: 0, left: 10 }} barSize={18}>
-                      <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="currentColor" className="opacity-10" />
-                      <XAxis type="number" hide />
-                      <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 13, fontWeight: 900 }} stroke="currentColor" className="opacity-80" />
-                      <Tooltip 
-                        cursor={{ fill: 'currentColor', opacity: 0.03 }}
-                        contentStyle={{ 
-                          backgroundColor: 'rgba(255, 255, 255, 0.9)', 
-                          backdropFilter: 'blur(8px)',
-                          borderRadius: '16px', 
-                          border: 'none', 
-                          boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                          fontWeight: 'black',
-                          color: '#0f172a'
-                        }}
-                      />
-                      <Bar dataKey="students" radius={[0, 20, 20, 0]} animationDuration={1500}>
-                        {activeCoursesData.map((_entry, index) => (
-                          <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#f59e0b' : '#fb923c'} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </GlassCard>
-
-            <GlassCard className="p-1">
-              <div className="p-6 bg-gradient-to-br from-indigo-50/50 to-white/50 dark:from-slate-900/50 dark:to-black/50 rounded-[inherit] h-full flex flex-col">
-                <CardHeader className="p-0 pb-4">
-                  <CardTitle className="font-black text-lg tracking-tight">System Resources</CardTitle>
-                  <CardDescription>Real-time compute performance</CardDescription>
-                </CardHeader>
-                <div className="space-y-6 flex-1 flex flex-col justify-center">
-                  {[
-                    { label: "API Cluster", value: 12, color: "bg-indigo-500", icon: Server, status: "Healthy" },
-                    { label: "Database", value: 45, color: "bg-emerald-500", icon: Database, status: "Stable" },
-                    { label: "Storage", value: 78, color: "bg-amber-500", icon: ServerCrash, status: "Critical" }
-                  ].map((item) => (
-                    <div key={item.label} className="group/stat">
-                      <div className="flex items-center justify-between mb-2">
-                         <span className="text-xs font-black uppercase tracking-widest flex items-center gap-2 text-muted-foreground/80 group-hover/stat:text-primary transition-colors">
-                            <item.icon className="w-4 h-4" /> {item.label}
-                         </span>
-                         <span className="text-[10px] font-black text-muted-foreground bg-white/40 dark:bg-black/40 px-2 py-0.5 rounded-md border border-white/20">{item.status}</span>
-                      </div>
-                      <div className="w-full bg-slate-200/50 dark:bg-slate-800/50 rounded-full h-3 p-0.5 overflow-hidden">
-                        <div className={cn("h-full rounded-full transition-all duration-1000 shadow-sm", item.color)} style={{ width: `${item.value}%` }}></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </GlassCard>
           </div>
+          <div className="flex-1 w-full min-h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={userGrowthData}>
+                <defs>
+                  <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="opacity-5" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 900 }} stroke="currentColor" className="opacity-40" />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 900 }} stroke="currentColor" className="opacity-40" />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'rgba(0,0,0,0.8)', 
+                    backdropFilter: 'blur(12px)',
+                    borderRadius: '24px', 
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'white',
+                    fontWeight: 'black'
+                  }}
+                  itemStyle={{ color: '#818cf8' }}
+                />
+                <Area type="monotone" dataKey="users" stroke="#6366f1" strokeWidth={4} fillOpacity={1} fill="url(#colorUsers)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </GlassCard>
+
+        {/* KPI: Sessions */}
+        <div className="lg:col-span-3">
+          <KPICard title="Live Loops" value={12} icon={Activity} colorClass="text-emerald-500" delay="200ms" />
         </div>
 
-        {/* Right Column - Recent Activity & Security */}
-        <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
-          <GlassCard className="flex-1 min-h-[500px]">
-            <CardHeader className="pb-4">
-              <div className="flex justify-between items-center">
-                <div className="flex flex-col gap-1">
-                   <CardTitle className="font-black text-xl tracking-tight">System Journal</CardTitle>
-                   <CardDescription>Live telemetry stream</CardDescription>
+        {/* KPI: Security */}
+        <div className="lg:col-span-3">
+          <KPICard title="Shield Vector" value={2} change="Action Required" icon={AlertCircle} colorClass="text-rose-500" delay="300ms" />
+        </div>
+
+        {/* System Journal: Activity feed */}
+        <GlassCard className="lg:col-span-4 lg:row-span-2 p-8 space-y-8" noHover>
+           <div className="flex justify-between items-center">
+              <h3 className="text-xl font-black tracking-tight">System Journal</h3>
+              <Badge variant="outline" className="font-mono text-[10px] opacity-40">STREAMS://LOGS</Badge>
+           </div>
+           <div className="space-y-6">
+              {recentActivity.map((item, i) => (
+                <div key={item.id} className="flex gap-4 group animate-in fade-in slide-in-from-left-4 duration-500" style={{ animationDelay: `${i * 100}ms` }}>
+                   <div className={cn("mt-1 p-2 rounded-xl border border-white/10 shrink-0 transform group-hover:rotate-12 transition-transform", item.bg)}>
+                      <item.icon className={cn("w-4 h-4", item.color)} />
+                   </div>
+                   <div className="space-y-1">
+                      <div className="flex items-center justify-between gap-4">
+                         <span className="text-sm font-black tracking-tight">{item.action}</span>
+                         <span className="text-[9px] font-black uppercase text-muted-foreground/40">{item.time}</span>
+                      </div>
+                      <p className="text-xs font-bold text-muted-foreground/60 leading-relaxed">{item.detail}</p>
+                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="h-9 px-4 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-primary hover:text-white transition-all">Export</Button>
+              ))}
+           </div>
+           <Button variant="ghost" className="w-full h-12 rounded-[1.2rem] font-black uppercase tracking-widest text-[10px] hover:bg-white/5 border border-white/5">
+              Access Full Archive
+           </Button>
+        </GlassCard>
+
+        {/* Course Engagement: Bar Chart */}
+        <GlassCard className="lg:col-span-4 lg:row-span-2 p-8" noHover>
+           <h3 className="text-xl font-black tracking-tight mb-8 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-amber-500" />
+              Orb Engagement
+           </h3>
+           <div className="h-[300px] w-full mt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={activeCoursesData} layout="vertical" margin={{ top: 0, right: 30, bottom: 0, left: 10 }}>
+                  <XAxis type="number" hide />
+                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 900 }} stroke="currentColor" className="opacity-80" />
+                  <Tooltip cursor={{ fill: 'currentColor', opacity: 0.05 }} contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'black' }} />
+                  <Bar dataKey="students" radius={[0, 20, 20, 0]} barSize={20}>
+                    {activeCoursesData.map((_entry, index) => (
+                      <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#f59e0b' : '#fb923c'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+           </div>
+        </GlassCard>
+
+        {/* Infrastructure: Stats Grid */}
+        <GlassCard className="lg:col-span-4 lg:row-span-2 bg-slate-900 group overflow-hidden" noHover>
+           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.1),transparent_70%)]" />
+           <div className="relative p-8 h-full flex flex-col">
+              <div className="flex items-center gap-4 mb-8">
+                 <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform duration-500">
+                    <ShieldCheck className="w-6 h-6 text-indigo-400" />
+                 </div>
+                 <div className="flex flex-col">
+                    <span className="text-[10px] font-black text-indigo-400/60 uppercase tracking-[0.2em]">Shield Status</span>
+                    <span className="text-lg font-black text-white tracking-tight">Active Parity</span>
+                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="relative border-l-2 border-slate-100 dark:border-slate-800/50 ml-6 space-y-10 pb-4 mt-6">
-                {recentActivity.map((item) => (
-                  <div key={item.id} className="relative pl-10 group">
-                    <div className={cn(
-                      "absolute -left-[1.35rem] top-0 h-10 w-10 rounded-2xl border-4 border-white dark:border-black flex items-center justify-center shadow-lg transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300",
-                      item.bg
-                    )}>
-                      <item.icon className={cn("h-4 w-4", item.color)} />
-                    </div>
-                    <div className="flex flex-col space-y-2">
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
-                        <span className="text-sm font-black tracking-tight text-foreground group-hover:text-primary transition-colors">{item.action}</span>
-                        <div className="flex items-center gap-1.5 opacity-60">
-                           <Clock className="w-3 h-3" />
-                           <span className="text-[10px] font-black uppercase tracking-tighter">{item.time}</span>
-                        </div>
+              <div className="space-y-6 flex-1">
+                 {[
+                   { label: "API CLUSTER", value: 12, color: "bg-indigo-500", icon: Server, status: "Healthy" },
+                   { label: "DATABASE", value: 45, color: "bg-emerald-500", icon: Database, status: "Stable" },
+                   { label: "STORAGE CORE", value: 78, color: "bg-amber-500", icon: ServerCrash, status: "Peak" }
+                 ].map((item) => (
+                   <div key={item.label} className="space-y-2">
+                      <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-white/40">
+                         <span className="flex items-center gap-2 text-white/60"><item.icon className="w-3 h-3" /> {item.label}</span>
+                         <span>{item.status}</span>
                       </div>
-                      <div className="p-3 bg-white/30 dark:bg-black/30 rounded-2xl border border-white/20 text-xs font-bold text-muted-foreground/80 leading-relaxed shadow-sm">
-                        {item.detail}
+                      <div className="h-2 bg-white/5 rounded-full overflow-hidden p-0.5">
+                         <div className={cn("h-full rounded-full transition-all duration-1000", item.color)} style={{ width: `${item.value}%` }} />
                       </div>
-                    </div>
-                  </div>
-                ))}
+                   </div>
+                 ))}
               </div>
-            </CardContent>
-          </GlassCard>
+              <Button className="mt-8 w-full h-12 bg-white text-slate-900 font-black uppercase tracking-widest rounded-2xl hover:bg-slate-200 transition-all">
+                 <Zap className="w-4 h-4 mr-2" />
+                 Audit Nodes
+              </Button>
+           </div>
+        </GlassCard>
 
-          {/* Security Deep Card */}
-          <GlassCard className="bg-[#1C1917] dark:bg-[#0C0A09] border-[#CA8A04]/30 p-1 group overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(202,138,4,0.15),transparent_70%)]" />
-            <div className="relative p-6 border border-[#CA8A04]/20 rounded-[inherit] space-y-6">
-               <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-[#CA8A04]/10 flex items-center justify-center border border-[#CA8A04]/20 shadow-lg shadow-yellow-500/5 group-hover:scale-110 transition-transform duration-500">
-                     <ShieldCheck className="w-8 h-8 text-[#CA8A04]" />
-                  </div>
-                  <div className="flex flex-col">
-                     <span className="text-sm font-black text-white uppercase tracking-[0.2em] opacity-60">Shield Active</span>
-                     <span className="text-xl font-black text-white tracking-tight">Enterprise Guard</span>
-                  </div>
-               </div>
-               
-               <p className="text-[#CA8A04]/60 text-xs font-bold leading-relaxed">
-                  Advanced threat detection is active. All nodes are reporting healthy status. Last intrusion scan completed at 23:45 UTC.
-               </p>
-
-               <div className="grid grid-cols-2 gap-3 pb-2">
-                  <div className="p-3 bg-white/5 rounded-2xl border border-white/5 flex flex-col gap-1 hover:bg-white/10 transition-colors">
-                     <span className="text-[10px] font-black text-white/40 uppercase">Safe Nodes</span>
-                     <span className="text-lg font-black text-white">100%</span>
-                  </div>
-                  <div className="p-3 bg-white/5 rounded-2xl border border-white/5 flex flex-col gap-1 hover:bg-white/10 transition-colors">
-                     <span className="text-[10px] font-black text-white/40 uppercase">Threats</span>
-                     <span className="text-lg font-black text-rose-500 group-hover:animate-pulse">None</span>
-                  </div>
-               </div>
-
-               <Button className="w-full h-12 bg-[#CA8A04] hover:bg-[#B47B04] text-[#1C1917] font-black uppercase tracking-widest rounded-2xl transition-all shadow-xl shadow-yellow-500/20 active:scale-95 group-hover:shadow-yellow-500/40">
-                  <Zap className="w-4 h-4 mr-2" />
-                  Audit Protocol
-               </Button>
-            </div>
-          </GlassCard>
-        </div>
+      </div>
+      
+      {/* Decorative Footer Elements */}
+      <div className="mt-12 flex flex-col md:flex-row items-center justify-between border-t border-white/10 pt-8 opacity-30 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700 font-mono text-[9px] tracking-[0.5em] uppercase">
+         <div className="flex items-center gap-4">
+            <Hexagon className="w-3 h-3" />
+            <span>ClassTrack Central Command Node</span>
+         </div>
+         <div className="flex items-center gap-4">
+            <span>Uptime: 99.999%</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Cluster parity synced</span>
+         </div>
       </div>
     </div>
   );
