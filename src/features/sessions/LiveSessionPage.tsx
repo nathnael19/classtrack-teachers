@@ -106,7 +106,7 @@ const LiveSessionPage = () => {
     retry: 1,
   });
 
-  // 2. Fetch Live Attendance — polls every 3s for real-time updates
+  // 2. Fetch Live Attendance — initially loads, then updated via WebSocket
   const { data: attendance = [] } = useQuery<AttendanceRecord[]>({
     queryKey: ['session-attendance', session?.id],
     queryFn: async () => {
@@ -115,8 +115,57 @@ const LiveSessionPage = () => {
       return res.data;
     },
     enabled: !!session?.id,
-    refetchInterval: 3000,
+    // refetchInterval removed in favor of WebSockets
   });
+
+  // WebSocket for Real-time Updates
+  useEffect(() => {
+    if (!session?.id) return;
+
+    // Derive WS URL from API URL
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+    const wsUrl = apiUrl.replace(/^http/, 'ws') + `/sessions/${session.id}/ws`;
+    
+    const ws = new WebSocket(wsUrl);
+
+    ws.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        if (message.type === 'attendance_recorded') {
+          const newRecord: AttendanceRecord = {
+            id: Date.now(), // Temporary ID for list key if backend doesn't provide one in broadcast
+            student_id: message.student.id,
+            student_name: message.student.name,
+            student_code: message.student.student_id,
+            timestamp: message.student.timestamp,
+            status: message.student.status,
+          };
+
+          // Optimistically update the query cache
+          queryClient.setQueryData(['session-attendance', session.id], (old: AttendanceRecord[] | undefined) => {
+            const list = old || [];
+            // Avoid duplicates
+            if (list.some(r => r.student_id === newRecord.student_id)) return list;
+            return [...list, newRecord];
+          });
+
+          toast.success(`📡 ${newRecord.student_name} just checked in!`, {
+            description: `ID: ${newRecord.student_code}`,
+            icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+          });
+        }
+      } catch (err) {
+        console.error("WebSocket message error:", err);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket disconnected. Retrying in 5s...");
+      // Simple retry logic could be added here if needed
+    };
+
+    return () => ws.close();
+  }, [session?.id, queryClient]);
 
   // 3. Fetch All Enrolled Students (for manual marking)
   const { data: enrolledStudents = [], isLoading: isLoadingEnrolled } = useQuery<SessionStudent[]>({
@@ -172,17 +221,6 @@ const LiveSessionPage = () => {
       toast.error('Failed to terminate session safely.');
     }
   });
-
-  // Toast handler when new students scan in
-  useEffect(() => {
-    if (attendance.length > prevAttendanceCount.current && prevAttendanceCount.current !== 0) {
-      const newest = attendance[attendance.length - 1];
-      toast.success(`📡 ${newest?.student_name || 'A student'} just checked in!`, {
-        description: newest?.student_code ? `ID: ${newest.student_code}` : undefined,
-      });
-    }
-    prevAttendanceCount.current = attendance.length;
-  }, [attendance.length]);
 
   // Timer & Token Rotation Hook (2-minute rotation)
   useEffect(() => {
