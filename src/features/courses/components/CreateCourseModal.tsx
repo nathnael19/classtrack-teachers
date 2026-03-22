@@ -3,11 +3,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { 
-  Plus, 
-  Loader2, 
-  BookOpen, 
-  Fingerprint, 
+import {
+  Plus,
+  Loader2,
+  BookOpen,
+  Fingerprint,
   Sparkles,
   X,
   ShieldCheck,
@@ -81,14 +81,14 @@ export const CreateCourseModal = () => {
         {/* Premium Header Section */}
         <div className="relative p-10 pb-6 overflow-hidden">
           <div className="absolute top-0 right-0 p-4">
-             <Button 
-               variant="ghost" 
-               size="icon" 
-               onClick={() => setOpen(false)}
-               className="rounded-full h-10 w-10 hover:bg-black/5 text-slate-400"
-             >
-                <X className="w-5 h-5" />
-             </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setOpen(false)}
+              className="rounded-full h-10 w-10 hover:bg-black/5 text-slate-400"
+            >
+              <X className="w-5 h-5" />
+            </Button>
           </div>
 
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
@@ -98,7 +98,7 @@ export const CreateCourseModal = () => {
             <div className="w-16 h-16 rounded-[1.25rem] bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-primary/30">
               <Sparkles className="w-8 h-8 animate-pulse" />
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3 py-1">System Provisioning</Badge>
@@ -131,13 +131,13 @@ export const CreateCourseModal = () => {
                       </div>
                       <FormControl>
                         <div className="relative group">
-                          <Input 
-                            placeholder="e.g. Quantum Computing & Ethics" 
+                          <Input
+                            placeholder="e.g. Quantum Computing & Ethics"
                             className="h-16 rounded-2xl bg-slate-50 border-slate-100 px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-bold text-slate-900 transition-all group-hover:bg-white group-hover:border-primary/20 placeholder:text-slate-300"
-                            {...field} 
+                            {...field}
                           />
                           <div className="absolute inset-y-0 right-6 flex items-center">
-                             <div className="w-1.5 h-1.5 rounded-full bg-slate-200 group-focus-within:bg-primary transition-colors" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-slate-200 group-focus-within:bg-primary transition-colors" />
                           </div>
                         </div>
                       </FormControl>
@@ -157,13 +157,13 @@ export const CreateCourseModal = () => {
                       </div>
                       <FormControl>
                         <div className="relative group">
-                          <Input 
-                            placeholder="e.g. QC-702-X" 
+                          <Input
+                            placeholder="e.g. QC-702-X"
                             className="h-16 rounded-2xl bg-slate-50 border-slate-100 px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-mono font-black text-slate-900 transition-all group-hover:bg-white group-hover:border-primary/20 placeholder:text-slate-300 uppercase"
-                            {...field} 
+                            {...field}
                           />
                           <div className="absolute inset-y-0 right-6 flex items-center">
-                             <Zap className="w-4 h-4 text-slate-200 group-focus-within:text-emerald-500 transition-colors" />
+                            <Zap className="w-4 h-4 text-slate-200 group-focus-within:text-emerald-500 transition-colors" />
                           </div>
                         </div>
                       </FormControl>
@@ -182,10 +182,10 @@ export const CreateCourseModal = () => {
                       </div>
                       <FormControl>
                         <div className="relative group">
-                          <textarea 
-                            placeholder="Optional context or syllabus summary..." 
+                          <textarea
+                            placeholder="Optional context or syllabus summary..."
                             className="w-full min-h-[100px] rounded-2xl bg-slate-50 border-slate-100 p-6 shadow-inner focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/5 font-bold text-slate-900 transition-all group-hover:bg-white group-hover:border-primary/20 placeholder:text-slate-300 resize-none"
-                            {...field} 
+                            {...field}
                           />
                         </div>
                       </FormControl>
@@ -214,8 +214,8 @@ export const CreateCourseModal = () => {
                   >
                     Abort Phase
                   </Button>
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={mutation.isPending}
                     className="flex-[2] h-14 rounded-2xl bg-primary hover:bg-primary/90 font-black uppercase text-[10px] tracking-widest shadow-xl shadow-primary/20 gap-3 border-b-4 border-indigo-700 active:border-b-0 active:translate-y-1 transition-all"
                   >

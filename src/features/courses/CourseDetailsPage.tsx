@@ -14,7 +14,6 @@ import {
   ArrowUpRight,
   ShieldCheck,
   AlertCircle,
-  Plus,
   Trash2
 } from 'lucide-react';
 import { format } from 'date-fns';

@@ -3,10 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { 
-  Play, 
-  Clock, 
-  MapPin, 
+import {
+  Play,
+  Clock,
+  MapPin,
   Loader2,
   Sparkles,
   History,
@@ -157,10 +157,10 @@ const SessionCreationPage = () => {
       startTime = new Date();
     }
     const endTime = new Date(startTime.getTime() + parseInt(values.duration) * 60000);
-    
+
     // Find the selected room to get its telemetry
     const selectedRoom = rooms.find(r => r.name === values.room);
-    
+
     const payload = {
       course_id: parseInt(values.courseId),
       room: values.room,
@@ -222,7 +222,7 @@ const SessionCreationPage = () => {
                     <div className="w-16 h-1 bg-gradient-to-r from-primary to-transparent rounded-full" />
                   </div>
                 </div>
-                
+
                 <CardContent className="p-12 space-y-10">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <FormField
@@ -268,11 +268,11 @@ const SessionCreationPage = () => {
                               {rooms.map((room) => (
                                 <SelectItem key={room.id} value={room.name} className="rounded-xl py-4 font-black text-sm uppercase tracking-wide focus:bg-primary focus:text-white mb-1">
                                   <div className="flex items-center gap-3">
-                                     <Building className="w-4 h-4 opacity-40" />
-                                     <div className="flex flex-col">
-                                        <span>{room.name}</span>
-                                        <span className="text-[9px] opacity-40 tracking-tighter">{room.building}</span>
-                                     </div>
+                                    <Building className="w-4 h-4 opacity-40" />
+                                    <div className="flex flex-col">
+                                      <span>{room.name}</span>
+                                      <span className="text-[9px] opacity-40 tracking-tighter">{room.building}</span>
+                                    </div>
                                   </div>
                                 </SelectItem>
                               ))}
@@ -296,10 +296,10 @@ const SessionCreationPage = () => {
                               <div className="absolute left-5 top-1/2 -translate-y-1/2 p-2.5 bg-indigo-50 rounded-xl text-indigo-500 group-focus-within:bg-primary group-focus-within:text-white transition-all shadow-sm">
                                 <Clock className="w-4 h-4" />
                               </div>
-                              <Input 
-                                type="number" 
-                                className="pl-20 h-16 bg-slate-50 border-none rounded-[1.25rem] shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-black text-xl text-slate-900" 
-                                {...field} 
+                              <Input
+                                type="number"
+                                className="pl-20 h-16 bg-slate-50 border-none rounded-[1.25rem] shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-black text-xl text-slate-900"
+                                {...field}
                               />
                             </div>
                           </FormControl>
@@ -318,10 +318,10 @@ const SessionCreationPage = () => {
                               <div className="absolute left-5 top-1/2 -translate-y-1/2 p-2.5 bg-emerald-50 rounded-xl text-emerald-500 group-focus-within:bg-emerald-500 group-focus-within:text-white transition-all shadow-sm">
                                 <MapPin className="w-4 h-4" />
                               </div>
-                              <Input 
-                                type="number" 
-                                className="pl-20 h-16 bg-slate-50 border-none rounded-[1.25rem] shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-black text-xl text-slate-900" 
-                                {...field} 
+                              <Input
+                                type="number"
+                                className="pl-20 h-16 bg-slate-50 border-none rounded-[1.25rem] shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-black text-xl text-slate-900"
+                                {...field}
                               />
                             </div>
                           </FormControl>
@@ -341,10 +341,10 @@ const SessionCreationPage = () => {
                           <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1">Session Topic / Curriculum</FormLabel>
                           <FormControl>
                             <div className="relative group">
-                              <Input 
-                                placeholder="e.g. Introduction to Quantum Mechanics" 
-                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-bold text-slate-900 placeholder:text-slate-300 transition-all group-hover:bg-white" 
-                                {...field} 
+                              <Input
+                                placeholder="e.g. Introduction to Quantum Mechanics"
+                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-bold text-slate-900 placeholder:text-slate-300 transition-all group-hover:bg-white"
+                                {...field}
                               />
                             </div>
                           </FormControl>
@@ -360,10 +360,10 @@ const SessionCreationPage = () => {
                           <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1">Operational Directives</FormLabel>
                           <FormControl>
                             <div className="relative group">
-                              <Input 
-                                placeholder="e.g. Bring lab coats, read chapter 4..." 
-                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-bold text-slate-900 placeholder:text-slate-300 transition-all group-hover:bg-white" 
-                                {...field} 
+                              <Input
+                                placeholder="e.g. Bring lab coats, read chapter 4..."
+                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-bold text-slate-900 placeholder:text-slate-300 transition-all group-hover:bg-white"
+                                {...field}
                               />
                             </div>
                           </FormControl>
@@ -382,10 +382,10 @@ const SessionCreationPage = () => {
                           <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1">Target Section</FormLabel>
                           <FormControl>
                             <div className="relative group">
-                              <Input 
-                                placeholder="Leave empty for all sections" 
-                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-bold text-slate-900 placeholder:text-slate-300 transition-all group-hover:bg-white" 
-                                {...field} 
+                              <Input
+                                placeholder="Leave empty for all sections"
+                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-bold text-slate-900 placeholder:text-slate-300 transition-all group-hover:bg-white"
+                                {...field}
                               />
                             </div>
                           </FormControl>
@@ -424,10 +424,10 @@ const SessionCreationPage = () => {
                           <FormItem className="space-y-4">
                             <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1">Schedule Date</FormLabel>
                             <FormControl>
-                              <Input 
+                              <Input
                                 type="date"
-                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-black text-slate-900" 
-                                {...field} 
+                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-black text-slate-900"
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage className="text-[9px] font-black uppercase tracking-widest text-destructive" />
@@ -441,10 +441,10 @@ const SessionCreationPage = () => {
                           <FormItem className="space-y-4">
                             <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-1">Start Time</FormLabel>
                             <FormControl>
-                              <Input 
+                              <Input
                                 type="time"
-                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-black text-slate-900" 
-                                {...field} 
+                                className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 font-black text-slate-900"
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage className="text-[9px] font-black uppercase tracking-widest text-destructive" />
@@ -454,18 +454,18 @@ const SessionCreationPage = () => {
                     </div>
                   )}
                 </CardContent>
-                
+
                 <div className="px-12 py-10 border-t border-indigo-50/30 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-center gap-8">
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
+                  <Button
+                    type="button"
+                    variant="ghost"
                     onClick={() => navigate(-1)}
                     className="font-black text-[10px] uppercase tracking-widest text-slate-400 hover:bg-slate-200/50 h-14 px-8 rounded-2xl"
                   >
                     Abort Sequence
                   </Button>
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={createSessionMutation.isPending}
                     className="w-full sm:w-auto gap-4 rounded-full px-12 h-16 bg-primary hover:bg-primary/90 shadow-2xl shadow-primary/30 transition-all font-black text-lg uppercase tracking-wider group border-b-4 border-indigo-800 active:border-b-0 active:translate-y-1"
                   >
@@ -509,14 +509,14 @@ const SessionCreationPage = () => {
           <div className="glass-card p-10 rounded-[2.5rem] bg-indigo-900 text-white space-y-8 relative overflow-hidden shadow-2xl">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10" />
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/20 rounded-full blur-xl -ml-10 -mb-10" />
-            
+
             <div className="relative flex flex-col items-center gap-4 border-b border-white/10 pb-8">
-               <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-md">
-                 <History className="w-6 h-6 text-primary" />
-               </div>
-               <h3 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-60">Historical Performance</h3>
+              <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-md">
+                <History className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-60">Historical Performance</h3>
             </div>
-            
+
             <div className="relative space-y-8">
               <div className="flex justify-between items-center bg-white/5 p-6 rounded-[1.5rem] border border-white/10 group hover:bg-white/10 transition-colors">
                 <div className="flex flex-col gap-1">
@@ -524,28 +524,28 @@ const SessionCreationPage = () => {
                   <span className="font-black text-2xl tracking-tighter">{context?.last_course || '...'}</span>
                 </div>
                 <div className="p-3 bg-emerald-500/20 rounded-xl">
-                   <FlaskConical className="w-5 h-5 text-emerald-400" />
+                  <FlaskConical className="w-5 h-5 text-emerald-400" />
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-6">
-                 <div className="p-6 bg-white/5 rounded-[1.5rem] border border-white/10 flex flex-col items-center gap-1 group hover:bg-white/10 transition-colors">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Success</span>
-                    <span className="font-black text-2xl text-emerald-400">{context?.success_rate || '0%'}</span>
-                 </div>
-                 <div className="p-6 bg-white/5 rounded-[1.5rem] border border-white/10 flex flex-col items-center gap-1 group hover:bg-white/10 transition-colors">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Scans</span>
-                    <span className="font-black text-2xl text-white">{context?.total_scans || 0}</span>
-                 </div>
+                <div className="p-6 bg-white/5 rounded-[1.5rem] border border-white/10 flex flex-col items-center gap-1 group hover:bg-white/10 transition-colors">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Success</span>
+                  <span className="font-black text-2xl text-emerald-400">{context?.success_rate || '0%'}</span>
+                </div>
+                <div className="p-6 bg-white/5 rounded-[1.5rem] border border-white/10 flex flex-col items-center gap-1 group hover:bg-white/10 transition-colors">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Scans</span>
+                  <span className="font-black text-2xl text-white">{context?.total_scans || 0}</span>
+                </div>
               </div>
 
-               <div className="p-6 bg-primary/10 rounded-[1.5rem] border border-primary/20 flex items-center justify-between">
-                  <div className="flex flex-col gap-1">
-                     <span className="text-[9px] font-black text-primary uppercase tracking-widest">Anomalies Detected</span>
-                     <span className="font-black text-xl text-white">{context?.outliers || 0} Outliers</span>
-                  </div>
-                  <div className="w-3 h-3 rounded-full bg-primary animate-ping" />
-               </div>
+              <div className="p-6 bg-primary/10 rounded-[1.5rem] border border-primary/20 flex items-center justify-between">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[9px] font-black text-primary uppercase tracking-widest">Anomalies Detected</span>
+                  <span className="font-black text-xl text-white">{context?.outliers || 0} Outliers</span>
+                </div>
+                <div className="w-3 h-3 rounded-full bg-primary animate-ping" />
+              </div>
             </div>
           </div>
         </div>
