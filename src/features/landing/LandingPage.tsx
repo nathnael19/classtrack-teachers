@@ -1,6 +1,8 @@
 import LandingNav from './components/LandingNav';
 import HeroSection from './components/HeroSection';
 import FeatureSection from './components/FeatureSection';
+import AnalyticsSection from './components/AnalyticsSection';
+import TestimonialSection from './components/TestimonialSection';
 import CTASection from './components/CTASection';
 
 const LandingPage = () => {
@@ -32,6 +34,8 @@ const LandingPage = () => {
       <main className="relative z-10">
         <HeroSection />
         <FeatureSection />
+        <AnalyticsSection />
+        <TestimonialSection />
         <CTASection />
       </main>
 
