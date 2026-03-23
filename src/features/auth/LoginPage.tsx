@@ -41,10 +41,16 @@ const LoginPage = () => {
       
       // Update global auth state with user data and token
       const responseMe = await api.get('/users/me');
-      useAuthStore.getState().login(responseMe.data, access_token);
+      const user = responseMe.data;
+      useAuthStore.getState().login(user, access_token);
 
-      toast.success('Access Granted. Welcome back, Admin.');
-      navigate('/dashboard');
+      toast.success(`Access Granted. Welcome back, ${user.name}.`);
+      
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (error: any) {
       const message = error.response?.data?.detail || 'Authentication failed. Check your coordinates.';
       toast.error(message);
