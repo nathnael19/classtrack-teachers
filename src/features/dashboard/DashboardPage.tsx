@@ -160,17 +160,17 @@ const DashboardPage = () => {
              <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
                 <Brain className="w-5 h-5 text-primary" />
              </div>
-             <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">ClassTrack Core</span>
+             <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">Overview</span>
           </div>
           <h1 className="text-6xl font-black tracking-tighter text-foreground leading-[0.8] flex items-center gap-4">
-            Live<span className="text-primary italic">Insights</span>
+            Dash<span className="text-primary italic">board</span>
             <div className="flex gap-1.5 mt-2">
                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/20" />
             </div>
           </h1>
           <p className="text-muted-foreground text-lg font-medium leading-relaxed max-w-xl">
-            Autonomous academic observability. Real-time capture of <span className="text-foreground font-black italic">performance vectors</span> and attendance dynamics.
+            Real-time attendance tracking and academic performance insights.
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -213,7 +213,7 @@ const DashboardPage = () => {
                     Performance Comparison
                     <Badge variant="outline" className="text-[9px] border-emerald-500/20 bg-emerald-500/5 text-emerald-500 font-mono tracking-widest">LIVE_STREAM</Badge>
                   </h2>
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40 italic">Weekly Engagement Fluctuations</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40 italic">Weekly Performance Metrics</p>
                 </div>
                 <div className="flex gap-2">
                    <div className="p-3 bg-white/5 rounded-xl border border-white/10 shadow-inner">
@@ -280,9 +280,9 @@ const DashboardPage = () => {
             <div className="flex justify-between items-start mb-12">
                <div className="space-y-2">
                   <h2 className="text-2xl font-black tracking-tighter flex items-center gap-3">
-                     Identity Mix
+                     Student Distribution
                   </h2>
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40 italic">Student Distribution</p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40 italic">Course breakdown</p>
                </div>
                <div className="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20 shadow-inner">
                   <Target className="w-5 h-5 text-emerald-500" />
@@ -334,13 +334,13 @@ const DashboardPage = () => {
         <div className="p-10 border-b border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8 bg-white/5">
           <div className="space-y-2">
             <h2 className="text-3xl font-black tracking-tighter flex items-center gap-4">
-              Matrix Registry
+              Recent Sessions
               <div className="flex gap-1">
                 <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(30,64,175,0.5)]" />
                 <div className="w-2.5 h-2.5 rounded-full bg-primary/20" />
               </div>
             </h2>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40">Verified Academic Transitions</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-40">Successfully recorded attendance sessions</p>
           </div>
           <Button variant="ghost" size="lg" onClick={() => navigate('/reports')} className="rounded-2xl border border-white/10 hover:bg-white/10 transition-all px-10 font-black text-[10px] uppercase tracking-[0.2em] shadow-inner active:scale-95">
             Full History Array
@@ -351,11 +351,11 @@ const DashboardPage = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-white/[0.02]">
-                <th className="py-8 font-black text-muted-foreground/30 uppercase tracking-[0.3em] text-[10px] pl-12">Registry Node</th>
-                <th className="py-8 font-black text-muted-foreground/30 uppercase tracking-[0.3em] text-[10px]">Temporal Index</th>
-                <th className="py-8 font-black text-muted-foreground/30 uppercase tracking-[0.3em] text-[10px]">Population Volume</th>
-                <th className="py-8 font-black text-muted-foreground/30 uppercase tracking-[0.3em] text-[10px]">Capture Intensity</th>
-                <th className="py-8 font-black text-muted-foreground/30 uppercase tracking-[0.3em] text-[10px] text-right pr-12">Access Matrix</th>
+                <th className="py-8 font-black text-muted-foreground/30 uppercase tracking-[0.3em] text-[10px] pl-12">Course Name</th>
+                <th className="py-8 font-black text-muted-foreground/30 uppercase tracking-[0.3em] text-[10px]">Date & Time</th>
+                <th className="py-8 font-black text-muted-foreground/30 uppercase tracking-[0.3em] text-[10px]">Attendance</th>
+                <th className="py-8 font-black text-muted-foreground/30 uppercase tracking-[0.3em] text-[10px]">Attendance Rate</th>
+                <th className="py-8 font-black text-muted-foreground/30 uppercase tracking-[0.3em] text-[10px] text-right pr-12">Details</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
