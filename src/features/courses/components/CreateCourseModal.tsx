@@ -101,15 +101,15 @@ export const CreateCourseModal = () => {
 
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3 py-1">System Provisioning</Badge>
+                <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3 py-1">Course Setup</Badge>
                 <span className="w-1.5 h-1.5 rounded-full bg-slate-200" />
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">v1.2.0</span>
               </div>
               <DialogTitle className="text-4xl font-black tracking-tighter text-slate-900 uppercase italic leading-none">
-                Deploy Module
+                Create Course
               </DialogTitle>
               <DialogDescription className="text-slate-500 font-semibold text-lg max-w-sm">
-                Initialize a new high-performance academic vector in the system.
+                Create a new course to manage attendance and student engagement.
               </DialogDescription>
             </div>
           </div>
@@ -126,7 +126,7 @@ export const CreateCourseModal = () => {
                   render={({ field }) => (
                     <FormItem className="space-y-3">
                       <div className="flex items-center justify-between ml-1">
-                        <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Strategic Title</FormLabel>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Course Name</FormLabel>
                         <BookOpen className="w-3 h-3 text-primary/40" />
                       </div>
                       <FormControl>
@@ -152,7 +152,7 @@ export const CreateCourseModal = () => {
                   render={({ field }) => (
                     <FormItem className="space-y-3">
                       <div className="flex items-center justify-between ml-1">
-                        <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">System Identifier</FormLabel>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Course Code</FormLabel>
                         <Fingerprint className="w-3 h-3 text-primary/40" />
                       </div>
                       <FormControl>
@@ -178,7 +178,7 @@ export const CreateCourseModal = () => {
                   render={({ field }) => (
                     <FormItem className="space-y-3">
                       <div className="flex items-center justify-between ml-1">
-                        <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Contextual Description</FormLabel>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Description</FormLabel>
                       </div>
                       <FormControl>
                         <div className="relative group">
@@ -212,7 +212,7 @@ export const CreateCourseModal = () => {
                     onClick={() => setOpen(false)}
                     className="flex-1 h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-100 text-slate-500"
                   >
-                    Abort Phase
+                    Cancel
                   </Button>
                   <Button
                     type="submit"
@@ -224,7 +224,7 @@ export const CreateCourseModal = () => {
                     ) : (
                       <Plus className="w-4 h-4" />
                     )}
-                    Initialize Module
+                    Create Course
                   </Button>
                 </div>
               </div>

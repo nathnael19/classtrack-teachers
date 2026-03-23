@@ -62,7 +62,7 @@ const PreviewTermCard = ({ data }: { data: Partial<TermFormValues> }) => (
           )}>
             {data.status || "DRAFT"}
           </Badge>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">Timeline v4.0</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">New Term v1.0</span>
         </div>
       </div>
 
@@ -90,7 +90,7 @@ const PreviewTermCard = ({ data }: { data: Partial<TermFormValues> }) => (
         <div className="w-full h-1 bg-white/10 dark:bg-white/5 rounded-full overflow-hidden">
           <div className="h-full bg-gradient-to-r from-indigo-500 to-amber-500 w-1/2 animate-pulse" />
         </div>
-        <span className="text-[9px] font-black uppercase tracking-widest opacity-30">Phased</span>
+        <span className="text-[9px] font-black uppercase tracking-widest opacity-30">Planned</span>
       </div>
       
       <div className="grid grid-cols-3 gap-2">
@@ -135,13 +135,13 @@ const AddTermPage = () => {
         start_date: data.startDate,
         end_date: data.endDate
       });
-      toast.success("Timeline Node Integrated!", {
-        description: `${data.name} is now part of the master academic calendar.`,
+      toast.success("Term Created!", {
+        description: `${data.name} has been added to the academic calendar.`,
         icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
       });
       navigate("/admin/academic");
     } catch (error: any) {
-      toast.error("Integration Failed", { description: error?.response?.data?.detail || "Could not register term timeline." });
+      toast.error("Failed to Create Term", { description: error?.response?.data?.detail || "Could not save term details." });
     } finally {
       setIsSubmitting(false);
     }
@@ -161,7 +161,7 @@ const AddTermPage = () => {
           className="mb-8 text-muted-foreground hover:text-foreground group rounded-xl px-4 py-2 hover:bg-white/10 backdrop-blur-sm border border-transparent hover:border-white/10 transition-all"
         >
           <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-xs font-black uppercase tracking-widest">Temporal Registry</span>
+          <span className="text-xs font-black uppercase tracking-widest">Back to Academic Management</span>
         </Button>
 
         <div className="grid lg:grid-cols-12 gap-12 items-start">
@@ -172,13 +172,13 @@ const AddTermPage = () => {
                  <div className="p-2.5 bg-indigo-500/10 rounded-2xl border border-indigo-500/20 text-indigo-600 dark:text-indigo-400 backdrop-blur-md">
                     <CalendarDays className="w-5 h-5" />
                  </div>
-                 <Badge variant="outline" className="border-indigo-500/30 text-indigo-600 dark:text-indigo-400 bg-indigo-500/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Academic Timeline</Badge>
+                 <Badge variant="outline" className="border-indigo-500/30 text-indigo-600 dark:text-indigo-400 bg-indigo-500/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Term Management</Badge>
               </div>
               <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-indigo-600 dark:from-white dark:via-slate-200 dark:to-indigo-400">
-                Timeline Synthesis
+                Add New Term
               </h1>
               <p className="text-lg font-medium text-muted-foreground/80 max-w-xl leading-relaxed">
-                Architect the temporal framework for academic progression within the ClassTrack global registry.
+                Create and configure a new academic term or semester.
               </p>
             </div>
 
@@ -188,7 +188,7 @@ const AddTermPage = () => {
                   <div className="grid gap-x-8 gap-y-10 md:grid-cols-2">
                     {/* Semester Name */}
                     <div className="space-y-3 col-span-2 group">
-                      <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 group-focus-within:opacity-100 transition-opacity">Temporal Designation</Label>
+                      <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 group-focus-within:opacity-100 transition-opacity">Term Name</Label>
                       <div className="relative">
                         <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 group-focus-within:text-indigo-500 transition-colors" />
                         <Input 
@@ -206,7 +206,7 @@ const AddTermPage = () => {
 
                     {/* Academic Year */}
                     <div className="space-y-3 group">
-                      <Label htmlFor="year" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Cyclical Period</Label>
+                      <Label htmlFor="year" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Academic Year</Label>
                       <div className="relative">
                         <History className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 transition-colors" />
                         <Input 
@@ -223,7 +223,7 @@ const AddTermPage = () => {
 
                     {/* Operational Status */}
                     <div className="space-y-3">
-                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Lifecycle State</Label>
+                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Status</Label>
                       <Select onValueChange={(val: any) => setValue("status", val)} defaultValue="Upcoming">
                         <SelectTrigger className="h-14 bg-white/10 dark:bg-black/40 border-white/10 hover:border-white/20 focus:border-indigo-500/50 rounded-2xl transition-all font-black text-lg">
                           <SelectValue placeholder="Select status..." />
@@ -231,7 +231,7 @@ const AddTermPage = () => {
                         <SelectContent className="bg-white/95 dark:bg-black/95 backdrop-blur-2xl border-white/10 rounded-2xl shadow-2xl p-1">
                           {["Upcoming", "Active", "Completed"].map(s => (
                             <SelectItem key={s} value={s} className="h-12 rounded-xl focus:bg-indigo-500/10 font-bold">
-                              {s} Node
+                              {s}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -240,7 +240,7 @@ const AddTermPage = () => {
 
                     {/* Start Date */}
                     <div className="space-y-3 group">
-                       <Label htmlFor="startDate" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Commencement</Label>
+                       <Label htmlFor="startDate" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Start Date</Label>
                        <div className="relative">
                           <CalendarDays className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 transition-colors z-10" />
                           <Input 
@@ -254,7 +254,7 @@ const AddTermPage = () => {
 
                     {/* End Date */}
                     <div className="space-y-3 group">
-                       <Label htmlFor="endDate" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Conclusion</Label>
+                       <Label htmlFor="endDate" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">End Date</Label>
                        <div className="relative">
                           <Flag className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 transition-colors z-10" />
                           <Input 
@@ -278,12 +278,12 @@ const AddTermPage = () => {
                       {isSubmitting ? (
                         <div className="flex items-center gap-3">
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Indexing Timeline...
+                          Saving Term...
                         </div>
                       ) : (
                         <div className="flex items-center justify-center gap-3">
                           <Save className="w-5 h-5" />
-                          Commit to Registry
+                          Create Term
                         </div>
                       )}
                     </Button>
@@ -303,8 +303,8 @@ const AddTermPage = () => {
           {/* Right Preview Section */}
           <div className="hidden xl:flex xl:col-span-4 flex-col gap-8 justify-center min-h-[600px] animate-in slide-in-from-right-12 duration-1000">
              <div className="space-y-2 text-right">
-                <h2 className="text-2xl font-black italic tracking-tighter">Temporal Intelligence</h2>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Simulating academic progression in real-time</p>
+                <h2 className="text-2xl font-black italic tracking-tighter">Preview</h2>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">See how your term will look</p>
              </div>
              
              <div className="relative">
