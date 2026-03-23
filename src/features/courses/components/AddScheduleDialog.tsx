@@ -103,10 +103,10 @@ export const AddScheduleDialog = ({ courseId, onSuccess }: AddScheduleDialogProp
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button 
-          className="mt-8 rounded-2xl h-14 px-10 shadow-lg shadow-primary/20 font-black text-xs uppercase tracking-widest gap-2 bg-primary hover:bg-primary/90"
+          className="rounded-2xl h-14 px-8 shadow-lg shadow-primary/20 font-black text-xs uppercase tracking-widest gap-2 bg-primary hover:bg-primary/90"
         >
           <Plus className="w-4 h-4" />
-          Add recurring slot
+          ADD RECURRING SLOT
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] rounded-[32px] p-8 border-indigo-50 shadow-2xl">
