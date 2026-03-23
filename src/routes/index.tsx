@@ -9,6 +9,7 @@ const CoursesPage = lazy(() => import("@/features/courses/CoursesPage"));
 const CourseDetailsPage = lazy(() => import("@/features/courses/CourseDetailsPage"));
 const SessionCreationPage = lazy(() => import("@/features/sessions/SessionCreationPage"));
 const LiveSessionPage = lazy(() => import("@/features/sessions/LiveSessionPage"));
+const LeaveRequestsPage = lazy(() => import("@/features/sessions/LeaveRequestsPage"));
 const AnalyticsPage = lazy(() => import("@/features/analytics/AnalyticsPage"));
 const ReportsPage = lazy(() => import("@/features/reports/ReportsPage"));
 const SettingsPage = lazy(() => import("@/features/settings/SettingsPage"));
@@ -117,6 +118,7 @@ export const router = createBrowserRouter([
               { path: "courses/:id", element: <Suspense fallback={<PageLoader />}><CourseDetailsPage /></Suspense> },
               { path: "sessions/new", element: <Suspense fallback={<PageLoader />}><SessionCreationPage /></Suspense> },
               { path: "sessions/live", element: <Suspense fallback={<PageLoader />}><LiveSessionPage /></Suspense> },
+              { path: "sessions/leave-requests", element: <Suspense fallback={<PageLoader />}><LeaveRequestsPage /></Suspense> },
               { path: "analytics", element: <Suspense fallback={<PageLoader />}><AnalyticsPage /></Suspense> },
               { path: "reports", element: <Suspense fallback={<PageLoader />}><ReportsPage /></Suspense> },
               { path: "settings", element: <Suspense fallback={<PageLoader />}><SettingsPage /></Suspense> },
@@ -135,6 +137,7 @@ export const router = createBrowserRouter([
               { path: "admin/academic/departments/new", element: <Suspense fallback={<PageLoader />}><AddDepartmentPage /></Suspense> },
               { path: "admin/academic/rooms/new", element: <Suspense fallback={<PageLoader />}><AddRoomPage /></Suspense> },
               { path: "admin/academic/terms/new", element: <Suspense fallback={<PageLoader />}><AddTermPage /></Suspense> },
+              { path: "admin/leave-requests", element: <Suspense fallback={<PageLoader />}><LeaveRequestsPage /></Suspense> },
               { path: "admin/settings", element: <Suspense fallback={<PageLoader />}><AdminSettingsPage /></Suspense> },
             ],
           },
