@@ -27,13 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-const initialUsers = [
-  { id: "1", name: "Alice Johnson", email: "alice@example.com", role: "student", status: "Active", joined: "2024-01-15", risk: "Low" },
-  { id: "2", name: "Bob Smith", email: "bob@example.com", role: "lecturer", status: "Active", joined: "2024-02-10", risk: "Low" },
-  { id: "3", name: "Charlie Brown", email: "charlie@example.com", role: "student", status: "Inactive", joined: "2024-03-05", risk: "Low" },
-  { id: "4", name: "Diana Prince", email: "diana@example.com", role: "admin", status: "Active", joined: "2023-12-20", risk: "Low" },
-  { id: "5", name: "Eve Davis", email: "eve@example.com", role: "lecturer", status: "Active", joined: "2024-01-22", risk: "Moderate" },
-];
+
 
 const AnimatedNumber = ({ value }: { value: number | string }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -84,18 +78,48 @@ const GlassCard = ({ children, className = "", noHover = false, style = {} }: Gl
   </div>
 );
 
+import api from "@/services/api";
+
 const UsersManagementPage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
-  const [users] = useState(initialUsers);
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredUsers = users.filter((u) => {
-    const matchesSearch = u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         u.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTab = activeTab === "all" || u.role === activeTab;
-    return matchesSearch && matchesTab;
-  });
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const params: any = {
+          skip: 0,
+          limit: 100,
+        };
+        if (activeTab !== "all") {
+          params.role = activeTab;
+        }
+        if (searchTerm) {
+          params.q = searchTerm;
+        }
+        
+        const response = await api.get("/users/", { params });
+        setUsers(response.data);
+      } catch (error) {
+        console.error("Failed to fetch identities:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Debounce search
+    const timer = setTimeout(() => {
+      fetchUsers();
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [activeTab, searchTerm]);
+
+  const filteredUsers = users;
 
   const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
 
@@ -151,8 +175,8 @@ const UsersManagementPage = () => {
               </div>
            </div>
            <div className="mt-6 space-y-1">
-              <p className="text-4xl font-black tracking-tighter italic"><AnimatedNumber value={users.length * 1052} /></p>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60">Total Population Index</p>
+              <p className="text-4xl font-black tracking-tighter italic"><AnimatedNumber value={users.length} /></p>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60">Live Population Index</p>
            </div>
         </GlassCard>
 
@@ -248,7 +272,16 @@ const UsersManagementPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.length === 0 ? (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center h-64 border-none">
+                    <div className="flex flex-col items-center justify-center text-muted-foreground gap-4">
+                       <div className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+                       <span className="text-lg font-black tracking-tighter italic opacity-40">Synchronizing Identity Cluster...</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : filteredUsers.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center h-64 border-none">
                     <div className="flex flex-col items-center justify-center text-muted-foreground gap-4">
