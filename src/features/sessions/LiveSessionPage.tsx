@@ -89,7 +89,7 @@ const LiveSessionPage = () => {
   const [qrTimeLeft, setQrTimeLeft] = useState(120);
   const [searchQuery, setSearchQuery] = useState("");
   const [isManageOpen, setIsManageOpen] = useState(false);
-  const prevAttendanceCount = useRef(0);
+
 
   const ROTATION_INTERVAL = 120; // seconds — 2 minutes
 
@@ -314,7 +314,7 @@ const LiveSessionPage = () => {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh] gap-6">
         <Loader2 className="w-12 h-12 animate-spin text-primary opacity-20" />
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground animate-pulse">Establishing Secure Stream...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground animate-pulse">Loading Session...</p>
       </div>
     );
   }
@@ -325,11 +325,11 @@ const LiveSessionPage = () => {
         <div className="w-20 h-20 bg-primary/5 rounded-3xl flex items-center justify-center mx-auto text-primary">
           <AlertCircle className="w-10 h-10" />
         </div>
-        <h2 className="text-3xl font-black tracking-tighter uppercase italic">No Active Signal</h2>
+        <h2 className="text-3xl font-black tracking-tighter uppercase italic">No Active Session</h2>
         <p className="text-slate-500 font-semibold">There is no attendance session currently active in the secure zone.</p>
         <Button onClick={() => navigate('/sessions/new')} className="w-full h-14 rounded-2xl font-black uppercase tracking-widest gap-3">
           <Activity className="w-5 h-5" />
-          Initialize Protocol
+          Start Session
         </Button>
       </div>
     );
@@ -396,7 +396,7 @@ const LiveSessionPage = () => {
               </div>
               
               <div className="text-center space-y-2 my-10 relative">
-                <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] mb-3 ml-1">Dynamic Auth Token</h3>
+                <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] mb-3 ml-1">Attendance Code</h3>
                 <div className="text-5xl font-black tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-600 to-indigo-800 tabular-nums font-mono">
                   {activeToken || 'SYST'}
                 </div>
@@ -438,12 +438,12 @@ const LiveSessionPage = () => {
                 ) : (
                   <Square className="w-5 h-5 fill-current" />
                 )}
-                Terminate Session
+                End Session
               </Button>
               <div className="flex items-center justify-center gap-2 opacity-40">
                  <ShieldCheck className="w-3 h-3 text-emerald-500" />
                  <p className="text-[9px] font-black uppercase tracking-tighter text-slate-600">
-                   Biometric verification streams are active
+                   Attendance verification is active
                  </p>
               </div>
             </div>
@@ -461,7 +461,7 @@ const LiveSessionPage = () => {
                     <div className="p-2 bg-blue-500/10 rounded-xl text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300">
                       <MapPin className="w-4 h-4" />
                     </div>
-                    <span className="text-xs font-black uppercase tracking-widest text-slate-500">Spatial Lock</span>
+                    <span className="text-xs font-black uppercase tracking-widest text-slate-500">Location Check</span>
                   </div>
                   <Badge className="bg-blue-500/10 text-blue-600 border-none text-[9px] font-black">ENFORCED</Badge>
                </div>
@@ -470,7 +470,7 @@ const LiveSessionPage = () => {
                      <div className="p-2 bg-purple-500/10 rounded-xl text-purple-600 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
                        <ArrowRightLeft className="w-4 h-4" />
                      </div>
-                     <span className="text-xs font-black uppercase tracking-widest text-slate-500">Auth Method</span>
+                     <span className="text-xs font-black uppercase tracking-widest text-slate-500">Auth Type</span>
                    </div>
                    <Badge className="bg-purple-500/10 text-purple-600 border-none text-[9px] font-black">HMAC-SHA256</Badge>
                 </div>
@@ -496,7 +496,7 @@ const LiveSessionPage = () => {
                   <Users className="w-7 h-7 text-primary" />
                   Live Attendance Feed
                 </CardTitle>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mt-2">Real-time Biometric Ingest Stream</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mt-2">Real-time Attendance Feed</p>
               </div>
               <div className="flex gap-4">
                  <div className="hidden sm:flex flex-col items-end gap-1 px-6 py-3 bg-white/60 border border-indigo-50 rounded-2xl shadow-sm">
@@ -509,7 +509,7 @@ const LiveSessionPage = () => {
               <Table>
                 <TableHeader className="bg-slate-50/80 sticky top-0 z-10 backdrop-blur-md border-b">
                   <TableRow className="border-none hover:bg-transparent">
-                    <TableHead className="py-6 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Student Identity</TableHead>
+                    <TableHead className="py-6 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Student</TableHead>
                     <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sec</TableHead>
                     <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Credential ID</TableHead>
                     <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Time-Stamp</TableHead>
@@ -527,7 +527,7 @@ const LiveSessionPage = () => {
                               <DialogHeader>
                                 <DialogTitle className="text-2xl font-black uppercase italic tracking-tighter flex items-center gap-3">
                                   <UserCheck className="w-8 h-8 text-primary" />
-                                  Manual Override Protocol
+                                  Manual Attendance
                                 </DialogTitle>
                                 <DialogDescription className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-2">
                                   Mark attendance for students without smartphone hardware.
@@ -663,8 +663,8 @@ const LiveSessionPage = () => {
                      </div>
                   </div>
                   <div className="text-center">
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Awaiting Signal Phase</p>
-                    <p className="text-sm font-bold opacity-30 mt-2 italic">Scanning secure zones for student identifiers...</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Waiting for Students</p>
+                    <p className="text-sm font-bold opacity-30 mt-2 italic">Waiting for students to check in...</p>
                   </div>
                 </div>
               )}

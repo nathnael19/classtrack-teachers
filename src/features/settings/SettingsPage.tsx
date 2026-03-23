@@ -73,10 +73,10 @@ const SettingsPage = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-profile'] });
-      toast.success('Neural configurations synchronized!');
+      toast.success('Settings updated!');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || 'Protocol synchronization failure.');
+      toast.error(error.response?.data?.detail || 'Failed to update settings.');
     }
   });
 
@@ -223,7 +223,7 @@ const SettingsPage = () => {
           <Loader2 className="w-16 h-16 animate-spin text-primary opacity-20" />
           <Fingerprint className="w-8 h-8 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
         </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Scanning Bio-Digital Credentials...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Loading Settings...</p>
       </div>
     );
   }
