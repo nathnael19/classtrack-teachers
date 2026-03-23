@@ -69,7 +69,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="pt-8 border-t border-[#0EA5E9]/5 flex flex-col md:flex-row justify-between items-center text-xs text-muted-foreground gap-4 font-['Atkinson_Hyperlegible']">
-            <p>© {new Date().getFullYear()} ClassTrack Protocol. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} ClassTrack. All rights reserved.</p>
             <div className="flex space-x-6">
               <span>Status: Operational</span>
               <span>v2.0.4 Premium</span>

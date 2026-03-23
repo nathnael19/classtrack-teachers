@@ -63,7 +63,7 @@ const AdminSettingsPage = () => {
   const [isSyncing, setIsSyncing] = useState(false);
 
   const categories = [
-    { id: "general", label: "Nucleus", icon: Settings },
+    { id: "general", label: "General", icon: Settings },
     { id: "security", label: "Security", icon: Shield },
     { id: "academic", label: "Academic", icon: GraduationCap },
     { id: "network", label: "Network", icon: Globe },
@@ -73,8 +73,8 @@ const AdminSettingsPage = () => {
   const handleSync = async () => {
     setIsSyncing(true);
     await new Promise(resolve => setTimeout(resolve, 2000));
-    toast.success("Global configurations synchronized!", {
-      description: "ClassTrack core has parity with all distributed nodes.",
+    toast.success("Settings updated successfully!", {
+      description: "Your changes have been applied across the system.",
       icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
     });
     setIsSyncing(false);
@@ -94,13 +94,13 @@ const AdminSettingsPage = () => {
                 <div className="p-2.5 bg-primary/10 rounded-2xl border border-primary/20 text-primary backdrop-blur-md">
                    <Settings className="w-5 h-5" />
                 </div>
-                <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Administrative Nucleus</Badge>
+                <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Admin Settings</Badge>
              </div>
              <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-primary dark:from-white dark:via-slate-200 dark:to-primary">
-                System <span className="italic">Orchestration</span>
+                System <span className="italic">Settings</span>
              </h1>
              <p className="text-xl font-medium text-muted-foreground/80 max-w-2xl leading-relaxed">
-                Configure global protocols, infrastructure parity, and system branding for the ClassTrack enterprise ecosystem.
+                Manage system branding, security protocols, and academic configurations.
              </p>
           </div>
           <Button 
@@ -109,7 +109,7 @@ const AdminSettingsPage = () => {
             className="h-16 px-8 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-3xl font-black uppercase tracking-widest flex items-center gap-3 shadow-2xl hover:scale-105 active:scale-95 transition-all group overflow-hidden relative"
           >
             <RefreshCw className={cn("w-5 h-5", isSyncing && "animate-spin")} />
-            <span>{isSyncing ? "Syncing core..." : "Sync Global State"}</span>
+            <span>{isSyncing ? "Updating..." : "Sync Settings"}</span>
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:animate-shimmer" />
           </Button>
         </div>
@@ -154,13 +154,13 @@ const AdminSettingsPage = () => {
                 <div className="bg-white/5 dark:bg-black/20 p-8 md:p-12 h-full rounded-[inherit] min-h-[600px]">
                    {activeTab === "general" && (
                      <SettingSection 
-                       title="System Nucleus" 
-                       description="Global branding and enterprise deployment parameters."
+                       title="General Settings" 
+                       description="Manage your institution's name and domain settings."
                        icon={Terminal}
                      >
                        <div className="grid md:grid-cols-2 gap-8">
                           <div className="space-y-4">
-                             <Label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 ml-2">Institution Identity</Label>
+                             <Label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 ml-2">Institution Name</Label>
                              <Input 
                                defaultValue="ClassTrack University of Excellence" 
                                className="h-14 bg-white/10 dark:bg-black/40 border-white/10 focus:border-primary/50 rounded-2xl transition-all font-black text-lg px-6"
@@ -175,8 +175,8 @@ const AdminSettingsPage = () => {
                           </div>
                           <div className="p-6 rounded-3xl bg-white/5 dark:bg-black/40 border border-white/10 col-span-2 flex items-center justify-between group">
                              <div className="space-y-1">
-                                <h4 className="font-bold">Maintenance Core Protocol</h4>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Restrict write access for cluster upgrades</p>
+                                <h4 className="font-bold">Maintenance Mode</h4>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Temporary disable updates during maintenance</p>
                              </div>
                              <Switch className="data-[state=checked]:bg-rose-500" />
                           </div>
@@ -186,17 +186,17 @@ const AdminSettingsPage = () => {
 
                    {activeTab === "security" && (
                      <SettingSection 
-                       title="Security Protocols" 
-                       description="Manage authentication vectors and data protection clusters."
+                       title="Security Settings" 
+                       description="Manage authentication and data protection."
                        icon={Shield}
                      >
                        <div className="space-y-8">
                           <div className="grid gap-6">
                              {[
-                               { title: "Multi-Factor Authentication", desc: "Require dual-layer validation for all administrative staff", icon: Fingerprint, defaultOn: true },
-                               { title: "Session Persistence Tuning", desc: "Auto-decommission inactive session tokens after 30 mins", icon: RefreshCw, defaultOn: true },
-                               { title: "Audit Log Streaming", desc: "Stream interaction metadata to external security clusters", icon: Activity, defaultOn: false },
-                               { title: "IP Whitelisting", desc: "Enforce network boundary for super-admin access", icon: Globe, defaultOn: false },
+                               { title: "Two-Factor Authentication (2FA)", desc: "Require two-step verification for all administrative staff", icon: Fingerprint, defaultOn: true },
+                               { title: "Session Timeout", desc: "Automatically log out inactive users after 30 minutes", icon: RefreshCw, defaultOn: true },
+                               { title: "Live Audit Logs", desc: "Send system logs to external monitoring services", icon: Activity, defaultOn: false },
+                               { title: "IP Restrictions", desc: "Restrict admin access to specific IP addresses", icon: Globe, defaultOn: false },
                              ].map((item, i) => (
                                <div key={i} className="flex items-center justify-between p-6 rounded-3xl bg-white/5 dark:bg-black/40 border border-white/10 hover:border-primary/20 transition-all group">
                                   <div className="flex gap-4">
@@ -216,11 +216,11 @@ const AdminSettingsPage = () => {
                              <div className="flex gap-4 items-center">
                                 <AlertTriangle className="w-8 h-8 text-rose-500 animate-pulse" />
                                 <div className="space-y-1 text-center md:text-left">
-                                   <h4 className="font-black text-rose-500 uppercase tracking-tighter">Emergency Purge Mode</h4>
-                                   <p className="text-[10px] font-bold opacity-60">Revoke all active tokens and lock down system core immediately.</p>
+                                   <h4 className="font-black text-rose-500 uppercase tracking-tighter">Emergency Lockdown</h4>
+                                   <p className="text-[10px] font-bold opacity-60">Instantly log out all users and disable system access.</p>
                                 </div>
                              </div>
-                             <Button variant="destructive" className="rounded-2xl px-8 h-12 font-black uppercase text-[10px] tracking-widest bg-rose-500 hover:bg-rose-600">Execute Purge</Button>
+                             <Button variant="destructive" className="rounded-2xl px-8 h-12 font-black uppercase text-[10px] tracking-widest bg-rose-500 hover:bg-rose-600">Lockdown System</Button>
                           </div>
                        </div>
                      </SettingSection>
@@ -228,13 +228,13 @@ const AdminSettingsPage = () => {
 
                    {activeTab === "academic" && (
                      <SettingSection 
-                       title="Academic Orbs" 
-                       description="Configure underlying educational logic and scheduling loops."
+                       title="Academic Settings" 
+                       description="Manage lecture durations and attendance scanning rules."
                        icon={GraduationCap}
                      >
                        <div className="grid md:grid-cols-2 gap-8">
                           <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-4">
-                             <Label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Default Session Window</Label>
+                             <Label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Default Session Duration</Label>
                              <div className="flex items-center justify-between">
                                 <span className="text-4xl font-black">60m</span>
                                 <div className="flex gap-2">
@@ -242,10 +242,10 @@ const AdminSettingsPage = () => {
                                    <Button variant="ghost" className="w-10 h-10 rounded-xl bg-white/5"> + </Button>
                                 </div>
                              </div>
-                             <p className="text-[10px] font-bold text-muted-foreground leading-relaxed">System-wide default for new lecture sessions.</p>
+                             <p className="text-[10px] font-bold text-muted-foreground leading-relaxed">Set the standard duration for new classes.</p>
                           </div>
                           <div className="p-6 rounded-3xl bg-white/5 border border-white/10 space-y-4">
-                             <Label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Geospatial Radius</Label>
+                             <Label className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Attendance Radius</Label>
                              <div className="flex items-center justify-between">
                                 <span className="text-4xl font-black">50m</span>
                                 <div className="flex gap-2">
@@ -253,7 +253,7 @@ const AdminSettingsPage = () => {
                                    <Button variant="ghost" className="w-10 h-10 rounded-xl bg-white/5"> + </Button>
                                 </div>
                              </div>
-                             <p className="text-[10px] font-bold text-muted-foreground leading-relaxed">Enforced geofence boundary for student scanning.</p>
+                             <p className="text-[10px] font-bold text-muted-foreground leading-relaxed">Set the maximum distance for valid attendance check-ins.</p>
                           </div>
                        </div>
                      </SettingSection>
@@ -261,8 +261,8 @@ const AdminSettingsPage = () => {
 
                    {activeTab === "health" && (
                      <SettingSection 
-                       title="Infrastructure Parity" 
-                       description="Detailed telemetry from the distributed enterprise clusters."
+                       title="System Health" 
+                       description="Detailed telemetry from the system performance."
                        icon={Cpu}
                      >
                         <div className="space-y-8">
@@ -307,9 +307,9 @@ const AdminSettingsPage = () => {
 
       <footer className="mt-20 py-10 border-t border-white/5 flex items-center justify-center">
          <div className="flex items-center gap-4 opacity-30 grayscale hover:grayscale-0 hover:opacity-100 transition-all cursor-crosshair">
-            <span className="text-[10px] font-black uppercase tracking-[0.5em]">ClassTrack Nucleus Hub</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.5em]">ClassTrack Admin</span>
             <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-            <span className="text-[10px] font-black uppercase tracking-[0.5em]">Infrastructure Core v4.0.2</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.5em]">System Version 4.0.2</span>
          </div>
       </footer>
     </div>
