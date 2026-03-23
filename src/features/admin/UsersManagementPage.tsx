@@ -147,7 +147,7 @@ const UsersManagementPage = () => {
       {/* Immersive Background */}
       <div className="fixed inset-0 overflow-hidden -z-20 pointer-events-none">
         <div className="absolute top-[10%] left-[10%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[5%] right-[5%] w-[40%] h-[40%] bg-amber-500/5 rounded-full blur-[100px] animate-pulse transition-all duration-[4000ms]" />
+        <div className="absolute bottom-[5%] right-[5%] w-[40%] h-[40%] bg-amber-500/5 rounded-full blur-[100px] animate-pulse transition-all duration-[time:4000ms]" />
       </div>
 
       {/* Header / Command Center */}
