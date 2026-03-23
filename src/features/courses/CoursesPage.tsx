@@ -33,6 +33,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/services/api';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/store/authStore';
 import { CreateCourseModal } from './components/CreateCourseModal';
 import { EditCourseModal } from './components/EditCourseModal';
 import { EnrollStudentsModal } from './components/EnrollStudentsModal';
@@ -52,6 +53,7 @@ interface Course {
 const CoursesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const queryClient = useQueryClient();
 
   // --- Queries ---
@@ -122,7 +124,7 @@ const CoursesPage = () => {
             Manage your courses and student performance tracking.
           </p>
         </div>
-        <CreateCourseModal />
+        {user?.role === 'lecturer' && <CreateCourseModal />}
       </header>
 
       <div className="glass-card rounded-[3rem] overflow-hidden border-indigo-50/30 shadow-2xl shadow-indigo-500/5">
