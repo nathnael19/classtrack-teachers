@@ -55,9 +55,9 @@ const PreviewRoomCard = ({ data }: { data: Partial<RoomFormValues> }) => (
         </div>
         <div className="flex flex-col items-end gap-1">
           <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 px-3 py-1 text-[10px] font-black uppercase tracking-widest whitespace-nowrap">
-            Spatial Preview
+            Room Preview
           </Badge>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">Asset Node v3.2</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">New Room v1.0</span>
         </div>
       </div>
 
@@ -72,11 +72,11 @@ const PreviewRoomCard = ({ data }: { data: Partial<RoomFormValues> }) => (
 
       <div className="grid grid-cols-2 gap-4">
         <div className="p-3 rounded-2xl bg-white/10 dark:bg-black/20 border border-white/10 flex flex-col gap-1">
-          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Limit</span>
+          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Capacity</span>
           <span className="text-lg font-black">{data.capacity || "0"} SEATS</span>
         </div>
         <div className="p-3 rounded-2xl bg-white/10 dark:bg-black/20 border border-white/10 flex flex-col gap-1 text-right">
-          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Load</span>
+          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Status</span>
           <span className="text-lg font-black text-emerald-500 italic">AVAILABLE</span>
         </div>
       </div>
@@ -91,7 +91,7 @@ const PreviewRoomCard = ({ data }: { data: Partial<RoomFormValues> }) => (
 
       <div className="p-4 rounded-2xl bg-emerald-600/5 dark:bg-emerald-400/5 border border-emerald-500/10">
         <p className="text-[11px] font-bold text-muted-foreground/80 leading-relaxed line-clamp-3 italic">
-          {data.description || "The spatial utility and infrastructure details for this educational node will manifest here..."}
+          {data.description || "The room details and equipment will appear here..."}
         </p>
       </div>
 
@@ -99,7 +99,7 @@ const PreviewRoomCard = ({ data }: { data: Partial<RoomFormValues> }) => (
         <div className="w-full h-1 bg-white/10 dark:bg-white/5 rounded-full overflow-hidden">
           <div className="h-full bg-gradient-to-r from-emerald-500 to-indigo-500 w-1/5 animate-pulse" />
         </div>
-        <span className="text-[9px] font-black uppercase tracking-widest opacity-30">Imaging</span>
+        <span className="text-[9px] font-black uppercase tracking-widest opacity-30">Saving...</span>
       </div>
     </div>
   </GlassCard>
@@ -137,13 +137,13 @@ const AddRoomPage = () => {
         capacity: parseInt(data.capacity) || null,
         building: data.location
       });
-      toast.success("Spatial Node Integrated!", {
-        description: `${data.name} is now available in the resource scheduler.`,
+      toast.success("Room Created!", {
+        description: `${data.name} has been added to the room list.`,
         icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
       });
       navigate("/admin/academic");
     } catch (error: any) {
-      toast.error("Integration Failed", { description: error?.response?.data?.detail || "Could not register facility node." });
+      toast.error("Failed to Create Room", { description: error?.response?.data?.detail || "Could not save room details." });
     } finally {
       setIsSubmitting(false);
     }
@@ -172,7 +172,7 @@ const AddRoomPage = () => {
           className="mb-8 text-muted-foreground hover:text-foreground group rounded-xl px-4 py-2 hover:bg-white/10 backdrop-blur-sm border border-transparent hover:border-white/10 transition-all"
         >
           <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-xs font-black uppercase tracking-widest">Resource Matrix</span>
+          <span className="text-xs font-black uppercase tracking-widest">Back to Academic Management</span>
         </Button>
 
         <div className="grid lg:grid-cols-12 gap-12 items-start">
@@ -183,13 +183,13 @@ const AddRoomPage = () => {
                  <div className="p-2.5 bg-emerald-500/10 rounded-2xl border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 backdrop-blur-md">
                     <Layout className="w-5 h-5" />
                  </div>
-                 <Badge variant="outline" className="border-indigo-500/30 text-indigo-600 dark:text-indigo-400 bg-indigo-500/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Resource Synthesis</Badge>
+                 <Badge variant="outline" className="border-indigo-500/30 text-indigo-600 dark:text-indigo-400 bg-indigo-500/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Room Management</Badge>
               </div>
               <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-emerald-600 dark:from-white dark:via-slate-200 dark:to-emerald-400">
-                Facility Synthesis
+                Add New Room
               </h1>
               <p className="text-lg font-medium text-muted-foreground/80 max-w-xl leading-relaxed">
-                Define and initialize structural learning environments within the ClassTrack global facility framework.
+                Create and configure a new classroom or lab for the campus.
               </p>
             </div>
 
@@ -199,7 +199,7 @@ const AddRoomPage = () => {
                   <div className="grid gap-x-8 gap-y-10 md:grid-cols-2">
                     {/* Room Name */}
                     <div className="space-y-3 col-span-2 group">
-                      <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 group-focus-within:opacity-100 transition-opacity">Facility Designation</Label>
+                      <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 group-focus-within:opacity-100 transition-opacity">Room Name</Label>
                       <div className="relative">
                         <Layout className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 group-focus-within:text-emerald-500 transition-colors" />
                         <Input 
@@ -217,11 +217,11 @@ const AddRoomPage = () => {
 
                     {/* Room Type */}
                     <div className="space-y-3">
-                      <Label htmlFor="type" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Operational Class</Label>
+                      <Label htmlFor="type" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Room Type</Label>
                       <div className="relative">
                          <Select onValueChange={(val) => setValue("type", val)} defaultValue="Lecture Hall">
                             <SelectTrigger className="h-14 bg-white/10 dark:bg-black/40 border-white/10 hover:border-white/20 focus:border-emerald-500/50 rounded-2xl transition-all font-black text-lg">
-                               <SelectValue placeholder="Select class..." />
+                               <SelectValue placeholder="Select type..." />
                             </SelectTrigger>
                             <SelectContent className="bg-white/95 dark:bg-black/95 backdrop-blur-2xl border-white/10 rounded-2xl shadow-2xl p-1">
                                {["Lecture Hall", "Computer Lab", "Seminar Room", "Workshop", "Research Studio"].map(t => (
@@ -236,7 +236,7 @@ const AddRoomPage = () => {
 
                     {/* Capacity */}
                     <div className="space-y-3 group">
-                      <Label htmlFor="capacity" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Human Load Limit</Label>
+                      <Label htmlFor="capacity" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Capacity</Label>
                       <div className="relative">
                         <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 transition-colors" />
                         <Input 
@@ -255,7 +255,7 @@ const AddRoomPage = () => {
 
                     {/* Location */}
                     <div className="space-y-3 col-span-2 group">
-                      <Label htmlFor="location" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Building Coordinates</Label>
+                      <Label htmlFor="location" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Location</Label>
                       <div className="relative">
                         <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 transition-colors" />
                         <Input 
@@ -272,11 +272,11 @@ const AddRoomPage = () => {
 
                     {/* Description */}
                     <div className="space-y-3 col-span-2 group">
-                      <Label htmlFor="description" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Infrastructural Narrative</Label>
+                      <Label htmlFor="description" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Description</Label>
                       <textarea 
                         id="description"
                         rows={3}
-                        placeholder="Detail the spatial capabilities and environmental features..."
+                        placeholder="Enter room details and equipment..."
                         className="w-full p-6 bg-white/10 dark:bg-black/40 border-white/10 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/5 rounded-2xl transition-all resize-none text-base font-bold placeholder:text-muted-foreground/30"
                         {...register("description")}
                       />
@@ -294,12 +294,12 @@ const AddRoomPage = () => {
                       {isSubmitting ? (
                         <div className="flex items-center gap-3">
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Indexing Spatial Node...
+                          Saving Room...
                         </div>
                       ) : (
                         <div className="flex items-center justify-center gap-3">
                           <Save className="w-5 h-5" />
-                          Commit to Matrix
+                          Create Room
                         </div>
                       )}
                     </Button>
@@ -328,8 +328,8 @@ const AddRoomPage = () => {
           {/* Right Preview Section */}
           <div className="hidden xl:flex xl:col-span-4 flex-col gap-8 justify-center min-h-[600px] animate-in slide-in-from-right-12 duration-1000">
              <div className="space-y-2 text-right">
-                <h2 className="text-2xl font-black italic tracking-tighter">Spatial Intelligence</h2>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Simulating structural occupancy in real-time</p>
+                <h2 className="text-2xl font-black italic tracking-tighter">Preview</h2>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">See how your room will look</p>
              </div>
              
              <div className="relative">
