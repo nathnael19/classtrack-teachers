@@ -151,7 +151,7 @@ const DashboardPage = () => {
       {/* Immersive Background */}
       <div className="fixed inset-0 overflow-hidden -z-20 pointer-events-none opacity-40">
         <div className="absolute top-[10%] right-[10%] w-[50rem] h-[50rem] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[5%] left-[5%] w-[40rem] h-[40rem] bg-emerald-500/5 rounded-full blur-[100px] animate-pulse transition-all duration-[4000ms]" />
+        <div className="absolute bottom-[5%] left-[5%] w-[40rem] h-[40rem] bg-emerald-500/5 rounded-full blur-[100px] animate-pulse transition-all duration-[time:4000ms]" />
       </div>
 
       <header className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 pb-8 border-b border-white/10">
@@ -396,7 +396,7 @@ const DashboardPage = () => {
                     <div className="flex items-center gap-6">
                       <div className="w-32 h-2.5 bg-white/5 rounded-full relative overflow-hidden border border-white/5 shadow-inner group-hover:border-white/10 transition-colors">
                         <div
-                          className="absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-[cubic-bezier(0.34,1.56,0.64,1)] bg-gradient-to-r from-primary to-indigo-400 group-hover:shadow-[0_0_15px_rgba(30,64,175,0.4)]"
+                          className="absolute inset-y-0 left-0 rounded-full transition-all duration-1000 [transition-timing-function:cubic-bezier(0.34,1.56,0.64,1)] bg-gradient-to-r from-primary to-indigo-400 group-hover:shadow-[0_0_15px_rgba(30,64,175,0.4)]"
                           style={{ width: session.rate }}
                         />
                       </div>
