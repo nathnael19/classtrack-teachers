@@ -121,8 +121,8 @@ const AdminDashboardPage = () => {
   return (
     <div className="relative min-h-screen p-4 md:p-8 space-y-8 font-sans overflow-hidden">
       {/* Immersive Background Decorations */}
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -z-10 animate-pulse duration-[10s]" />
-      <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[100px] -z-10 animate-pulse delay-700 duration-[15s]" />
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -z-10 animate-pulse [animation-duration:10s]" />
+      <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[100px] -z-10 animate-pulse delay-700 [animation-duration:15s]" />
       
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
