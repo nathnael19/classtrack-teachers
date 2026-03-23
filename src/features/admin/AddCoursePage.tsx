@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,12 +21,14 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import api from "@/services/api";
 
 const courseSchema = z.object({
   name: z.string().min(3, "Course name must be at least 3 characters"),
   code: z.string().min(3, "Course code must be at least 3 characters").max(10),
   credits: z.string().min(1, "Credits are required"),
   department: z.string().min(1, "Department is required"),
+  term: z.string().min(1, "Term is required"),
   description: z.string().optional(),
 });
 
@@ -114,30 +116,57 @@ const AddCoursePage = () => {
       name: "",
       code: "",
       department: "",
+      term: "",
       description: "",
     }
   });
 
   const formData = useWatch({ control });
 
+  const [dbDepartments, setDbDepartments] = useState<any[]>([]);
+  const [dbTerms, setDbTerms] = useState<any[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [deptRes, termRes] = await Promise.all([
+          api.get("/departments/"),
+          api.get("/terms/")
+        ]);
+        setDbDepartments(deptRes.data);
+        setDbTerms(termRes.data);
+      } catch (error) {
+        toast.error("Failed to load prerequisite data");
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+    fetchData();
+  }, []);
+
   const onSubmit = async (data: CourseFormValues) => {
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log("Ultra Premium Course Submit:", data);
-    toast.success("Curriculum Node Integrated!", {
-      description: `${data.code} is now part of the global academic registry.`,
-      icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
-    });
-    setIsSubmitting(false);
-    navigate("/admin/academic");
+    try {
+      await api.post('/courses/', {
+        name: data.name,
+        code: data.code,
+        credit_hours: parseInt(data.credits) || 3,
+        department_id: parseInt(data.department),
+        term_id: parseInt(data.term),
+        description: data.description || ""
+      });
+      toast.success("Curriculum Node Integrated!", {
+        description: `${data.code} is now part of the global academic registry.`,
+        icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
+      });
+      navigate("/admin/academic");
+    } catch (error: any) {
+      toast.error("Integration Failed", { description: error?.response?.data?.detail || "Could not register course node." });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
-  const departments = [
-    { value: "cs", label: "School of Computer Science", icon: Layers },
-    { value: "math", label: "Faculty of Mathematics", icon: GraduationCap },
-    { value: "physics", label: "Institute of Physics", icon: Zap },
-    { value: "arts", label: "Department of Arts & Humanities", icon: BookOpen },
-  ];
 
   return (
     <div className="relative min-h-[90vh] p-4 md:p-8 overflow-hidden font-sans">
@@ -238,27 +267,51 @@ const AddCoursePage = () => {
                     </div>
 
                     {/* Department Select */}
-                    <div className="space-y-3 col-span-2 group">
+                    <div className="space-y-3 group">
                       <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Core Faculty Assignment</Label>
-                      <Select onValueChange={(val) => setValue("department", val)}>
+                      <Select disabled={isLoadingData} onValueChange={(val) => setValue("department", val)}>
                         <SelectTrigger className="h-14 bg-white/10 dark:bg-black/40 border-white/10 hover:border-white/20 focus:border-indigo-500/50 rounded-2xl transition-all font-black text-lg">
                           <SelectValue placeholder="Select faculty network..." />
                         </SelectTrigger>
                         <SelectContent className="bg-white/95 dark:bg-black/95 backdrop-blur-2xl border-white/10 rounded-2xl shadow-2xl p-2 min-w-[300px]">
                           <div className="text-[10px] font-black uppercase tracking-[0.2em] p-2 opacity-40 border-b border-white/10 mb-2">Academic Domains</div>
-                          {departments.map(dept => (
-                            <SelectItem key={dept.value} value={dept.label} className="rounded-xl h-14 group transition-all focus:bg-indigo-500/10 focus:text-indigo-600">
+                          {dbDepartments.map(dept => (
+                            <SelectItem key={dept.id} value={dept.id.toString()} className="rounded-xl h-14 group transition-all focus:bg-indigo-500/10 focus:text-indigo-600">
                               <div className="flex items-center gap-3">
                                 <div className="p-2 bg-indigo-500/5 rounded-lg group-hover:bg-indigo-500/20 transition-colors">
-                                  <dept.icon className="w-4 h-4" />
+                                  <Layers className="w-4 h-4" />
                                 </div>
-                                <span className="font-bold">{dept.label}</span>
+                                <span className="font-bold">{dept.name}</span>
                               </div>
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                       {errors.department && <p className="text-[11px] font-bold text-rose-500 flex items-center gap-1 mt-1"><Info className="w-3 h-3" /> {errors.department.message}</p>}
+                    </div>
+
+                    {/* Term Select */}
+                    <div className="space-y-3 group">
+                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Active Term Deployment</Label>
+                      <Select disabled={isLoadingData} onValueChange={(val) => setValue("term", val)}>
+                        <SelectTrigger className="h-14 bg-white/10 dark:bg-black/40 border-white/10 hover:border-white/20 focus:border-indigo-500/50 rounded-2xl transition-all font-black text-lg">
+                          <SelectValue placeholder="Select term timeline..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white/95 dark:bg-black/95 backdrop-blur-2xl border-white/10 rounded-2xl shadow-2xl p-2 min-w-[200px]">
+                          <div className="text-[10px] font-black uppercase tracking-[0.2em] p-2 opacity-40 border-b border-white/10 mb-2">Temporal Nodes</div>
+                          {dbTerms.map(term => (
+                            <SelectItem key={term.id} value={term.id.toString()} className="rounded-xl h-14 group transition-all focus:bg-amber-500/10 focus:text-amber-600">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-amber-500/5 rounded-lg group-hover:bg-amber-500/20 transition-colors">
+                                  <Clock className="w-4 h-4" />
+                                </div>
+                                <span className="font-bold">{term.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {errors.term && <p className="text-[11px] font-bold text-rose-500 flex items-center gap-1 mt-1"><Info className="w-3 h-3" /> {errors.term.message}</p>}
                     </div>
 
                     {/* Description */}
