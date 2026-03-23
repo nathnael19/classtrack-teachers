@@ -137,7 +137,6 @@ export const router = createBrowserRouter([
               { path: "admin/academic/departments/new", element: <Suspense fallback={<PageLoader />}><AddDepartmentPage /></Suspense> },
               { path: "admin/academic/rooms/new", element: <Suspense fallback={<PageLoader />}><AddRoomPage /></Suspense> },
               { path: "admin/academic/terms/new", element: <Suspense fallback={<PageLoader />}><AddTermPage /></Suspense> },
-              { path: "admin/leave-requests", element: <Suspense fallback={<PageLoader />}><LeaveRequestsPage /></Suspense> },
               { path: "admin/settings", element: <Suspense fallback={<PageLoader />}><AdminSettingsPage /></Suspense> },
             ],
           },
