@@ -67,10 +67,10 @@ const CoursesPage = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['courses'] });
-      toast.success('Module decommissioned from active service.');
+      toast.success('Course deleted successfully.');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || 'Decommissioning protocol failed.');
+      toast.error(error.response?.data?.detail || 'Failed to delete course.');
     }
   });
 
@@ -99,7 +99,7 @@ const CoursesPage = () => {
           <div className="absolute inset-0 bg-primary/20 blur-2xl animate-pulse" />
         </div>
         <div className="flex flex-col items-center gap-1">
-          <p className="text-muted-foreground font-black tracking-[0.3em] uppercase text-[10px]">Curriculum Pipeline</p>
+          <p className="text-muted-foreground font-black tracking-[0.3em] uppercase text-[10px]">Courses</p>
           <span className="text-sm font-bold opacity-40">Syncing database records...</span>
         </div>
       </div>
@@ -116,10 +116,10 @@ const CoursesPage = () => {
         <div className="space-y-2">
           <div className="flex items-center gap-3">
              <div className="w-1.5 h-10 bg-gradient-to-b from-primary to-indigo-600 rounded-full" />
-             <h1 className="text-5xl font-black tracking-tighter text-foreground leading-none">Modules<span className="text-primary/40 text-3xl ml-2 font-black italic">PRO</span></h1>
+             <h1 className="text-5xl font-black tracking-tighter text-foreground leading-none">Courses</h1>
           </div>
           <p className="text-muted-foreground font-semibold text-lg max-w-xl">
-            Surgical control over your academic curriculum and student engagement vectors.
+            Manage your courses and student performance tracking.
           </p>
         </div>
         <CreateCourseModal />
@@ -132,7 +132,7 @@ const CoursesPage = () => {
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Query by title or module code..."
+              placeholder="Search by name or course code..."
               className="pl-14 h-14 bg-white/60 border-indigo-50 rounded-2xl shadow-inner focus-visible:ring-4 focus-visible:ring-primary/5 placeholder:text-muted-foreground/40 text-sm font-black"
             />
             {searchQuery && (
@@ -149,10 +149,10 @@ const CoursesPage = () => {
           <Table>
             <TableHeader className="bg-slate-50/50 border-b border-indigo-50/50">
               <TableRow className="hover:bg-transparent border-none">
-                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40 w-auto min-w-[200px]">Strategic Module</TableHead>
-                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40">Identifier</TableHead>
-                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40 text-center">Unit Core</TableHead>
-                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40 text-center">Temporal</TableHead>
+                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40 w-auto min-w-[200px]">Course Name</TableHead>
+                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40">Code</TableHead>
+                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40 text-center">Students</TableHead>
+                <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40 text-center">Sessions</TableHead>
                 <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40 text-center">Status</TableHead>
                 <TableHead className="px-2 lg:px-6 py-8 font-black uppercase text-[10px] tracking-wider text-muted-foreground/40 text-right">Actions</TableHead>
               </TableRow>
@@ -223,7 +223,7 @@ const CoursesPage = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-64 rounded-[1.5rem] border-indigo-50/50 backdrop-blur-2xl bg-white/90 p-3 shadow-2xl animate-in zoom-in-95 duration-200">
-                        <DropdownMenuLabel className="px-4 py-3 text-[10px] font-black uppercase text-muted-foreground/40 tracking-[0.3em]">Operational Menu</DropdownMenuLabel>
+                        <DropdownMenuLabel className="px-4 py-3 text-[10px] font-black uppercase text-muted-foreground/40 tracking-[0.3em]">Actions</DropdownMenuLabel>
                         
                         <DropdownMenuItem 
                           onClick={() => handleViewAnalytics(course.id)}
@@ -257,7 +257,7 @@ const CoursesPage = () => {
                           ) : (
                             <Trash2 className="w-5 h-5" />
                           )}
-                          <span className="font-black text-sm uppercase tracking-wider">Decommission Module</span>
+                          <span className="font-black text-sm uppercase tracking-wider">Delete Course</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -272,10 +272,10 @@ const CoursesPage = () => {
                          <Search className="w-10 h-10" />
                        </div>
                        <div className="flex flex-col gap-2">
-                         <span className="font-black text-2xl uppercase tracking-widest text-foreground">Zero Vectors Found</span>
+                         <span className="font-black text-2xl uppercase tracking-widest text-foreground">No Courses Found</span>
                          <p className="text-sm font-bold">Your search query returned no active modules.</p>
                        </div>
-                       <Button variant="outline" onClick={() => setSearchQuery('')} className="rounded-xl px-10 border-indigo-100 font-black uppercase text-[10px] tracking-widest">Reset Discovery</Button>
+                       <Button variant="outline" onClick={() => setSearchQuery('')} className="rounded-xl px-10 border-indigo-100 font-black uppercase text-[10px] tracking-widest">Clear Search</Button>
                     </div>
                   </TableCell>
                 </tr>
@@ -286,9 +286,9 @@ const CoursesPage = () => {
 
         <div className="p-10 border-t border-indigo-50/50 bg-slate-50/30 backdrop-blur-sm flex items-center gap-6">
           <div className="flex flex-col">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/40 leading-none mb-2">Total Modules</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground/40 leading-none mb-2">Total Courses</span>
             <p className="text-sm font-bold text-muted-foreground flex items-center gap-3">
-              Monitoring <span className="text-primary font-black px-4 py-1.5 bg-primary/10 rounded-xl text-lg shadow-sm">{filteredCourses.length}</span> active modules
+              Monitoring <span className="text-primary font-black px-4 py-1.5 bg-primary/10 rounded-xl text-lg shadow-sm">{filteredCourses.length}</span> active courses
             </p>
           </div>
           <div className="w-[1px] h-12 bg-indigo-50" />

@@ -83,9 +83,9 @@ const SetupPasswordPage = () => {
               <Key className="w-8 h-8 text-white" />
            </div>
            <div className="space-y-2">
-              <Badge variant="outline" className="border-purple-500/30 text-purple-600 bg-purple-500/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Security Vector</Badge>
+              <Badge variant="outline" className="border-purple-500/30 text-purple-600 bg-purple-500/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Password Setup</Badge>
               <h1 className="text-4xl font-black tracking-tighter uppercase italic bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-purple-600 dark:from-white dark:to-purple-400">
-                Setup Identity
+                Setup Password
               </h1>
               <p className="text-sm font-medium text-muted-foreground max-w-[280px]">
                 Finalize your account synthesis by defining your unique access vector.
@@ -115,7 +115,7 @@ const SetupPasswordPage = () => {
                     </div>
 
                     <div className="space-y-2 group">
-                       <Label className="text-[10px] font-black uppercase tracking-widest opacity-40 px-1">Confirm Identity</Label>
+                       <Label className="text-[10px] font-black uppercase tracking-widest opacity-40 px-1">Confirm Password</Label>
                        <div className="relative">
                           <Fingerprint className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 group-focus-within:text-purple-500 transition-colors" />
                           <Input 
@@ -141,7 +141,7 @@ const SetupPasswordPage = () => {
                      <Zap className="w-5 h-5 animate-spin" />
                    ) : (
                      <div className="flex items-center gap-2">
-                        Commit Identity <ArrowRight className="w-4 h-4" />
+                        Save Password <ArrowRight className="w-4 h-4" />
                      </div>
                    )}
                  </Button>
