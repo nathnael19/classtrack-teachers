@@ -145,6 +145,8 @@ const AddTermPage = () => {
     try {
       await api.post('/terms/', {
         name: data.name,
+        year: data.year,
+        status: data.status,
         start_date: data.startDate,
         end_date: data.endDate,
         organization_id: data.organization_id ? parseInt(data.organization_id) : null,
@@ -200,7 +202,22 @@ const AddTermPage = () => {
               <div className="bg-white/5 dark:bg-black/20 p-8 md:p-12 h-full rounded-[inherit]">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
                   <div className="grid gap-x-8 gap-y-10 md:grid-cols-2">
-                    {/* Semester Name */}
+                    {/* Organization Selection if multiple */}
+                    {organizations.length > 1 && (
+                      <div className="space-y-3 col-span-2">
+                        <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Organization</Label>
+                        <Select onValueChange={(val: string) => setValue("organization_id", val)}>
+                          <SelectTrigger className="h-14 bg-white/10 dark:bg-black/40 border-white/10 focus:border-indigo-500/50 rounded-2xl">
+                            <SelectValue placeholder="Select organization" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {organizations.map((org) => (
+                              <SelectItem key={org.id} value={String(org.id)}>{org.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                     <div className="space-y-3 col-span-2 group">
                       <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 group-focus-within:opacity-100 transition-opacity">Term Name</Label>
                       <div className="relative">
