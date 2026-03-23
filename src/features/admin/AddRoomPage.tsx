@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import api from "@/services/api";
 
 const roomSchema = z.object({
   name: z.string().min(2, "Room designation is required"),
@@ -129,14 +130,23 @@ const AddRoomPage = () => {
 
   const onSubmit = async (data: RoomFormValues) => {
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log("Ultra Premium Room Submit:", data);
-    toast.success("Spatial Node Integrated!", {
-      description: `${data.name} is now available in the resource scheduler.`,
-      icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
-    });
-    setIsSubmitting(false);
-    navigate("/admin/academic");
+    try {
+      await api.post('/rooms/', {
+        name: data.name,
+        type: data.type.toLowerCase().replace(/ /g, "_"),
+        capacity: parseInt(data.capacity) || null,
+        building: data.location
+      });
+      toast.success("Spatial Node Integrated!", {
+        description: `${data.name} is now available in the resource scheduler.`,
+        icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
+      });
+      navigate("/admin/academic");
+    } catch (error: any) {
+      toast.error("Integration Failed", { description: error?.response?.data?.detail || "Could not register facility node." });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const amenities = [
