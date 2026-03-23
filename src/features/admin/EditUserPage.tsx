@@ -28,7 +28,7 @@ const userSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
   role: z.enum(["student", "lecturer", "admin"]),
-  state: z.string().optional(),
+  account_status: z.string().optional(),
   student_id: z.string().optional(),
   department_id: z.string().optional(),
 });
@@ -58,9 +58,9 @@ const PreviewUserCard = ({ data, originalData }: { data: Partial<UserFormValues>
         <div className="flex flex-col items-end gap-1">
           <Badge className={cn(
              "border-none px-3 py-1 text-[10px] font-black uppercase tracking-widest whitespace-nowrap",
-             data.state === 'active' ? "bg-emerald-500/10 text-emerald-600" : "bg-amber-500/10 text-amber-600"
+             (data.account_status || data.state) === 'active' ? "bg-emerald-500/10 text-emerald-600" : "bg-amber-500/10 text-amber-600"
           )}>
-            {data.state || 'Pending'}
+            {data.account_status || data.state || 'Pending'}
           </Badge>
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">User Profile</span>
         </div>
@@ -134,7 +134,7 @@ const EditUserPage = () => {
           name: response.data.name,
           email: response.data.email,
           role: response.data.role,
-          state: response.data.state || 'active',
+          account_status: response.data.account_status || 'active',
           student_id: response.data.student_id || '',
           department_id: response.data.department_id?.toString() || '',
         });
@@ -153,10 +153,14 @@ const EditUserPage = () => {
     setIsSubmitting(true);
     try {
       const payload = {
-        ...data,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        account_status: data.account_status || undefined,
+        student_id: data.student_id || undefined,
         department_id: data.department_id ? parseInt(data.department_id) : null,
       };
-      
+
       await api.put(`/users/${id}`, payload);
       
       toast.success("User Updated!", {
@@ -278,19 +282,19 @@ const EditUserPage = () => {
                       </div>
                     </div>
 
-                    {/* State/Status */}
+                    {/* Account Status */}
                     <div className="space-y-3">
                       <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Account Status</Label>
                       <div className="relative">
                         <Activity className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 z-10" />
-                        <Select onValueChange={(val: any) => setValue("state", val)} defaultValue={originalUser?.state || "active"}>
+                        <Select onValueChange={(val: any) => setValue("account_status", val)} defaultValue={originalUser?.account_status || "active"}>
                           <SelectTrigger className="pl-12 h-14 bg-white/10 dark:bg-black/40 border-white/10 hover:border-white/20 focus:border-purple-500/50 rounded-2xl transition-all font-black text-lg shadow-sm">
                             <SelectValue placeholder="Select status" />
                           </SelectTrigger>
                           <SelectContent className="bg-white/95 dark:bg-black/95 backdrop-blur-2xl border-white/10 rounded-2xl shadow-2xl p-1">
-                            {["active", "inactive"].map(state => (
-                              <SelectItem key={state} value={state} className="h-12 rounded-xl focus:bg-purple-500/10 font-bold transition-colors uppercase text-[10px] tracking-widest">
-                                {state}
+                            {["active", "suspended", "graduated", "on_leave"].map(status => (
+                              <SelectItem key={status} value={status} className="h-12 rounded-xl focus:bg-purple-500/10 font-bold transition-colors uppercase text-[10px] tracking-widest">
+                                {status.replace("_", " ")}
                               </SelectItem>
                             ))}
                           </SelectContent>
