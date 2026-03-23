@@ -103,7 +103,7 @@ const RegisterPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Academic Vector (Email)</Label>
+                  <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Email Address</Label>
                   <div className="relative group">
                     <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors duration-300">
                       <Mail className="w-5 h-5" />
@@ -122,7 +122,7 @@ const RegisterPage = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">New Cypher</Label>
+                    <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Password</Label>
                     <div className="relative group">
                       <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors duration-300">
                         <Lock className="w-5 h-5" />
@@ -139,7 +139,7 @@ const RegisterPage = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Validate Cypher</Label>
+                    <Label htmlFor="confirmPassword" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Confirm Password</Label>
                     <div className="relative group">
                       <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors duration-300">
                         <Lock className="w-5 h-5" />
@@ -172,7 +172,7 @@ const RegisterPage = () => {
                   ) : (
                     <>
                       <Sparkles className="w-6 h-6 animate-pulse" />
-                      <span className="tracking-wide">Request Authorization</span>
+                      <span className="tracking-wide">Sign Up</span>
                       <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
                     </>
                   )}
@@ -190,7 +190,7 @@ const RegisterPage = () => {
 
         <div className="mt-12 text-center text-muted-foreground">
           <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-80">
-            &copy; 2026 CLASSTRACK &bull; FACULTY AUTHENTICATION PROTOCOL
+            &copy; 2026 CLASSTRACK &bull; FACULTY AUTHENTICATION
           </p>
         </div>
       </div>

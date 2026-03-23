@@ -15,9 +15,9 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { 
-  UserPlus, ArrowLeft, Save, Sparkles, 
-  User, Mail, Shield, BookOpen,
-  CheckCircle2, Info, ChevronRight, Fingerprint
+  UserPlus, ArrowLeft, Save, 
+  User, Mail, Shield,
+  CheckCircle2, Info, Fingerprint
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -133,14 +133,14 @@ const AddUserPage = () => {
       
       await api.post("/users/admin/create-user", payload);
       
-      toast.success("Identity Node Integrated!", {
-        description: `${data.name} is now part of the global registry. Setup email sent!`,
+      toast.success("User Created!", {
+        description: `${data.name} has been added to the system. Setup email sent!`,
         icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
       });
       navigate("/admin/users");
     } catch (error: any) {
-      toast.error("Integration Failed", {
-        description: error.response?.data?.detail || "An unexpected error occurred during node synthesis.",
+      toast.error("Failed to Create User", {
+        description: error.response?.data?.detail || "An unexpected error occurred.",
       });
     } finally {
       setIsSubmitting(false);
@@ -160,7 +160,7 @@ const AddUserPage = () => {
           className="mb-8 text-muted-foreground hover:text-foreground group rounded-xl px-4 py-2 hover:bg-white/10 backdrop-blur-sm border border-transparent hover:border-white/10 transition-all"
         >
           <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-xs font-black uppercase tracking-widest">Identity Hub</span>
+          <span className="text-xs font-black uppercase tracking-widest">Back to Users</span>
         </Button>
 
         <div className="grid lg:grid-cols-12 gap-12 items-start">
@@ -171,13 +171,13 @@ const AddUserPage = () => {
                  <div className="p-2.5 bg-purple-500/10 rounded-2xl border border-purple-500/20 text-purple-600 dark:text-purple-400 backdrop-blur-md">
                     <UserPlus className="w-5 h-5" />
                  </div>
-                 <Badge variant="outline" className="border-purple-500/30 text-purple-600 dark:text-purple-400 bg-purple-500/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Synthesis Portal</Badge>
+                 <Badge variant="outline" className="border-purple-500/30 text-purple-600 dark:text-purple-400 bg-purple-500/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">New User</Badge>
               </div>
               <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-purple-900 to-indigo-600 dark:from-white dark:via-purple-300 dark:to-indigo-400">
-                Identity Synthesis
+                Create New User
               </h1>
               <p className="text-lg font-medium text-muted-foreground/80 max-w-xl leading-relaxed">
-                Initialize new entity vectors into the ClassTrack ecosystem. Password setup is automated via secure dispatch.
+                Add a new student, lecturer, or admin to the system. Password setup is automated via email.
               </p>
             </div>
 
@@ -187,7 +187,7 @@ const AddUserPage = () => {
                   <div className="grid gap-x-8 gap-y-10 md:grid-cols-2">
                     {/* Full Name */}
                     <div className="space-y-3 col-span-2 group">
-                      <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 group-focus-within:opacity-100 transition-opacity">Entity Designation (Full Name)</Label>
+                      <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 group-focus-within:opacity-100 transition-opacity">Full Name</Label>
                       <div className="relative">
                         <Fingerprint className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 group-focus-within:text-purple-500 transition-colors" />
                         <Input 
@@ -205,7 +205,7 @@ const AddUserPage = () => {
 
                     {/* Email */}
                     <div className="space-y-3 col-span-2 group">
-                      <Label htmlFor="email" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Communication Pipeline (Email)</Label>
+                      <Label htmlFor="email" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Email Address</Label>
                       <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 group-focus-within:text-purple-500 transition-colors" />
                         <Input 
@@ -223,7 +223,7 @@ const AddUserPage = () => {
 
                     {/* Role */}
                     <div className="space-y-3">
-                      <Label htmlFor="role" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Governance Class</Label>
+                      <Label htmlFor="role" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">User Role</Label>
                       <div className="relative">
                         <Shield className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 z-10" />
                         <Select onValueChange={(val: any) => setValue("role", val)} defaultValue="student">
@@ -243,7 +243,7 @@ const AddUserPage = () => {
 
                     {/* Student ID (conditional) */}
                     <div className="space-y-3 group">
-                      <Label htmlFor="student_id" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Vector Identifier (ID)</Label>
+                      <Label htmlFor="student_id" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Student/Staff ID</Label>
                       <div className="relative">
                         <Fingerprint className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 transition-colors" />
                         <Input 
@@ -257,7 +257,7 @@ const AddUserPage = () => {
 
                     {/* Department ID */}
                     <div className="space-y-3 col-span-2 group">
-                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Organizational node (Optional)</Label>
+                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Department (Optional)</Label>
                        <Input 
                           id="department_id"
                           placeholder="Department ID (Numeric)" 
@@ -278,12 +278,12 @@ const AddUserPage = () => {
                       {isSubmitting ? (
                         <div className="flex items-center gap-3">
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Indexing Node...
+                          Saving User...
                         </div>
                       ) : (
                         <div className="flex items-center justify-center gap-3 uppercase">
                           <Save className="w-5 h-5" />
-                          Commit Identity
+                          Create User
                         </div>
                       )}
                     </Button>
@@ -297,7 +297,7 @@ const AddUserPage = () => {
           <div className="hidden xl:flex xl:col-span-4 flex-col gap-8 justify-center min-h-[600px] animate-in slide-in-from-right-12 duration-1000">
              <div className="space-y-2 text-right">
                 <h2 className="text-2xl font-black italic tracking-tighter uppercase">Live Intelligence</h2>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Simulating identity state in real-time</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Preview user profile</p>
              </div>
              
              <div className="relative">
