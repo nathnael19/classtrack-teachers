@@ -62,13 +62,13 @@ const PreviewUserCard = ({ data, originalData }: { data: Partial<UserFormValues>
           )}>
             {data.state || 'Pending'}
           </Badge>
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">Identity Node</span>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">User Profile</span>
         </div>
       </div>
 
       <div className="space-y-2 min-h-[80px]">
         <h3 className="text-2xl font-black tracking-tighter leading-none line-clamp-2 uppercase">
-          {data.name || "Unknown Identity"}
+          {data.name || "Unknown User"}
         </h3>
         <p className="font-mono text-[10px] font-black uppercase tracking-widest text-purple-600 truncate">
           {data.email || "EMAIL@EXAMPLE.COM"}
@@ -77,13 +77,13 @@ const PreviewUserCard = ({ data, originalData }: { data: Partial<UserFormValues>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="p-3 rounded-2xl bg-white/10 dark:bg-black/20 border border-white/10 flex flex-col gap-1 text-center">
-          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Governance</span>
+          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Role</span>
           <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-none rounded-lg font-black text-[9px] px-2 self-center">
             {(data.role || "pending").toUpperCase()}
           </Badge>
         </div>
         <div className="p-3 rounded-2xl bg-white/10 dark:bg-black/20 border border-white/10 flex flex-col gap-1 text-center">
-          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Nexus ID</span>
+          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">User ID</span>
           <span className="text-sm font-black italic">#{originalData?.id || "---"}</span>
         </div>
       </div>
@@ -91,7 +91,7 @@ const PreviewUserCard = ({ data, originalData }: { data: Partial<UserFormValues>
       <div className="p-4 rounded-2xl bg-indigo-600/5 dark:bg-indigo-400/5 border border-indigo-500/10 flex items-center gap-3">
          <Activity className="w-4 h-4 text-indigo-500 opacity-50" />
          <p className="text-[10px] font-bold text-muted-foreground/80 leading-tight italic">
-            Modified vectors will be committed to the global registry upon execution.
+            Your changes will be saved to the system.
          </p>
       </div>
 
@@ -140,7 +140,7 @@ const EditUserPage = () => {
         });
       } catch (error) {
         console.error("Failed to fetch user:", error);
-        toast.error("Vector resonance failure. Could not retrieve identity.");
+        toast.error("Failed to retrieve user information.");
         navigate("/admin/users");
       } finally {
         setLoading(false);
@@ -159,14 +159,14 @@ const EditUserPage = () => {
       
       await api.put(`/users/${id}`, payload);
       
-      toast.success("Identity Re-synthesized!", {
-        description: `${data.name}'s vectors have been updated in the global mesh.`,
+      toast.success("User Updated!", {
+        description: `${data.name}'s profile has been updated successfully.`,
         icon: <ShieldCheck className="w-4 h-4 text-emerald-500" />,
       });
       navigate("/admin/users");
     } catch (error: any) {
-      toast.error("Re-synthesis Failed", {
-        description: error.response?.data?.detail || "An unexpected error occurred during node re-alignment.",
+      toast.error("Failed to Update User", {
+        description: error.response?.data?.detail || "An unexpected error occurred while saving changes.",
       });
     } finally {
       setIsSubmitting(false);
@@ -178,7 +178,7 @@ const EditUserPage = () => {
       <div className="min-h-[90vh] flex items-center justify-center">
         <div className="flex flex-col items-center gap-6">
            <div className="w-16 h-16 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
-           <p className="text-xl font-black tracking-tighter italic opacity-40 animate-pulse uppercase">Searching Identity Space...</p>
+           <p className="text-xl font-black tracking-tighter italic opacity-40 animate-pulse uppercase">Finding User...</p>
         </div>
       </div>
     );
@@ -197,7 +197,7 @@ const EditUserPage = () => {
           className="mb-8 text-muted-foreground hover:text-foreground group rounded-xl px-4 py-2 hover:bg-white/10 backdrop-blur-sm border border-transparent hover:border-white/10 transition-all"
         >
           <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-xs font-black uppercase tracking-widest">Identity Hub</span>
+          <span className="text-xs font-black uppercase tracking-widest">Back to User Management</span>
         </Button>
 
         <div className="grid lg:grid-cols-12 gap-12 items-start">
@@ -208,13 +208,13 @@ const EditUserPage = () => {
                  <div className="p-2.5 bg-purple-500/10 rounded-2xl border border-purple-500/20 text-purple-600 dark:text-purple-400 backdrop-blur-md">
                     <RefreshCw className="w-5 h-5" />
                  </div>
-                 <Badge variant="outline" className="border-purple-500/30 text-purple-600 dark:text-purple-400 bg-purple-500/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Vector Re-alignment</Badge>
+                 <Badge variant="outline" className="border-purple-500/30 text-purple-600 dark:text-purple-400 bg-purple-500/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Edit User</Badge>
               </div>
               <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-purple-900 to-indigo-600 dark:from-white dark:via-purple-300 dark:to-indigo-400">
-                Reshape Identity
+                Update User Profile
               </h1>
               <p className="text-lg font-medium text-muted-foreground/80 max-w-xl leading-relaxed">
-                Modifying governance nodes for <span className="text-foreground font-black italic">{originalUser?.name}</span>. Changes effect global permissions instantly.
+                Edit details and permissions for <span className="text-foreground font-black italic">{originalUser?.name}</span>. Changes take effect immediately.
               </p>
             </div>
 
@@ -224,7 +224,7 @@ const EditUserPage = () => {
                   <div className="grid gap-x-8 gap-y-10 md:grid-cols-2">
                     {/* Full Name */}
                     <div className="space-y-3 col-span-2 group">
-                      <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 group-focus-within:opacity-100 transition-opacity">Entity Designation</Label>
+                      <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 group-focus-within:opacity-100 transition-opacity">Full Name</Label>
                       <div className="relative">
                         <Fingerprint className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 group-focus-within:text-purple-500 transition-colors" />
                         <Input 
@@ -242,7 +242,7 @@ const EditUserPage = () => {
 
                     {/* Email */}
                     <div className="space-y-3 col-span-2 group">
-                      <Label htmlFor="email" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Communication Pipeline</Label>
+                      <Label htmlFor="email" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Email Address</Label>
                       <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 group-focus-within:text-purple-500 transition-colors" />
                         <Input 
@@ -260,7 +260,7 @@ const EditUserPage = () => {
 
                     {/* Role */}
                     <div className="space-y-3">
-                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Governance Class</Label>
+                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">User Role</Label>
                       <div className="relative">
                         <Shield className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 z-10" />
                         <Select onValueChange={(val: any) => setValue("role", val)} defaultValue={originalUser?.role}>
@@ -280,7 +280,7 @@ const EditUserPage = () => {
 
                     {/* State/Status */}
                     <div className="space-y-3">
-                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Identity State</Label>
+                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Account Status</Label>
                       <div className="relative">
                         <Activity className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 z-10" />
                         <Select onValueChange={(val: any) => setValue("state", val)} defaultValue={originalUser?.state || "active"}>
@@ -300,7 +300,7 @@ const EditUserPage = () => {
 
                     {/* Student ID */}
                     <div className="space-y-3 group">
-                      <Label htmlFor="student_id" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Vector Identifier</Label>
+                      <Label htmlFor="student_id" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Student/Staff ID</Label>
                       <div className="relative">
                         <Fingerprint className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 transition-colors" />
                         <Input 
@@ -314,7 +314,7 @@ const EditUserPage = () => {
 
                     {/* Department ID */}
                     <div className="space-y-3 col-span-2 group">
-                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Organizational Node</Label>
+                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Department</Label>
                        <Input 
                           id="department_id"
                           placeholder="DEP_ID_REFERENCE" 
@@ -335,12 +335,12 @@ const EditUserPage = () => {
                       {isSubmitting ? (
                         <div className="flex items-center gap-3">
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Commiting Changes...
+                          Saving Changes...
                         </div>
                       ) : (
                         <div className="flex items-center justify-center gap-3 uppercase">
                           <Save className="w-5 h-5" />
-                          Execute Re-alignment
+                          Save Changes
                         </div>
                       )}
                     </Button>
@@ -353,8 +353,8 @@ const EditUserPage = () => {
           {/* Right Preview Section */}
           <div className="hidden xl:flex xl:col-span-4 flex-col gap-8 justify-center min-h-[600px] animate-in slide-in-from-right-12 duration-1000">
              <div className="space-y-2 text-right">
-                <h2 className="text-2xl font-black italic tracking-tighter uppercase">Nexus Live</h2>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Simulating vector outcome</p>
+                <h2 className="text-2xl font-black italic tracking-tighter uppercase">Preview</h2>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Review your changes</p>
              </div>
              
              <div className="relative">

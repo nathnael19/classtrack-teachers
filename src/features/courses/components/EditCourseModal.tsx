@@ -78,10 +78,10 @@ export const EditCourseModal = ({ course }: EditCourseModalProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['courses'] });
       setOpen(false);
-      toast.success('Module parameters recalibrated successfully!');
+      toast.success('Course updated successfully!');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || 'Recalibration failure.');
+      toast.error(error.response?.data?.detail || 'Update failed.');
     }
   });
 
@@ -94,7 +94,7 @@ export const EditCourseModal = ({ course }: EditCourseModalProps) => {
       <DialogTrigger asChild>
         <button className="flex w-full items-center gap-4 py-4 px-4 rounded-xl cursor-pointer hover:bg-primary/5 transition-colors group/item">
           <Edit2 className="w-5 h-5 text-muted-foreground group-hover/item:text-primary transition-colors" /> 
-          <span className="font-black text-sm uppercase tracking-wider">Modify Params</span>
+          <span className="font-black text-sm uppercase tracking-wider">Edit Course</span>
         </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden rounded-[2.5rem] border-none shadow-2xl bg-white focus:outline-none focus:ring-0">
@@ -121,15 +121,15 @@ export const EditCourseModal = ({ course }: EditCourseModalProps) => {
             
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3 py-1">Parameter Recalibration</Badge>
+                <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3 py-1">Edit Course</Badge>
                 <span className="w-1.5 h-1.5 rounded-full bg-slate-200" />
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">ID-{course.id}</span>
               </div>
               <DialogTitle className="text-4xl font-black tracking-tighter text-slate-900 uppercase italic leading-none">
-                Modify Params
+                Edit Course
               </DialogTitle>
               <DialogDescription className="text-slate-500 font-semibold text-lg max-w-sm">
-                Adjust the strategic operational limits for this academic module.
+                Update the name and code for this course.
               </DialogDescription>
             </div>
           </div>
@@ -146,7 +146,7 @@ export const EditCourseModal = ({ course }: EditCourseModalProps) => {
                   render={({ field }) => (
                     <FormItem className="space-y-3">
                       <div className="flex items-center justify-between ml-1">
-                        <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Strategic Title</FormLabel>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Course Name</FormLabel>
                         <BookOpen className="w-3 h-3 text-primary/40" />
                       </div>
                       <FormControl>
@@ -169,7 +169,7 @@ export const EditCourseModal = ({ course }: EditCourseModalProps) => {
                   render={({ field }) => (
                     <FormItem className="space-y-3">
                       <div className="flex items-center justify-between ml-1">
-                        <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">System Identifier</FormLabel>
+                        <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Course Code</FormLabel>
                         <Fingerprint className="w-3 h-3 text-primary/40" />
                       </div>
                       <FormControl>
@@ -204,7 +204,7 @@ export const EditCourseModal = ({ course }: EditCourseModalProps) => {
                     onClick={() => setOpen(false)}
                     className="flex-1 h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-100 text-slate-500"
                   >
-                    Abort Phase
+                    Cancel
                   </Button>
                   <Button 
                     type="submit" 
@@ -216,7 +216,7 @@ export const EditCourseModal = ({ course }: EditCourseModalProps) => {
                     ) : (
                       <Check className="w-4 h-4" />
                     )}
-                    Commit Recalibration
+                    Save Changes
                   </Button>
                 </div>
               </div>
