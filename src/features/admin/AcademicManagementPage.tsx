@@ -40,6 +40,13 @@ interface Room {
   status: string;
 }
 
+interface Term {
+  id: number;
+  name: string;
+  start_date: string;
+  end_date: string;
+}
+
 const AnimatedNumber = ({ value }: { value: number }) => {
   const [displayValue, setDisplayValue] = useState(0);
   useEffect(() => {
@@ -85,21 +92,25 @@ const AcademicManagementPage = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [terms, setTerms] = useState<Term[]>([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
   const [isDeptsLoading, setIsDeptsLoading] = useState(true);
   const [isRoomsLoading, setIsRoomsLoading] = useState(true);
+  const [isTermsLoading, setIsTermsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [coursesRes, deptsRes, roomsRes] = await Promise.all([
+        const [coursesRes, deptsRes, roomsRes, termsRes] = await Promise.all([
           api.get("/courses/"),
           api.get("/departments/"),
-          api.get("/rooms/")
+          api.get("/rooms/"),
+          api.get("/terms/")
         ]);
         setCourses(coursesRes.data);
         setDepartments(deptsRes.data);
         setRooms(roomsRes.data);
+        setTerms(termsRes.data);
       } catch (error) {
         console.error("Failed to fetch academic vectors:", error);
         toast.error("Critical failure during academic vector synchronization");
@@ -107,6 +118,7 @@ const AcademicManagementPage = () => {
         setIsCoursesLoading(false);
         setIsDeptsLoading(false);
         setIsRoomsLoading(false);
+        setIsTermsLoading(false);
       }
     };
 
@@ -443,56 +455,88 @@ const AcademicManagementPage = () => {
               </div>
 
               <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
-              {[
-                { name: "Spring 2026", duration: "Jan 10 - May 24", status: "Current", active: true, load: "100%" },
-                { name: "Fall 2025", duration: "Sep 01 - Dec 15", status: "Completed", active: false, load: "Synced" },
-                { name: "Summer 2025", duration: "Jun 10 - Aug 20", status: "Completed", active: false, load: "Archived" },
-              ].map((term) => (
-                <GlassCard key={term.name} className={cn(
-                  "p-10 group",
-                  term.active && "border-emerald-500/30 ring-4 ring-emerald-500/10 shadow-emerald-500/20"
-                )}>
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                    <div className="flex items-center gap-8">
-                      <div className={cn(
-                        "w-20 h-20 rounded-[2.5rem] flex items-center justify-center border border-white/20 shadow-2xl transition-all duration-700 group-hover:rotate-[360deg]",
-                        term.active ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-white" : "bg-white/10 text-muted-foreground"
-                      )}>
-                        <Activity className="w-10 h-10" />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-4">
-                           <h3 className="text-3xl font-black tracking-tighter italic leading-none">{term.name}</h3>
-                           {term.active && (
-                             <Badge className="bg-emerald-500 animate-pulse rounded-lg font-black uppercase tracking-widest text-[8px] py-1 shadow-lg shadow-emerald-500/40">GENESIS://RUNNING</Badge>
-                           )}
-                        </div>
-                        <div className="flex items-center gap-4">
-                           <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest opacity-60">
-                              <Clock className="w-3.5 h-3.5" />
-                              Timeline: {term.duration}
-                           </div>
-                           <div className="w-1 h-1 rounded-full bg-white/20" />
-                           <div className="flex items-center gap-2 text-xs font-black text-indigo-500 uppercase tracking-widest">
-                              <BarChart3 className="w-3.5 h-3.5" />
-                              Health: {term.load}
-                           </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-10">
-                       <div className="hidden lg:flex flex-col items-end">
-                          <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Registry Status</span>
-                          <span className={cn("text-lg font-black italic", term.active ? "text-emerald-500" : "text-muted-foreground")}>{term.status}</span>
-                       </div>
-                       <ChevronRight className={cn(
-                         "w-12 h-12 opacity-20 group-hover:opacity-100 group-hover:translate-x-4 transition-all duration-700 cursor-pointer p-2 rounded-2xl hover:bg-white/10",
-                         term.active ? "text-emerald-500" : "text-muted-foreground"
-                       )} />
-                    </div>
+              {isTermsLoading ? (
+                 Array.from({ length: 3 }).map((_, i) => (
+                    <GlassCard key={i} className="p-10 h-32 animate-pulse">
+                       <div className="w-1/3 h-6 bg-white/10 rounded mb-4" />
+                       <div className="w-1/4 h-4 bg-white/10 rounded" />
+                    </GlassCard>
+                 ))
+              ) : terms.length > 0 ? (
+                 terms.map((term) => {
+                    const startDate = new Date(term.start_date);
+                    const endDate = new Date(term.end_date);
+                    const now = new Date();
+                    
+                    const formatOptions: Intl.DateTimeFormatOptions = { month: 'short', day: '2-digit' };
+                    const duration = `${startDate.toLocaleDateString('en-US', formatOptions)} - ${endDate.toLocaleDateString('en-US', formatOptions)}`;
+                    
+                    let status = "Upcoming";
+                    let active = false;
+                    let load = "Pending";
+                    
+                    if (now >= startDate && now <= endDate) {
+                        status = "Current";
+                        active = true;
+                        load = "100%";
+                    } else if (now > endDate) {
+                        status = "Completed";
+                        load = "Archived";
+                    }
+
+                    return (
+                        <GlassCard key={term.id} className={cn(
+                          "p-10 group",
+                          active && "border-emerald-500/30 ring-4 ring-emerald-500/10 shadow-emerald-500/20"
+                        )}>
+                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                            <div className="flex items-center gap-8">
+                              <div className={cn(
+                                "w-20 h-20 rounded-[2.5rem] flex items-center justify-center border border-white/20 shadow-2xl transition-all duration-700 group-hover:rotate-[360deg]",
+                                active ? "bg-gradient-to-br from-emerald-400 to-teal-600 text-white" : "bg-white/10 text-muted-foreground"
+                              )}>
+                                <Activity className="w-10 h-10" />
+                              </div>
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-4">
+                                   <h3 className="text-3xl font-black tracking-tighter italic leading-none">{term.name}</h3>
+                                   {active && (
+                                     <Badge className="bg-emerald-500 animate-pulse rounded-lg font-black uppercase tracking-widest text-[8px] py-1 shadow-lg shadow-emerald-500/40">GENESIS://RUNNING</Badge>
+                                   )}
+                                </div>
+                                <div className="flex items-center gap-4">
+                                   <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest opacity-60">
+                                      <Clock className="w-3.5 h-3.5" />
+                                      Timeline: {duration}
+                                   </div>
+                                   <div className="w-1 h-1 rounded-full bg-white/20" />
+                                   <div className="flex items-center gap-2 text-xs font-black text-indigo-500 uppercase tracking-widest">
+                                      <BarChart3 className="w-3.5 h-3.5" />
+                                      Health: {load}
+                                   </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-10">
+                               <div className="hidden lg:flex flex-col items-end">
+                                  <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Registry Status</span>
+                                  <span className={cn("text-lg font-black italic", active ? "text-emerald-500" : "text-muted-foreground")}>{status}</span>
+                               </div>
+                               <ChevronRight className={cn(
+                                 "w-12 h-12 opacity-20 group-hover:opacity-100 group-hover:translate-x-4 transition-all duration-700 cursor-pointer p-2 rounded-2xl hover:bg-white/10",
+                                 active ? "text-emerald-500" : "text-muted-foreground"
+                               )} />
+                            </div>
+                          </div>
+                        </GlassCard>
+                    );
+                 })
+              ) : (
+                  <div className="col-span-12 py-20 text-center">
+                    <CalendarDays className="w-12 h-12 mx-auto opacity-20 mb-4" />
+                    <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 italic">No temporal matrices initialized.</p>
                   </div>
-                </GlassCard>
-              ))}
+              )}
               </div>
            </div>
         )}
