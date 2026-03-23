@@ -229,26 +229,26 @@ const CourseDetailsPage = () => {
       )}
 
       {activeTab === 'students' ? (
-        <div className="bg-white rounded-[40px] border border-indigo-50 shadow-sm overflow-hidden flex flex-col">
+        <div className="bg-white rounded-[40px] border border-stone-200/60 shadow-sm overflow-hidden flex flex-col">
           {/* Table Header Controls */}
-          <div className="p-8 border-b border-indigo-50 flex items-center justify-between gap-6 bg-slate-50/30">
+          <div className="p-8 border-b border-stone-100 flex items-center justify-between gap-6 bg-stone-50/30">
             <div className="flex items-center gap-6 flex-1 max-w-2xl">
               <div className="relative flex-1 group">
-                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400 group-focus-within:text-stone-900 transition-colors" />
                 <Input 
                   placeholder="Search students by name or ID..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-14 pl-14 pr-10 rounded-2xl border-indigo-100/50 bg-white focus:ring-4 focus:ring-primary/5 transition-all font-medium font-['FiraSans']"
+                  className="h-14 pl-14 pr-10 rounded-2xl border-stone-200 bg-white focus:ring-4 focus:ring-stone-900/5 transition-all font-medium"
                 />
               </div>
-              <Button variant="outline" className="rounded-2xl h-14 px-8 border-indigo-100 hover:bg-primary/5 gap-3 font-black text-xs uppercase tracking-widest transition-all">
-                <Filter className="w-4 h-4 text-muted-foreground" />
+              <Button variant="outline" className="rounded-2xl h-14 px-8 border-stone-200 hover:bg-stone-50 gap-3 font-black text-xs uppercase tracking-widest transition-all">
+                <Filter className="w-4 h-4 text-stone-500" />
                 Filter
               </Button>
             </div>
             
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-stone-400">
               <Clock className="w-3 h-3" />
               Last Sync: {format(new Date(), 'HH:mm')}
             </div>
@@ -257,27 +257,27 @@ const CourseDetailsPage = () => {
           {/* The Grid */}
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader className="bg-slate-50/50 border-b border-indigo-50/50">
+              <TableHeader className="bg-stone-50/50 border-b border-stone-100">
                 <TableRow className="hover:bg-transparent border-none">
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40 w-[300px]">Student</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Sec</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">University ID</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Attendance</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Last Seen</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Status</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40 text-right">Actions</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400 w-[300px]">Student</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400">Sec</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400">University ID</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400">Attendance</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400">Last Seen</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400">Status</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody className="divide-y divide-slate-50">
+              <TableBody>
                 {filteredStudents.map((student) => (
-                  <TableRow key={student.id} className="group hover:bg-indigo-50/30 transition-all duration-300">
+                  <TableRow key={student.id} className="group hover:bg-stone-50/50 transition-all duration-300 border-stone-50">
                     <TableCell className="px-6 py-6">
                       <div className="flex items-center gap-5">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 flex items-center justify-center text-primary shadow-sm group-hover:scale-110 transition-transform duration-500">
+                        <div className="w-12 h-12 rounded-2xl bg-stone-100 border border-stone-200 flex items-center justify-center text-stone-900 shadow-sm group-hover:scale-105 transition-transform duration-500">
                           <span className="font-black text-sm">{student.name.charAt(0)}</span>
                         </div>
                         <div className="flex flex-col gap-1">
-                          <span className="font-black text-lg text-[#1E3A8A] font-['FiraCode'] leading-none">
+                          <span className="font-black text-lg text-stone-900 leading-none">
                             {student.name}
                           </span>
                           <div className="flex items-center gap-2 opacity-50">
@@ -288,28 +288,28 @@ const CourseDetailsPage = () => {
                       </div>
                     </TableCell>
                     <TableCell className="px-6 py-6">
-                      <div className="inline-flex px-3 py-1 bg-primary/5 text-primary border border-primary/10 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                      <div className="inline-flex px-3 py-1 bg-stone-100 text-stone-900 border border-stone-200 rounded-lg text-[10px] font-black uppercase tracking-widest">
                         {student.section || '-'}
                       </div>
                     </TableCell>
                     <TableCell className="px-6 py-6">
-                      <div className="inline-flex px-4 py-2 bg-slate-100 rounded-xl font-mono text-xs font-black text-foreground border border-slate-200/50 group-hover:bg-[#1E40AF] group-hover:text-white transition-all">
+                      <div className="inline-flex px-4 py-2 bg-stone-100 rounded-xl font-mono text-xs font-black text-stone-600 border border-stone-200 group-hover:bg-stone-900 group-hover:text-white transition-all">
                         {student.student_id}
                       </div>
                     </TableCell>
                     <TableCell className="px-6 py-6">
                       <div className="flex items-center gap-4">
                         <div className="flex flex-col gap-1.5 w-full max-w-[120px]">
-                          <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-[#1E3A8A]">
+                          <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-stone-500">
                             <span>Attendance</span>
                             <span>{Math.round(student.attendance_rate)}%</span>
                           </div>
-                          <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-1.5 w-full bg-stone-100 rounded-full overflow-hidden">
                             <div 
                               className={cn(
                                 "h-full transition-all duration-1000",
-                                student.attendance_rate >= 80 ? "bg-emerald-500" :
-                                student.attendance_rate >= 50 ? "bg-amber-500" : "bg-red-500"
+                                student.attendance_rate >= 80 ? "bg-stone-900" :
+                                student.attendance_rate >= 50 ? "bg-stone-600" : "bg-stone-400"
                               )}
                               style={{ width: `${student.attendance_rate}%` }}
                             />
@@ -319,24 +319,24 @@ const CourseDetailsPage = () => {
                     </TableCell>
                     <TableCell className="px-6 py-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-muted-foreground/60">
+                        <div className="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center text-stone-400">
                           <Clock className="w-4 h-4" />
                         </div>
                         <div className="flex flex-col">
-                          <span className="font-black text-sm text-foreground">
+                          <span className="font-black text-sm text-stone-900">
                             {student.last_seen ? format(new Date(student.last_seen), 'MMM dd, HH:mm') : 'Never'}
                           </span>
-                          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Last Seen</span>
+                          <span className="text-[9px] font-black uppercase tracking-widest text-stone-400">Last Seen</span>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell className="px-6 py-6">
                       <Badge className={cn(
                         "rounded-full px-5 py-2 font-black text-[9px] uppercase tracking-[0.2em] border-none shadow-sm",
-                        student.status === 'Consistent' ? "bg-emerald-100 text-emerald-600" :
-                        student.status === 'Moderate' ? "bg-blue-100 text-blue-600" :
-                        student.status === 'At Risk' ? "bg-amber-100 text-amber-600" :
-                        "bg-red-100 text-red-600"
+                        student.status === 'Consistent' ? "bg-stone-900 text-stone-50" :
+                        student.status === 'Moderate' ? "bg-stone-200 text-stone-700" :
+                        student.status === 'At Risk' ? "bg-yellow-100 text-yellow-700" :
+                        "bg-red-50 text-red-600"
                       )}>
                         {student.status === 'Consistent' && <ShieldCheck className="w-3 h-3 mr-2 inline" />}
                         {student.status === 'At Risk' && <AlertCircle className="w-3 h-3 mr-2 inline" />}
@@ -346,17 +346,17 @@ const CourseDetailsPage = () => {
                     <TableCell className="px-6 py-6 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-slate-100">
+                          <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-stone-100">
                             <MoreHorizontal className="h-5 w-5" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-indigo-50 shadow-xl">
-                          <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2 py-2">Actions</DropdownMenuLabel>
-                          <DropdownMenuItem className="rounded-xl p-3 gap-3 font-bold text-sm cursor-pointer">
+                        <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-stone-200 shadow-xl">
+                          <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-stone-400 px-2 py-2">Actions</DropdownMenuLabel>
+                          <DropdownMenuItem className="rounded-xl p-3 gap-3 font-bold text-sm cursor-pointer hover:bg-stone-50">
                             <Mail className="w-4 h-4" />
                             Send Notification
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="rounded-xl p-3 gap-3 font-bold text-sm cursor-pointer">
+                          <DropdownMenuItem className="rounded-xl p-3 gap-3 font-bold text-sm cursor-pointer hover:bg-stone-50">
                             <TrendingUp className="w-4 h-4" />
                             View Full History
                           </DropdownMenuItem>
@@ -370,78 +370,124 @@ const CourseDetailsPage = () => {
             
             {filteredStudents.length === 0 && (
               <div className="p-20 flex flex-col items-center justify-center text-center space-y-4">
-                <div className="w-20 h-20 rounded-[32px] bg-slate-50 flex items-center justify-center text-slate-200">
+                <div className="w-20 h-20 rounded-[32px] bg-stone-50 flex items-center justify-center text-stone-200">
                   <Search className="w-10 h-10" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-foreground">No students found</h3>
-                  <p className="text-muted-foreground font-medium">Try adjusting your search parameters.</p>
+                  <h3 className="text-xl font-black text-stone-900">No students found</h3>
+                  <p className="text-stone-500 font-medium">Try adjusting your search parameters.</p>
                 </div>
               </div>
             )}
           </div>
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-12">
           {(course?.schedules || []).length === 0 ? (
-            <div className="bg-white rounded-[40px] border border-indigo-50 shadow-sm p-8 flex flex-col items-center justify-center text-center py-20 bg-gradient-to-b from-white to-slate-50/50">
-              <div className="w-24 h-24 rounded-[36px] bg-primary/5 flex items-center justify-center text-primary mb-8">
+            <div className="relative overflow-hidden bg-white rounded-[40px] border border-stone-200 shadow-sm p-12 flex flex-col items-center justify-center text-center py-32 bg-gradient-to-b from-white to-stone-50/50">
+              <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#1C1917 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+              <div className="w-24 h-24 rounded-[36px] bg-stone-900 flex items-center justify-center text-yellow-500 mb-8 shadow-2xl shadow-stone-900/20">
                 <Calendar className="w-10 h-10" />
               </div>
-              <div className="max-w-md mx-auto space-y-4">
-                <h2 className="text-3xl font-black text-slate-900 leading-tight">No Schedule Set</h2>
-                <p className="text-slate-500 font-medium leading-relaxed">
-                  Start by adding recurring teaching slots. Students will see these in their local Ethiopian time.
+              <div className="max-w-md mx-auto space-y-4 relative">
+                <h2 className="text-4xl font-black text-stone-900 leading-tight tracking-tight">Elegance in Scheduling</h2>
+                <p className="text-stone-500 font-medium leading-relaxed text-lg">
+                  No recurring teaching slots have been defined yet. Define your schedule to track attendance with precision.
                 </p>
+                <div className="pt-4 flex justify-center">
+                   <AddScheduleDialog courseId={id!} onSuccess={() => refetch()} />
+                </div>
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {course.schedules.map((slot) => (
-                <div key={slot.id} className="bg-white p-8 rounded-[32px] border border-indigo-50 shadow-sm hover:shadow-md transition-all group">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="px-4 py-2 bg-primary/5 text-primary rounded-xl text-[10px] font-black uppercase tracking-[0.2em]">
-                      Section {slot.section}
+            <div className="space-y-16">
+              {[0, 1, 2, 3, 4, 5, 6].map((dayIndex) => {
+                const daySchedules = course.schedules.filter(s => s.day_of_week === dayIndex);
+                if (daySchedules.length === 0) return null;
+                
+                const dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][dayIndex];
+                
+                return (
+                  <div key={dayIndex} className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-700">
+                    <div className="flex items-center gap-6">
+                      <div className="h-px flex-1 bg-stone-200" />
+                      <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-stone-400 bg-stone-50 px-6 py-2 rounded-full border border-stone-200 shadow-sm">
+                        {dayName}
+                      </h3>
+                      <div className="h-px flex-1 bg-stone-200" />
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => handleDeleteSchedule(slot.id)}
-                      className="h-10 w-10 p-0 rounded-xl hover:bg-red-50 hover:text-red-500 text-slate-300 transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-[#1E3A8A]">
-                        <Clock className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-black text-lg text-[#1E3A8A]">
-                          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][slot.day_of_week]}
-                        </h4>
-                        <div className="flex flex-col">
-                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                            {slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)} (Standard)
-                          </p>
-                          <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">
-                            {formatEthiopianTime(slot.start_time)} - {formatEthiopianTime(slot.end_time)} (Ethiopian)
-                          </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      {daySchedules.sort((a, b) => a.start_time.localeCompare(b.start_time)).map((slot) => (
+                        <div 
+                          key={slot.id} 
+                          className="group relative bg-white p-10 rounded-[40px] border border-stone-200/60 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer overflow-hidden"
+                        >
+                          <div className="absolute top-0 right-0 w-32 h-32 bg-stone-900/5 rounded-full -mr-16 -mt-16 group-hover:bg-yellow-500/10 transition-colors duration-500" />
+                          
+                          <div className="flex justify-between items-start mb-8 relative">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">Section</span>
+                              <div className="px-4 py-1.5 bg-stone-900 text-stone-50 rounded-xl text-xs font-black shadow-lg shadow-stone-900/20 group-hover:bg-yellow-600 transition-colors">
+                                {slot.section}
+                              </div>
+                            </div>
+                            <Button 
+                              variant="ghost" 
+                              onClick={() => handleDeleteSchedule(slot.id)}
+                              className="h-10 w-10 p-0 rounded-2xl hover:bg-red-50 hover:text-red-500 text-stone-300 transition-all"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </Button>
+                          </div>
+
+                          <div className="space-y-8 relative">
+                            <div className="flex items-start gap-5">
+                              <div className="w-14 h-14 rounded-[20px] bg-stone-50 border border-stone-100 flex items-center justify-center text-stone-900 group-hover:shadow-lg transition-all">
+                                <Clock className="w-6 h-6" />
+                              </div>
+                              <div className="space-y-2">
+                                <div className="flex flex-col">
+                                  <span className="text-2xl font-black text-stone-900 tracking-tight font-['FiraCode']">
+                                    {slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)}
+                                  </span>
+                                  <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">Standard Time</span>
+                                </div>
+                                <div className="flex flex-col gap-1 px-4 py-2 bg-yellow-50 rounded-2xl border border-yellow-100/50">
+                                  <span className="text-sm font-black text-yellow-700 font-['FiraCode']">
+                                    {formatEthiopianTime(slot.start_time)} - {formatEthiopianTime(slot.end_time)}
+                                  </span>
+                                  <span className="text-[8px] font-black uppercase tracking-[0.1em] text-yellow-600/60">Ethiopian Time</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-5">
+                              <div className="w-14 h-14 rounded-[20px] bg-stone-50 border border-stone-100 flex items-center justify-center text-stone-900 group-hover:shadow-lg transition-all">
+                                <ShieldCheck className="w-6 h-6" />
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="text-xl font-bold text-stone-800 tracking-tight">{slot.room}</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">Location</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="mt-8 pt-8 border-t border-stone-100 flex items-center justify-between">
+                            <div className="flex -space-x-2">
+                              {[1, 2, 3].map(i => (
+                                <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-stone-200" />
+                              ))}
+                              <div className="w-8 h-8 rounded-full border-2 border-white bg-stone-900 flex items-center justify-center text-[10px] text-white font-bold">+12</div>
+                            </div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">Class In Session</span>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
-                        <ShieldCheck className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-slate-700">{slot.room}</h4>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Location</p>
-                      </div>
+                      ))}
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
