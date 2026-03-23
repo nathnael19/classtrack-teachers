@@ -16,12 +16,19 @@ import {
 } from "@/components/ui/select";
 import { 
   UserPlus, ArrowLeft, Save, 
-  User, Mail, Shield,
+  User, Mail, Shield, Building2,
   CheckCircle2, Info, Fingerprint
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import api from "@/services/api";
+import { useQuery } from "@tanstack/react-query";
+
+interface Organization {
+  id: number;
+  name: string;
+  domain: string;
+}
 
 const userSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -29,6 +36,7 @@ const userSchema = z.object({
   role: z.enum(["student", "lecturer", "admin"]),
   student_id: z.string().optional(),
   department_id: z.string().optional(),
+  organization_id: z.string().optional(),
 });
 
 type UserFormValues = z.infer<typeof userSchema>;
@@ -118,10 +126,15 @@ const AddUserPage = () => {
       email: "",
       student_id: "",
       department_id: "",
+      organization_id: "",
     }
   });
 
   const formData = useWatch({ control });
+  const { data: organizations = [] } = useQuery<Organization[]>({
+    queryKey: ["organizations"],
+    queryFn: async () => (await api.get("/organizations/")).data,
+  });
 
   const onSubmit = async (data: UserFormValues) => {
     setIsSubmitting(true);
@@ -129,6 +142,7 @@ const AddUserPage = () => {
       const payload = {
         ...data,
         department_id: data.department_id ? parseInt(data.department_id) : null,
+        organization_id: data.organization_id ? parseInt(data.organization_id) : null,
       };
       
       await api.post("/users/admin/create-user", payload);
@@ -240,6 +254,28 @@ const AddUserPage = () => {
                         </Select>
                       </div>
                     </div>
+
+                    {/* Organization */}
+                    {organizations.length > 0 && (
+                      <div className="space-y-3 col-span-2">
+                        <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Organization (Optional)</Label>
+                        <div className="relative">
+                          <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 z-10" />
+                          <Select onValueChange={(val: string) => setValue("organization_id", val)}>
+                            <SelectTrigger className="pl-12 h-14 bg-white/10 dark:bg-black/40 border-white/10 hover:border-white/20 focus:border-purple-500/50 rounded-2xl transition-all font-bold text-lg shadow-sm">
+                              <SelectValue placeholder="Select organization" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {organizations.map((org) => (
+                                <SelectItem key={org.id} value={String(org.id)}>
+                                  {org.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Student ID (conditional) */}
                     <div className="space-y-3 group">
