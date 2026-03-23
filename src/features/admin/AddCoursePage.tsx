@@ -154,7 +154,7 @@ const AddCoursePage = () => {
         credit_hours: parseInt(data.credits) || 3,
         department_id: parseInt(data.department),
         term_id: parseInt(data.term),
-        description: data.description || ""
+        description: data.description || "",
       });
       toast.success("Course Created!", {
         description: `${data.code} has been added to the course list.`,
