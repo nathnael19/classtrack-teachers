@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   ChevronLeft, 
   Users, 
@@ -39,6 +39,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { AddScheduleDialog } from './components/AddScheduleDialog';
 
 interface StudentActivity {
@@ -62,6 +69,12 @@ interface CourseSchedule {
   room: string;
 }
 
+interface LecturerBrief {
+  id: number;
+  name: string;
+  email?: string;
+}
+
 interface CourseDetail {
   id: number;
   name: string;
@@ -72,12 +85,22 @@ interface CourseDetail {
   average_attendance: number;
   students: StudentActivity[];
   schedules: CourseSchedule[];
+  lecturers?: LecturerBrief[];
+}
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
 }
 
 const CourseDetailsPage = () => {
   const { id } = useParams();
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'students' | 'schedule'>('students');
+  const [addingLecturerId, setAddingLecturerId] = useState<string>('');
 
   const { data: course, isLoading, refetch } = useQuery<CourseDetail>({
     queryKey: ['course', id],
@@ -86,6 +109,35 @@ const CourseDetailsPage = () => {
       return data;
     },
   });
+
+  const { data: lecturers = [] } = useQuery<User[]>({
+    queryKey: ['users-lecturers'],
+    queryFn: async () => (await api.get('/users/lecturers')).data,
+  });
+
+  const addLecturerMutation = useMutation({
+    mutationFn: async (lecturerId: number) => {
+      await api.post(`/courses/${id}/lecturers`, { lecturer_id: lecturerId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['course', id] });
+      setAddingLecturerId('');
+    },
+  });
+
+  const removeLecturerMutation = useMutation({
+    mutationFn: async (lecturerId: number) => {
+      await api.delete(`/courses/${id}/lecturers/${lecturerId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['course', id] });
+    },
+  });
+
+  const coLecturers = course?.lecturers ?? [];
+  const availableLecturers = lecturers.filter(
+    (u) => u.id !== course?.lecturer_id && !coLecturers.some((c) => c.id === u.id)
+  );
 
   const handleDeleteSchedule = async (scheduleId: number) => {
     if (!window.confirm("Are you sure you want to delete this schedule slot?")) return;
@@ -158,6 +210,53 @@ const CourseDetailsPage = () => {
               Manage Schedule
             </Button>
           </div>
+        </div>
+      </div>
+
+      {/* Co-lecturers Section */}
+      <div className="bg-white rounded-[32px] border border-indigo-50 shadow-sm p-8">
+        <h3 className="text-lg font-black text-foreground mb-4 flex items-center gap-2">
+          <Users className="w-5 h-5 text-primary" />
+          Co-Lecturers
+        </h3>
+        <div className="flex flex-wrap gap-4 items-center">
+          {coLecturers.map((lec) => (
+            <div
+              key={lec.id}
+              className="flex items-center gap-3 px-4 py-2 rounded-xl bg-primary/5 border border-primary/10"
+            >
+              <span className="font-bold">{lec.name}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-red-500 hover:bg-red-50"
+                onClick={() => removeLecturerMutation.mutate(lec.id)}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+          {availableLecturers.length > 0 && (
+            <Select
+              value={addingLecturerId}
+              onValueChange={(val) => {
+                if (val) {
+                  addLecturerMutation.mutate(parseInt(val));
+                }
+              }}
+            >
+              <SelectTrigger className="w-[220px]">
+                <SelectValue placeholder="Add co-lecturer" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableLecturers.map((u) => (
+                  <SelectItem key={u.id} value={String(u.id)}>
+                    {u.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
       </div>
 
