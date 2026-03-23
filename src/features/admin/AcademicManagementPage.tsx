@@ -31,6 +31,15 @@ interface Department {
   organization_id?: number;
 }
 
+interface Room {
+  id: number;
+  name: string;
+  building?: string;
+  capacity?: number;
+  type: string;
+  status: string;
+}
+
 const AnimatedNumber = ({ value }: { value: number }) => {
   const [displayValue, setDisplayValue] = useState(0);
   useEffect(() => {
@@ -75,24 +84,29 @@ const AcademicManagementPage = () => {
   const [activeTab, setActiveTab] = useState("courses");
   const [courses, setCourses] = useState<Course[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [isCoursesLoading, setIsCoursesLoading] = useState(true);
   const [isDeptsLoading, setIsDeptsLoading] = useState(true);
+  const [isRoomsLoading, setIsRoomsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [coursesRes, deptsRes] = await Promise.all([
+        const [coursesRes, deptsRes, roomsRes] = await Promise.all([
           api.get("/courses/"),
-          api.get("/departments/")
+          api.get("/departments/"),
+          api.get("/rooms/")
         ]);
         setCourses(coursesRes.data);
         setDepartments(deptsRes.data);
+        setRooms(roomsRes.data);
       } catch (error) {
         console.error("Failed to fetch academic vectors:", error);
         toast.error("Critical failure during academic vector synchronization");
       } finally {
         setIsCoursesLoading(false);
         setIsDeptsLoading(false);
+        setIsRoomsLoading(false);
       }
     };
 
@@ -322,7 +336,7 @@ const AcademicManagementPage = () => {
                  <div className="space-y-6">
                     <div className="space-y-2">
                        <h3 className="text-2xl font-black tracking-tighter">Facility Registry</h3>
-                       <p className="text-muted-foreground text-sm font-medium">Monitoring {5} physical nodes across campus</p>
+                       <p className="text-muted-foreground text-sm font-medium">Monitoring <AnimatedNumber value={rooms.length} /> physical nodes across campus</p>
                     </div>
                     <div className="relative group">
                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-amber-500 transition-colors" />
@@ -332,7 +346,7 @@ const AcademicManagementPage = () => {
                        {[
                          { label: "Peak Occupancy", value: "88%", color: "text-amber-500" },
                          { label: "Health / Safety", value: "Optimal", color: "text-emerald-500" },
-                         { label: "Active Sessions", value: "14", color: "text-indigo-500" },
+                         { label: "Active Nodes", value: rooms.filter(r => r.status === "active").length.toString(), color: "text-indigo-500" },
                        ].map((stat) => (
                          <div key={stat.label} className="flex justify-between items-center">
                             <span className="text-[10px] font-black uppercase tracking-widest opacity-60">{stat.label}</span>
@@ -347,13 +361,19 @@ const AcademicManagementPage = () => {
               </GlassCard>
 
               <div className="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                 {[
-                   { name: "Block A - Hall 101", cap: 150, type: "Lecture Hall", status: "Available", load: 0 },
-                   { name: "Block C - Lab 03", cap: 30, type: "Computer Lab", status: "In Use", load: 85 },
-                   { name: "Block B - Room 204", cap: 45, type: "Smart Classroom", status: "Available", load: 0 },
-                   { name: "Main Auditorium", cap: 500, type: "Assembly", status: "Maintenance", load: 0 },
-                 ].map((room) => (
-                    <GlassCard key={room.name} className="p-8 group">
+                 {isRoomsLoading ? (
+                   Array.from({ length: 2 }).map((_, i) => (
+                     <GlassCard key={i} className="p-8 h-48 animate-pulse">
+                        <div className="flex justify-between items-start mb-6">
+                           <div className="w-20 h-4 bg-white/10 rounded" />
+                           <div className="w-12 h-6 bg-white/10 rounded-full" />
+                        </div>
+                        <div className="w-3/4 h-8 bg-white/10 rounded" />
+                     </GlassCard>
+                   ))
+                 ) : rooms.length > 0 ? (
+                   rooms.map((room) => (
+                    <GlassCard key={room.id} className="p-8 group">
                        <div className="flex justify-between items-start mb-6">
                           <div>
                              <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em]">{room.type}</span>
@@ -361,36 +381,42 @@ const AcademicManagementPage = () => {
                           </div>
                           <Badge className={cn(
                             "rounded-full px-4 text-[9px] font-black uppercase tracking-widest border-none shadow-lg",
-                            room.status === "Available" ? "bg-emerald-500/20 text-emerald-500" : 
-                            room.status === "In Use" ? "bg-indigo-500/20 text-indigo-500" : "bg-rose-500/20 text-rose-500"
-                          )}>{room.status === "Available" ? "SYNCED" : room.status === "In Use" ? "ACTIVE" : "DEBUGGING"}</Badge>
+                            room.status === "active" ? "bg-emerald-500 text-white" : 
+                            room.status === "under_maintenance" ? "bg-amber-500 text-white" : "bg-rose-500 text-white"
+                          )}>{room.status === "active" ? "SYNCED" : room.status === "under_maintenance" ? "DEBUGGING" : "OFFLINE"}</Badge>
                        </div>
                        
                        <div className="space-y-3">
                           <div className="flex justify-between items-end">
                              <div className="space-y-1">
                                 <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Spatial Capacity</span>
-                                <p className="text-lg font-black tracking-tighter leading-none italic">{room.cap} <span className="text-xs uppercase opacity-40 not-italic ml-1">Nodes</span></p>
+                                <p className="text-lg font-black tracking-tighter leading-none italic">{room.capacity || 0} <span className="text-xs uppercase opacity-40 not-italic ml-1">Nodes</span></p>
                              </div>
                              <div className="text-right">
-                                <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Load Heat</span>
-                                <p className="text-lg font-black tracking-tighter leading-none italic">{room.load}%</p>
+                                <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Building</span>
+                                <p className="text-lg font-black tracking-tighter leading-none italic uppercase">{room.building || "N/A"}</p>
                              </div>
                           </div>
                           <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                             <div className={cn("h-full transition-all duration-1000", room.load > 70 ? "bg-amber-500" : "bg-indigo-500")} style={{ width: `${room.load}%` }} />
+                             <div className={cn("h-full transition-all duration-1000 bg-indigo-500")} style={{ width: `${Math.min((room.capacity || 0) / 2, 100)}%` }} />
                           </div>
                        </div>
 
                        <div className="mt-6 pt-6 border-t border-white/5 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <span className="text-[9px] font-black text-muted-foreground italic uppercase tracking-widest">Facility Ref: CT-{Math.floor(Math.random() * 9000) + 1000}</span>
+                          <span className="text-[9px] font-black text-muted-foreground italic uppercase tracking-widest">Facility Ref: CT-{Math.floor(room.id * 1000) + room.id}</span>
                           <div className="flex gap-2">
                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-white/40"><Pencil className="w-3.5 h-3.5" /></Button>
                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-rose-500/20 text-rose-500"><Trash2 className="w-3.5 h-3.5" /></Button>
                           </div>
                        </div>
                     </GlassCard>
-                 ))}
+                  ))
+                 ) : (
+                   <div className="col-span-full py-20 text-center">
+                      <MapPin className="w-12 h-12 mx-auto opacity-20 mb-4" />
+                      <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 italic">No facility nodes registered.</p>
+                   </div>
+                 )}
               </div>
            </div>
         )}
