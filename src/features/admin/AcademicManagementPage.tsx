@@ -5,13 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import {
   Plus, BookOpen, Building2, MapPin, CalendarDays,
   Search, Layers, Clock,
-  ChevronRight, Users, Trash2, Pencil,
+  Users, Trash2, Pencil,
   TrendingUp, Activity, BarChart3, GraduationCap,
   Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import api from "@/services/api";
 import { toast } from "sonner";
+// Removed old edit modals
 import { useAuthStore } from "@/store/authStore";
 
 interface Course {
@@ -191,18 +192,7 @@ const AcademicManagementPage = () => {
         {activeTab === "courses" && (
           <div className="grid grid-cols-12 gap-6">
             {/* Action Card */}
-            <button
-              onClick={() => navigate("/admin/academic/courses/new")}
-              className="col-span-12 md:col-span-4 lg:col-span-3 h-full min-h-[220px] rounded-[2.5rem] border-2 border-dashed border-white/20 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all group relative overflow-hidden flex flex-col items-center justify-center gap-4"
-            >
-              <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500/20 transition-all duration-500 border border-white/10">
-                <Plus className="w-8 h-8 text-amber-500" />
-              </div>
-              <span className="font-black uppercase tracking-widest text-xs opacity-60 group-hover:opacity-100 italic transition-opacity">Add New Course</span>
-              <div className="absolute bottom-4 right-4 opacity-10">
-                <BookOpen className="w-12 h-12" />
-              </div>
-            </button>
+            {/* Add Course button removed for super admins */}
 
             {isCoursesLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
@@ -302,7 +292,13 @@ const AcademicManagementPage = () => {
                     </div>
                   </div>
                   <div className="mt-10 flex gap-4">
-                    <Button className="rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white px-8 font-black uppercase tracking-widest text-[10px]">Edit Department</Button>
+                    <Button 
+                      onClick={() => navigate(`/admin/academic/departments/edit/${featuredDept.id}`)}
+                      className="rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white px-8 font-black uppercase tracking-widest text-[10px] shadow-xl shadow-indigo-500/20"
+                    >
+                      <Pencil className="w-3.5 h-3.5 mr-2" />
+                      Edit Dept
+                    </Button>
                     <Button variant="outline" className="rounded-2xl border-white/20 px-8 font-black uppercase tracking-widest text-[10px] backdrop-blur-md">View Roster</Button>
                   </div>
                 </GlassCard>
@@ -320,9 +316,20 @@ const AcademicManagementPage = () => {
                           <p className="text-xs font-bold text-muted-foreground mt-1 tracking-tight italic">Courses: {dept.course_count}</p>
                         </div>
                       </div>
-                      <div className="flex flex-col items-end">
-                        <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Faculty Count</span>
-                        <span className="text-xl font-black italic">{dept.user_count}</span>
+                      <div className="flex flex-col items-end gap-2">
+                        <Button 
+                          onClick={() => navigate(`/admin/academic/departments/edit/${dept.id}`)}
+                          variant="ghost" 
+                          size="sm"
+                          className="h-8 rounded-xl hover:bg-indigo-500/10 text-indigo-500 font-black uppercase tracking-widest text-[9px] px-3"
+                        >
+                          <Pencil className="w-3 h-3 mr-2" />
+                          Edit
+                        </Button>
+                        <div className="flex flex-col items-end">
+                          <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Faculty Count</span>
+                          <span className="text-xl font-black italic">{dept.user_count}</span>
+                        </div>
                       </div>
                     </GlassCard>
                   ))}
@@ -422,8 +429,29 @@ const AcademicManagementPage = () => {
                     <div className="mt-6 pt-6 border-t border-white/5 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <span className="text-[9px] font-black text-muted-foreground italic uppercase tracking-widest">Reference ID: CT-{Math.floor(room.id * 1000) + room.id}</span>
                       <div className="flex gap-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-white/40"><Pencil className="w-3.5 h-3.5" /></Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-rose-500/20 text-rose-500"><Trash2 className="w-3.5 h-3.5" /></Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 rounded-lg hover:bg-indigo-500/10 text-indigo-500"
+                          onClick={() => navigate(`/admin/academic/rooms/edit/${room.id}`)}
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 rounded-lg hover:bg-rose-500/20 text-rose-500"
+                          onClick={() => {
+                            if (window.confirm("Are you sure you want to delete this room?")) {
+                              api.delete(`/rooms/${room.id}`).then(() => {
+                                toast.success("Room deleted");
+                                window.location.reload();
+                              });
+                            }
+                          }}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
                       </div>
                     </div>
                   </GlassCard>
@@ -527,10 +555,16 @@ const AcademicManagementPage = () => {
                             <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Term Status</span>
                             <span className={cn("text-lg font-black italic", active ? "text-emerald-500" : "text-muted-foreground")}>{status}</span>
                           </div>
-                          <ChevronRight className={cn(
-                            "w-12 h-12 opacity-20 group-hover:opacity-100 group-hover:translate-x-4 transition-all duration-700 cursor-pointer p-2 rounded-2xl hover:bg-white/10",
-                            active ? "text-emerald-500" : "text-muted-foreground"
-                          )} />
+                          <Button 
+                            onClick={() => navigate(`/admin/academic/terms/edit/${term.id}`)}
+                            className={cn(
+                              "rounded-2xl px-8 font-black uppercase tracking-widest text-[10px] shadow-xl transition-all",
+                              active ? "bg-white text-emerald-600 hover:bg-white/90" : "bg-indigo-600 text-white hover:bg-indigo-500 shadow-indigo-500/20"
+                            )}
+                          >
+                            <Pencil className="w-3.5 h-3.5 mr-2" />
+                            Edit Term
+                          </Button>
                         </div>
                       </div>
                     </GlassCard>
