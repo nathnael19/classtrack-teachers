@@ -121,22 +121,22 @@ const UsersManagementPage = () => {
   }, [activeTab, searchTerm]);
 
   const handleDeleteUser = async (userId: string, userName: string) => {
-    if (!confirm(`Are you absolutely sure you want to purge the identity of ${userName}? This action is irreversible in the current temporal drift.`)) {
+    if (!confirm(`Are you sure you want to delete ${userName}? This action cannot be undone.`)) {
       return;
     }
 
     try {
       await api.delete(`/users/${userId}`);
-      toast.success(`${userName} has been purged from the identity cluster.`);
+      toast.success(`${userName} has been deleted.`);
       setUsers(users.filter(u => u.id !== userId));
     } catch (error: any) {
       console.error("Failed to purge identity:", error);
-      toast.error(error.response?.data?.detail || "Purge failed. Shielding active.");
+      toast.error(error.response?.data?.detail || "Delete failed. Please try again.");
     }
   };
 
   const handleEditUser = (userId: string) => {
-    toast.info("Neural link established. Redirecting to edit portal...");
+    toast.info("Redirecting to user profile...");
     navigate(`/admin/users/edit/${userId}`); 
   };
 
@@ -158,26 +158,26 @@ const UsersManagementPage = () => {
                 <Fingerprint className="w-5 h-5 text-purple-500" />
              </div>
              <Badge variant="outline" className="font-mono text-[10px] tracking-widest uppercase opacity-60">
-                IDENTITY://GOVERNANCE_HUB
+                USER MANAGEMENT
              </Badge>
           </div>
           <h1 className="text-5xl md:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-purple-900 to-indigo-600 dark:from-white dark:via-purple-300 dark:to-indigo-400 leading-none">
-            Identity Nucleus
+            User Management
           </h1>
           <p className="text-muted-foreground text-lg font-medium leading-relaxed max-w-xl">
-            Managing <span className="text-foreground font-black italic">Population Vector</span> and autonomous lifecycle governance for ClassTrack entities.
+            Managing the <span className="text-foreground font-black italic">User Base</span> and account policies for ClassTrack members.
           </p>
         </div>
         
         <div className="flex gap-3">
           <Button variant="outline" className="rounded-2xl h-12 border-white/20 backdrop-blur-xl bg-white/5 hover:bg-white/10 font-black uppercase tracking-widest text-[10px] px-6">
-            <Download className="w-4 h-4 mr-2 opacity-60" /> Export Array
+            <Download className="w-4 h-4 mr-2 opacity-60" /> Export Users
           </Button>
           <Button 
             onClick={() => navigate("/admin/users/new")}
             className="rounded-2xl h-12 bg-purple-600 hover:bg-purple-700 text-white shadow-2xl shadow-purple-500/20 font-black uppercase tracking-widest text-[10px] px-8"
           >
-            <Plus className="w-4 h-4 mr-2" /> Initialize Identity
+            <Plus className="w-4 h-4 mr-2" /> Create User
           </Button>
         </div>
       </div>
@@ -195,7 +195,7 @@ const UsersManagementPage = () => {
            </div>
            <div className="mt-6 space-y-1">
               <p className="text-4xl font-black tracking-tighter italic"><AnimatedNumber value={users.length} /></p>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60">Live Population Index</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60">Total Registered Users</p>
            </div>
         </GlassCard>
 
@@ -208,7 +208,7 @@ const UsersManagementPage = () => {
            </div>
            <div className="mt-6 space-y-1">
               <p className="text-4xl font-black tracking-tighter italic"><AnimatedNumber value={842} /></p>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60">Active Session Threads</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60">Active Today</p>
            </div>
         </GlassCard>
 
@@ -221,11 +221,11 @@ const UsersManagementPage = () => {
                        <ShieldAlert className="w-6 h-6 text-rose-500" />
                     </div>
                     <div>
-                       <h3 className="text-lg font-black tracking-tight leading-none">Security Vector</h3>
-                       <p className="text-[10px] font-bold text-muted-foreground mt-1 uppercase tracking-widest opacity-60">Threat Mitigation Overlay</p>
+                       <h3 className="text-lg font-black tracking-tight leading-none">Security Overview</h3>
+                       <p className="text-[10px] font-bold text-muted-foreground mt-1 uppercase tracking-widest opacity-60">Authentication Security</p>
                     </div>
                  </div>
-                 <Badge variant="outline" className="border-rose-500/20 bg-rose-500/5 text-rose-500 font-mono text-[9px] px-2 py-1">SYS://ALERTS_CLEAN</Badge>
+                 <Badge variant="outline" className="border-rose-500/20 bg-rose-500/5 text-rose-500 font-mono text-[9px] px-2 py-1">SECURITY STATUS: OK</Badge>
               </div>
               
               <div className="grid grid-cols-2 gap-8 mt-6 pt-6 border-t border-white/10">
@@ -283,11 +283,11 @@ const UsersManagementPage = () => {
           <Table>
             <TableHeader className="bg-white/5">
               <TableRow className="border-white/5 hover:bg-transparent">
-                <TableHead className="font-black text-[9px] uppercase tracking-[0.3em] text-muted-foreground py-6 pl-10">Identity Metadata</TableHead>
-                <TableHead className="font-black text-[9px] uppercase tracking-[0.3em] text-muted-foreground py-6">Governance Role</TableHead>
-                <TableHead className="font-black text-[9px] uppercase tracking-[0.3em] text-muted-foreground py-6">Live Status</TableHead>
-                <TableHead className="font-black text-[9px] uppercase tracking-[0.3em] text-muted-foreground py-6">Temporal Node</TableHead>
-                <TableHead className="font-black text-[9px] uppercase tracking-[0.3em] text-muted-foreground py-6 pr-10 text-right">Matrix Ops</TableHead>
+                <TableHead className="font-black text-[9px] uppercase tracking-[0.3em] text-muted-foreground py-6 pl-10">User Details</TableHead>
+                <TableHead className="font-black text-[9px] uppercase tracking-[0.3em] text-muted-foreground py-6">Role</TableHead>
+                <TableHead className="font-black text-[9px] uppercase tracking-[0.3em] text-muted-foreground py-6">Status</TableHead>
+                <TableHead className="font-black text-[9px] uppercase tracking-[0.3em] text-muted-foreground py-6">Joined</TableHead>
+                <TableHead className="font-black text-[9px] uppercase tracking-[0.3em] text-muted-foreground py-6 pr-10 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -296,7 +296,7 @@ const UsersManagementPage = () => {
                   <TableCell colSpan={5} className="text-center h-64 border-none">
                     <div className="flex flex-col items-center justify-center text-muted-foreground gap-4">
                        <div className="w-12 h-12 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
-                       <span className="text-lg font-black tracking-tighter italic opacity-40">Synchronizing Identity Cluster...</span>
+                       <span className="text-lg font-black tracking-tighter italic opacity-40">Loading users...</span>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -307,8 +307,8 @@ const UsersManagementPage = () => {
                        <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center border border-white/10 animate-pulse">
                           <Zap className="w-8 h-8 opacity-20" />
                        </div>
-                       <span className="text-lg font-black tracking-tighter italic opacity-40">Null Results in Search Space</span>
-                       <Button variant="link" onClick={() => {setSearchTerm(""); setActiveTab("all");}} className="text-purple-500 font-bold uppercase tracking-widest text-[10px]">Refresh Local Cluster</Button>
+                       <span className="text-lg font-black tracking-tighter italic opacity-40">No users found</span>
+                       <Button variant="link" onClick={() => {setSearchTerm(""); setActiveTab("all");}} className="text-purple-500 font-bold uppercase tracking-widest text-[10px]">Refresh List</Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -397,14 +397,14 @@ const UsersManagementPage = () => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-[200px] bg-white/40 dark:bg-black/80 backdrop-blur-2xl border-white/10 rounded-[2rem] p-3 shadow-2xl animate-in zoom-in-95 duration-300">
-                              <DropdownMenuLabel className="text-[9px] font-black uppercase tracking-[0.3em] px-3 opacity-30 pb-3">Identity Vector Ops</DropdownMenuLabel>
+                              <DropdownMenuLabel className="text-[9px] font-black uppercase tracking-[0.3em] px-3 opacity-30 pb-3">User Actions</DropdownMenuLabel>
                               <DropdownMenuItem className="rounded-[1.25rem] h-11 gap-3 cursor-pointer focus:bg-purple-500/10 focus:text-purple-500 transition-all mb-1 px-4">
                                 <LockIcon className="w-4 h-4 text-amber-500" />
-                                <span className="font-black text-[10px] uppercase tracking-widest">Rotate Keys</span>
+                                <span className="font-black text-[10px] uppercase tracking-widest">Reset Password</span>
                               </DropdownMenuItem>
                               <DropdownMenuItem className="rounded-[1.25rem] h-11 gap-3 cursor-pointer focus:bg-purple-500/10 focus:text-purple-500 transition-all mb-1 px-4">
                                 <ArrowUpRight className="w-4 h-4 text-emerald-500" />
-                                <span className="font-black text-[10px] uppercase tracking-widest">Elevate Perms</span>
+                                <span className="font-black text-[10px] uppercase tracking-widest">Change Role</span>
                               </DropdownMenuItem>
                               <DropdownMenuSeparator className="bg-white/10 my-2" />
                               <DropdownMenuItem 
@@ -412,7 +412,7 @@ const UsersManagementPage = () => {
                                 className="rounded-[1.25rem] h-11 gap-3 cursor-pointer text-rose-500 focus:bg-rose-500/10 focus:text-rose-600 transition-all px-4"
                               >
                                 <ShieldAlert className="w-4 h-4" />
-                                <span className="font-black text-[10px] uppercase tracking-widest italic">Purge Identity</span>
+                                <span className="font-black text-[10px] uppercase tracking-widest italic">Delete User</span>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

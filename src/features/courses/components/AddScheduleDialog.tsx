@@ -111,7 +111,7 @@ export const AddScheduleDialog = ({ courseId, onSuccess }: AddScheduleDialogProp
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] rounded-[32px] p-8 border-indigo-50 shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-black text-[#1E3A8A] font-['FiraCode']">New Tactical Slot</DialogTitle>
+          <DialogTitle className="text-2xl font-black text-[#1E3A8A] font-['FiraCode']">Add Schedule Slot</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-4">
@@ -121,7 +121,7 @@ export const AddScheduleDialog = ({ courseId, onSuccess }: AddScheduleDialogProp
                 name="section"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Target Section</FormLabel>
+                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Class Section</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g. CS-1A" {...field} className="h-12 rounded-xl border-indigo-100" />
                     </FormControl>
@@ -134,7 +134,7 @@ export const AddScheduleDialog = ({ courseId, onSuccess }: AddScheduleDialogProp
                 name="day_of_week"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Deployment Day</FormLabel>
+                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Day of Week</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="h-12 rounded-xl border-indigo-100">
@@ -187,7 +187,7 @@ export const AddScheduleDialog = ({ courseId, onSuccess }: AddScheduleDialogProp
               name="room"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Operational Room</FormLabel>
+                  <FormLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Classroom</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger className="h-12 rounded-xl border-indigo-100">
@@ -215,7 +215,7 @@ export const AddScheduleDialog = ({ courseId, onSuccess }: AddScheduleDialogProp
                 disabled={isSubmitting}
                 className="w-full h-14 rounded-2xl font-black text-xs uppercase tracking-widest bg-primary shadow-lg shadow-primary/20"
               >
-                {isSubmitting ? 'Syncing...' : 'Deploy Tactical Slot'}
+                {isSubmitting ? 'Saving...' : 'Add Schedule Slot'}
               </Button>
             </DialogFooter>
           </form>
