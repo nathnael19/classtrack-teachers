@@ -1,5 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { 
   ChevronLeft, 
   Users, 
@@ -39,13 +39,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { AddScheduleDialog } from './components/AddScheduleDialog';
 
 interface StudentActivity {
@@ -69,12 +62,6 @@ interface CourseSchedule {
   room: string;
 }
 
-interface LecturerBrief {
-  id: number;
-  name: string;
-  email?: string;
-}
-
 interface CourseDetail {
   id: number;
   name: string;
@@ -85,23 +72,12 @@ interface CourseDetail {
   average_attendance: number;
   students: StudentActivity[];
   schedules: CourseSchedule[];
-  lecturers?: LecturerBrief[];
-}
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
 }
 
 const CourseDetailsPage = () => {
   const { id } = useParams();
-  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'students' | 'schedule'>('students');
-  const [addingLecturerId, setAddingLecturerId] = useState<string>('');
-
   const { data: course, isLoading, refetch } = useQuery<CourseDetail>({
     queryKey: ['course', id],
     queryFn: async () => {
@@ -109,35 +85,6 @@ const CourseDetailsPage = () => {
       return data;
     },
   });
-
-  const { data: lecturers = [] } = useQuery<User[]>({
-    queryKey: ['users-lecturers'],
-    queryFn: async () => (await api.get('/users/lecturers')).data,
-  });
-
-  const addLecturerMutation = useMutation({
-    mutationFn: async (lecturerId: number) => {
-      await api.post(`/courses/${id}/lecturers`, { lecturer_id: lecturerId });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['course', id] });
-      setAddingLecturerId('');
-    },
-  });
-
-  const removeLecturerMutation = useMutation({
-    mutationFn: async (lecturerId: number) => {
-      await api.delete(`/courses/${id}/lecturers/${lecturerId}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['course', id] });
-    },
-  });
-
-  const coLecturers = course?.lecturers ?? [];
-  const availableLecturers = lecturers.filter(
-    (u) => u.id !== course?.lecturer_id && !coLecturers.some((c) => c.id === u.id)
-  );
 
   const handleDeleteSchedule = async (scheduleId: number) => {
     if (!window.confirm("Are you sure you want to delete this schedule slot?")) return;
@@ -195,20 +142,10 @@ const CourseDetailsPage = () => {
           </div>
           
           <div className="flex items-center gap-3">
-             <Button variant="outline" className="rounded-2xl h-14 px-8 border-border hover:bg-primary/5 font-black text-xs uppercase tracking-widest gap-2">
-               <Download className="w-4 h-4" />
-               Export Report
-             </Button>
-            <Button 
-              onClick={() => setActiveTab('schedule')}
-              className={cn(
-                "rounded-2xl h-14 px-8 font-black text-xs uppercase tracking-widest gap-2 transition-all",
-                activeTab === 'schedule' ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-white text-muted-foreground border border-indigo-50 hover:bg-slate-50"
-              )}
-            >
-              <Calendar className="w-4 h-4" />
-              Manage Schedule
-            </Button>
+              <Button variant="outline" className="rounded-2xl h-14 px-8 border-border hover:bg-primary/5 font-black text-xs uppercase tracking-widest gap-2">
+                <Download className="w-4 h-4" />
+                Export Report
+              </Button>
             {activeTab === 'schedule' && (
               <AddScheduleDialog courseId={id!} onSuccess={() => refetch()} />
             )}
@@ -216,52 +153,6 @@ const CourseDetailsPage = () => {
         </div>
       </div>
 
-      {/* Co-lecturers Section */}
-      <div className="bg-white rounded-[32px] border border-indigo-50 shadow-sm p-8">
-        <h3 className="text-lg font-black text-foreground mb-4 flex items-center gap-2">
-          <Users className="w-5 h-5 text-primary" />
-          Co-Lecturers
-        </h3>
-        <div className="flex flex-wrap gap-4 items-center">
-          {coLecturers.map((lec) => (
-            <div
-              key={lec.id}
-              className="flex items-center gap-3 px-4 py-2 rounded-xl bg-primary/5 border border-primary/10"
-            >
-              <span className="font-bold">{lec.name}</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-red-500 hover:bg-red-50"
-                onClick={() => removeLecturerMutation.mutate(lec.id)}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          ))}
-          {availableLecturers.length > 0 && (
-            <Select
-              value={addingLecturerId}
-              onValueChange={(val) => {
-                if (val) {
-                  addLecturerMutation.mutate(parseInt(val));
-                }
-              }}
-            >
-              <SelectTrigger className="w-[220px]">
-                <SelectValue placeholder="Add co-lecturer" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableLecturers.map((u) => (
-                  <SelectItem key={u.id} value={String(u.id)}>
-                    {u.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        </div>
-      </div>
 
       {/* Navigation Tabs */}
       <div className="flex gap-4 mb-8">
@@ -286,54 +177,56 @@ const CourseDetailsPage = () => {
       </div>
 
       {/* KPI Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { 
-            label: "Students", 
-            value: course.student_count, 
-            sub: "Total Students", 
-            icon: Users,
-            color: "text-blue-600",
-            bg: "bg-blue-50"
-          },
-          { 
-            label: "Sessions", 
-            value: course.total_sessions, 
-            sub: "Total Sessions", 
-            icon: Calendar,
-            color: "text-emerald-600",
-            bg: "bg-emerald-50"
-          },
-          { 
-            label: "Attendance Rate", 
-            value: `${Math.round(course.average_attendance)}%`, 
-            sub: "Avg. Attendance", 
-            icon: TrendingUp,
-            color: "text-amber-600",
-            bg: "bg-amber-50"
-          }
-        ].map((kpi, i) => (
-          <div key={i} className="relative overflow-hidden group p-8 rounded-[32px] bg-white border border-indigo-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
-            <div className={cn("absolute top-0 right-0 w-32 h-32 -mr-8 -mt-8 opacity-10 rounded-full", kpi.bg)} />
-            <div className="flex justify-between items-start mb-6">
-              <div className={cn("p-4 rounded-2xl flex items-center justify-center", kpi.bg, kpi.color)}>
-                <kpi.icon className="w-6 h-6" />
+      {activeTab === 'students' && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { 
+              label: "Students", 
+              value: course.student_count, 
+              sub: "Total Students", 
+              icon: Users,
+              color: "text-blue-600",
+              bg: "bg-blue-50"
+            },
+            { 
+              label: "Sessions", 
+              value: course.total_sessions, 
+              sub: "Total Sessions", 
+              icon: Calendar,
+              color: "text-emerald-600",
+              bg: "bg-emerald-50"
+            },
+            { 
+              label: "Attendance Rate", 
+              value: `${Math.round(course.average_attendance)}%`, 
+              sub: "Avg. Attendance", 
+              icon: TrendingUp,
+              color: "text-amber-600",
+              bg: "bg-amber-50"
+            }
+          ].map((kpi, i) => (
+            <div key={i} className="relative overflow-hidden group p-8 rounded-[32px] bg-white border border-indigo-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
+              <div className={cn("absolute top-0 right-0 w-32 h-32 -mr-8 -mt-8 opacity-10 rounded-full", kpi.bg)} />
+              <div className="flex justify-between items-start mb-6">
+                <div className={cn("p-4 rounded-2xl flex items-center justify-center", kpi.bg, kpi.color)}>
+                  <kpi.icon className="w-6 h-6" />
+                </div>
+                <div className="flex items-center gap-1 text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded-lg">
+                  <ArrowUpRight className="w-3 h-3" />
+                  Live
+                </div>
               </div>
-              <div className="flex items-center gap-1 text-[10px] font-black text-emerald-500 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded-lg">
-                <ArrowUpRight className="w-3 h-3" />
-                Live
+              <div className="space-y-1">
+                <h3 className="text-4xl font-black text-foreground font-['FiraCode']">{kpi.value}</h3>
+                <div className="flex flex-col">
+                  <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">{kpi.label}</span>
+                  <span className="text-xs font-semibold text-muted-foreground font-['FiraSans']">{kpi.sub}</span>
+                </div>
               </div>
             </div>
-            <div className="space-y-1">
-              <h3 className="text-4xl font-black text-foreground font-['FiraCode']">{kpi.value}</h3>
-              <div className="flex flex-col">
-                <span className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground/60">{kpi.label}</span>
-                <span className="text-xs font-semibold text-muted-foreground font-['FiraSans']">{kpi.sub}</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {activeTab === 'students' ? (
         <div className="bg-white rounded-[40px] border border-indigo-50 shadow-sm overflow-hidden flex flex-col">
