@@ -91,10 +91,10 @@ const AnalyticsPage = () => {
   const isLoading = isLoadingStats || isLoadingTrend || isLoadingDist || isLoadingEngagement || isLoadingPeak;
 
   const metrics = [
-    { title: 'Efficiency Index', value: `${stats?.avg_attendance_rate ?? 0}%`, label: stats?.attendance_change, icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
-    { title: 'Module Volume', value: String(stats?.total_courses ?? 0), label: 'Active Curriculums', icon: Calendar, color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' },
-    { title: 'Top Performance', value: distributionData[0]?.name ?? '0.0', label: 'Unit Identifier', icon: Award, color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
-    { title: 'Session Vectors', value: String(stats?.active_sessions_today ?? 0), label: 'Daily Operations', icon: Activity, color: 'text-rose-500', bg: 'bg-rose-500/10', border: 'border-rose-500/20' },
+    { title: 'Attendance Rate', value: `${stats?.avg_attendance_rate ?? 0}%`, label: stats?.attendance_change, icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+    { title: 'Total Courses', value: String(stats?.total_courses ?? 0), label: 'Current courses', icon: Calendar, color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' },
+    { title: 'Top Course', value: distributionData[0]?.name ?? '0.0', label: 'Course code', icon: Award, color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
+    { title: 'Sessions Today', value: String(stats?.active_sessions_today ?? 0), label: 'Scheduled sessions for today', icon: Activity, color: 'text-rose-500', bg: 'bg-rose-500/10', border: 'border-rose-500/20' },
   ];
 
   if (isLoading) {
@@ -118,13 +118,13 @@ const AnalyticsPage = () => {
         <div className="space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em]">
             <Zap className="w-3 h-3 fill-current" />
-            Live Intelligence Stream
+            Real-time Analytics
           </div>
           <h1 className="text-6xl font-black tracking-tighter text-slate-900 leading-tight">
             Analytics <span className="italic text-primary">Hub</span>
           </h1>
           <p className="text-slate-500 text-xl font-medium max-w-xl">
-            Real-time multi-dimensional analysis of institutional attendance performance and student engagement.
+            Real-time analysis of attendance and student engagement.
           </p>
         </div>
         <div className="flex items-center gap-4 bg-white/50 backdrop-blur-xl p-2 rounded-3xl border border-white shadow-xl">
@@ -176,8 +176,8 @@ const AnalyticsPage = () => {
         <div className="lg:col-span-12 glass-card p-12 rounded-[3.5rem] bg-white/60">
            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
               <div>
-                <h2 className="text-3xl font-black tracking-tight text-slate-900 uppercase italic">Attendance Spectrum</h2>
-                <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Temporal Efficiency Comparison</p>
+                <h2 className="text-3xl font-black tracking-tight text-slate-900 uppercase italic">Attendance Trends</h2>
+                <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Weekly attendance comparison</p>
               </div>
               <div className="flex gap-4 p-1.5 bg-slate-100/50 rounded-2xl backdrop-blur-md">
                  <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm">
@@ -253,8 +253,8 @@ const AnalyticsPage = () => {
            <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-primary/20 rounded-full blur-[100px] -mr-40 -mt-40 animate-pulse" />
            
            <div className="relative mb-16">
-              <h2 className="text-3xl font-black tracking-tight uppercase italic">Institutional Distribution</h2>
-              <p className="text-white/40 font-bold uppercase tracking-widest text-[10px] mt-2">Attendance Volume per Registered Module</p>
+              <h2 className="text-3xl font-black tracking-tight uppercase italic">Course Attendance Breakdown</h2>
+              <p className="text-white/40 font-bold uppercase tracking-widest text-[10px] mt-2">Attendance Volume per Course</p>
            </div>
            
            <div className="relative h-[25rem] w-full">
@@ -309,14 +309,14 @@ const AnalyticsPage = () => {
                  <PieChartIcon className="w-8 h-8" />
               </div>
               <h2 className="text-2xl font-black tracking-tight text-slate-900 uppercase">Engagement</h2>
-              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2"> Arrival Protocol Accuracy </p>
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2"> Timing and attendance status </p>
            </div>
            
            <div className="flex flex-col items-center">
             <div className="h-72 w-full relative">
               <div className="absolute inset-0 flex flex-col items-center justify-center -translate-y-2">
                  <span className="text-4xl font-black text-slate-900 tracking-tighter">{engagementData[0]?.value ?? 0}%</span>
-                 <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">On Protocol</span>
+                 <span className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">On Time</span>
               </div>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -365,8 +365,8 @@ const AnalyticsPage = () => {
       <div className="glass-card p-12 rounded-[3.5rem] bg-white/60">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-16">
           <div>
-            <h2 className="text-3xl font-black tracking-tight text-slate-900 uppercase italic">Peak Velocity Periods</h2>
-            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Institutional Arrival Frequency Mapping</p>
+            <h2 className="text-3xl font-black tracking-tight text-slate-900 uppercase italic">Peak Attendance Times</h2>
+            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Peak attendance times across the institution</p>
           </div>
           <div className="p-3 bg-slate-100 rounded-2xl">
              <Clock className="w-6 h-6 text-slate-400" />

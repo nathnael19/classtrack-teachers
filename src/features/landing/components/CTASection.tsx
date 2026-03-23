@@ -22,7 +22,7 @@ const CTASection = () => {
             </h2>
             
             <p className="text-xl md:text-2xl text-[#0C4A6E]/70 dark:text-white/60 mb-12 max-w-2xl mx-auto font-['Atkinson_Hyperlegible'] font-bold leading-relaxed">
-              Join the academic elite using ClassTrack to streamline attendance, 
+              Join the growing community of educators using ClassTrack to streamline attendance, 
               engage students, and generate powerful insights instantly.
             </p>
             
@@ -37,7 +37,7 @@ const CTASection = () => {
             </div>
             
             <p className="mt-8 text-sm font-bold text-[#0C4A6E]/40 dark:text-white/30 tracking-widest uppercase font-['Atkinson_Hyperlegible']">
-              NO CREDIT CARD REQUIRED. v2.0 SECURE DEPLOYMENT.
+              NO CREDIT CARD REQUIRED. v2.0 SECURE PLATFORM.
             </p>
           </div>
         </div>
