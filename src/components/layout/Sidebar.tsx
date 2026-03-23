@@ -13,7 +13,8 @@ import {
   LogOut,
   Shield,
   Users,
-  GraduationCap
+  GraduationCap,
+  ClipboardList
 } from 'lucide-react';
 import { useUIStore } from '@/store/uiStore';
 import { useAuthStore } from '@/store/authStore';
@@ -25,6 +26,7 @@ const navItems = [
   { icon: BookOpen, label: 'Courses', path: '/courses' },
   { icon: Camera, label: 'Sessions', path: '/sessions/new' },
   { icon: Radio, label: 'Live Session', path: '/sessions/live' },
+  { icon: ClipboardList, label: 'Leave Requests', path: '/sessions/leave-requests' },
   { icon: BarChart3, label: 'Analytics', path: '/analytics' },
   { icon: FileText, label: 'Reports', path: '/reports' },
   { icon: Settings, label: 'Settings', path: '/settings' },
@@ -34,6 +36,7 @@ const adminNavItems = [
   { icon: Shield, label: 'Dashboard', path: '/admin/dashboard' },
   { icon: Users, label: 'User Mgmt', path: '/admin/users' },
   { icon: GraduationCap, label: 'Academic Mgmt', path: '/admin/academic' },
+  { icon: ClipboardList, label: 'Leave Requests', path: '/admin/leave-requests' },
   { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
 
