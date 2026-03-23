@@ -1,8 +1,42 @@
-import { Bell, Search, Menu, X, Sun, Moon } from 'lucide-react';
+import { Bell, Search, Menu, X, Sun, Moon, Loader2 } from 'lucide-react';
 import { useUIStore } from '@/store/uiStore';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '@/services/api';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { formatDistanceToNow } from 'date-fns';
+
+interface Notification {
+  id: number;
+  user_id: number;
+  title: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+}
 
 const TopNav = () => {
   const { isMobileMenuOpen, toggleMobileMenu, theme, toggleTheme } = useUIStore();
+  const queryClient = useQueryClient();
+
+  const { data: notifications = [], isLoading } = useQuery<Notification[]>({
+    queryKey: ['notifications'],
+    queryFn: async () => (await api.get('/notifications/')).data,
+  });
+
+  const markReadMutation = useMutation({
+    mutationFn: async (notifId: number) => {
+      return (await api.patch(`/notifications/${notifId}/read`)).data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   return (
     <header
@@ -41,7 +75,7 @@ const TopNav = () => {
         <button
           type="button"
           onClick={toggleTheme}
-          className="p-2.5 text-muted-foreground hover:text-foreground transition-all duration-300 rounded-full hover:bg-muted cursor-pointer active:scale-95"
+          className="p-2.5 text-muted-foreground hover:text-foreground transition-colors duration-150 rounded-full hover:bg-muted cursor-pointer active:scale-95"
           aria-label={theme === 'dark' ? "Switch to light mode" : "Switch to dark mode"}
         >
           {theme === 'dark' ? (
@@ -51,14 +85,52 @@ const TopNav = () => {
           )}
         </button>
 
-        <button
-          type="button"
-          className="relative p-2.5 text-muted-foreground hover:text-foreground transition-colors duration-150 rounded-full hover:bg-muted cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          aria-label="View notifications"
-        >
-          <Bell className="w-5 h-5" aria-hidden />
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-destructive ring-2 ring-card" aria-hidden />
-        </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              type="button"
+              className="relative p-2.5 text-muted-foreground hover:text-foreground transition-colors duration-150 rounded-full hover:bg-muted cursor-pointer focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              aria-label="View notifications"
+            >
+              <Bell className="w-5 h-5" aria-hidden />
+              {unreadCount > 0 && (
+                <span className="absolute top-2 right-2 min-w-[18px] h-[18px] px-1 flex items-center justify-center text-[10px] font-bold rounded-full bg-destructive text-destructive-foreground ring-2 ring-background">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80 max-h-[400px] overflow-y-auto">
+            <div className="px-3 py-2 border-b">
+              <h3 className="font-semibold text-sm">Notifications</h3>
+            </div>
+            {isLoading ? (
+              <div className="p-6 flex justify-center">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : notifications.length === 0 ? (
+              <div className="p-6 text-center text-sm text-muted-foreground">
+                No notifications yet.
+              </div>
+            ) : (
+              <div className="py-1">
+                {notifications.map((notif) => (
+                  <div
+                    key={notif.id}
+                    className={`px-3 py-2.5 cursor-pointer hover:bg-muted/50 transition-colors ${!notif.is_read ? 'bg-primary/5' : ''}`}
+                    onClick={() => !notif.is_read && markReadMutation.mutate(notif.id)}
+                  >
+                    <p className="font-medium text-sm">{notif.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{notif.message}</p>
+                    <p className="text-[10px] text-muted-foreground/80 mt-1">
+                      {formatDistanceToNow(new Date(notif.created_at), { addSuffix: true })}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );
