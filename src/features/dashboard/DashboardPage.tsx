@@ -160,10 +160,10 @@ const DashboardPage = () => {
              <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
                 <Brain className="w-5 h-5 text-primary" />
              </div>
-             <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">ACADEMIC://CORE_SYST</span>
+             <span className="font-mono text-[10px] tracking-[0.3em] uppercase opacity-40">ClassTrack Core</span>
           </div>
           <h1 className="text-6xl font-black tracking-tighter text-foreground leading-[0.8] flex items-center gap-4">
-            Insight<span className="text-primary italic">Live</span>
+            Live<span className="text-primary italic">Insights</span>
             <div className="flex gap-1.5 mt-2">
                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/20" />
@@ -176,7 +176,7 @@ const DashboardPage = () => {
         <div className="flex items-center gap-4">
           <Button size="lg" onClick={handleRefresh} className="rounded-2xl h-14 px-8 bg-white/5 border border-white/10 hover:bg-white/10 backdrop-blur-xl shadow-2xl font-black uppercase text-[10px] tracking-widest transition-all gap-3 active:scale-95">
             <RefreshCw className="w-4 h-4 opacity-60" />
-            Sync Hub
+            Dashboard
           </Button>
           <Button size="lg" className="rounded-2xl h-14 px-10 bg-primary hover:bg-primary/90 text-white shadow-2xl shadow-primary/30 font-black uppercase text-[10px] tracking-widest transition-all gap-3 overflow-hidden group">
             <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-500" />
@@ -210,7 +210,7 @@ const DashboardPage = () => {
               <div className="flex justify-between items-start mb-12">
                 <div className="space-y-2">
                   <h2 className="text-3xl font-black tracking-tighter flex items-center gap-4">
-                    Performance Delta
+                    Performance Comparison
                     <Badge variant="outline" className="text-[9px] border-emerald-500/20 bg-emerald-500/5 text-emerald-500 font-mono tracking-widest">LIVE_STREAM</Badge>
                   </h2>
                   <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-40 italic">Weekly Engagement Fluctuations</p>

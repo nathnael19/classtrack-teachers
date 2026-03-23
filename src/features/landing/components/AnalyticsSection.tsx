@@ -22,12 +22,12 @@ const AnalyticsSection = () => {
           <div className="lg:col-span-5 space-y-8">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#0EA5E9]/10 border border-[#0EA5E9]/20 text-[#0EA5E9] text-xs font-black tracking-widest uppercase font-['Atkinson_Hyperlegible']">
               <Activity className="w-3 h-3" />
-              <span>Real-time Capture</span>
+              <span>Real-time Tracking</span>
             </div>
             
             <h2 className="text-5xl md:text-6xl font-black font-['Crimson_Pro'] text-[#0C4A6E] dark:text-white leading-[0.95] tracking-tighter">
               Intelligence <br />
-              <span className="italic text-primary">In Every Session.</span>
+              <span className="italic text-primary">Insights for Every Session.</span>
             </h2>
             
             <p className="text-xl text-[#0C4A6E]/70 dark:text-white/60 font-['Atkinson_Hyperlegible'] font-medium leading-relaxed max-w-md">
@@ -37,7 +37,7 @@ const AnalyticsSection = () => {
             <div className="grid grid-cols-2 gap-6 pt-4 font-['Atkinson_Hyperlegible']">
               <div className="space-y-1">
                 <div className="text-3xl font-black text-[#0C4A6E] dark:text-white">99.8%</div>
-                <div className="text-xs font-bold text-[#0C4A6E]/40 dark:text-white/40 uppercase tracking-widest">Protocol Accuracy</div>
+                <div className="text-xs font-bold text-[#0C4A6E]/40 dark:text-white/40 uppercase tracking-widest">System Accuracy</div>
               </div>
               <div className="space-y-1">
                 <div className="text-3xl font-black text-[#0C4A6E] dark:text-white">&lt; 2s</div>
