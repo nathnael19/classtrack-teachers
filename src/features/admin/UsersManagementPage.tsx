@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { 
   Search, Plus, MoreHorizontal, Pencil, 
   Users, Shield,
@@ -119,7 +120,25 @@ const UsersManagementPage = () => {
     return () => clearTimeout(timer);
   }, [activeTab, searchTerm]);
 
-  const filteredUsers = users;
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    if (!confirm(`Are you absolutely sure you want to purge the identity of ${userName}? This action is irreversible in the current temporal drift.`)) {
+      return;
+    }
+
+    try {
+      await api.delete(`/users/${userId}`);
+      toast.success(`${userName} has been purged from the identity cluster.`);
+      setUsers(users.filter(u => u.id !== userId));
+    } catch (error: any) {
+      console.error("Failed to purge identity:", error);
+      toast.error(error.response?.data?.detail || "Purge failed. Shielding active.");
+    }
+  };
+
+  const handleEditUser = (userId: string) => {
+    toast.info("Neural link established. Redirecting to edit portal...");
+    // navigate(`/admin/users/edit/${userId}`); 
+  };
 
   const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
 
@@ -281,7 +300,7 @@ const UsersManagementPage = () => {
                     </div>
                   </TableCell>
                 </TableRow>
-              ) : filteredUsers.length === 0 ? (
+              ) : users.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center h-64 border-none">
                     <div className="flex flex-col items-center justify-center text-muted-foreground gap-4">
@@ -294,7 +313,7 @@ const UsersManagementPage = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredUsers.map((user, idx) => (
+                users.map((user: any, idx: number) => (
                   <TableRow 
                     key={user.id} 
                     className="group border-white/5 hover:bg-white/[0.05] transition-all duration-500 animate-in fade-in slide-in-from-bottom-4"
@@ -363,7 +382,12 @@ const UsersManagementPage = () => {
                     </TableCell>
                     <TableCell className="text-right pr-10">
                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0">
-                          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-2xl hover:bg-white/10 hover:text-purple-500 transition-all shadow-inner border border-transparent hover:border-white/10">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => handleEditUser(user.id)}
+                            className="h-10 w-10 rounded-2xl hover:bg-white/10 hover:text-purple-500 transition-all shadow-inner border border-transparent hover:border-white/10"
+                          >
                              <Pencil className="h-4 w-4" />
                           </Button>
                           <DropdownMenu>
@@ -383,7 +407,10 @@ const UsersManagementPage = () => {
                                 <span className="font-black text-[10px] uppercase tracking-widest">Elevate Perms</span>
                               </DropdownMenuItem>
                               <DropdownMenuSeparator className="bg-white/10 my-2" />
-                              <DropdownMenuItem className="rounded-[1.25rem] h-11 gap-3 cursor-pointer text-rose-500 focus:bg-rose-500/10 focus:text-rose-600 transition-all px-4">
+                              <DropdownMenuItem 
+                                onClick={() => handleDeleteUser(user.id, user.name)}
+                                className="rounded-[1.25rem] h-11 gap-3 cursor-pointer text-rose-500 focus:bg-rose-500/10 focus:text-rose-600 transition-all px-4"
+                              >
                                 <ShieldAlert className="w-4 h-4" />
                                 <span className="font-black text-[10px] uppercase tracking-widest italic">Purge Identity</span>
                               </DropdownMenuItem>
