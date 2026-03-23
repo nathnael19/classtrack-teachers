@@ -115,8 +115,8 @@ const AcademicManagementPage = () => {
         setRooms(roomsRes.data);
         setTerms(termsRes.data);
       } catch (error) {
-        console.error("Failed to fetch academic vectors:", error);
-        toast.error("Critical failure during academic vector synchronization");
+        console.error("Failed to fetch academic data:", error);
+        toast.error("Failed to load academic data. Please refresh.");
       } finally {
         setIsCoursesLoading(false);
         setIsDeptsLoading(false);
@@ -148,14 +148,14 @@ const AcademicManagementPage = () => {
                 <GraduationCap className="w-5 h-5 text-indigo-500" />
              </div>
              <Badge variant="outline" className="font-mono text-[10px] tracking-widest uppercase opacity-60">
-                CORE://ACADEMIC_INFRA
+                ACADEMIC MANAGEMENT
              </Badge>
           </div>
           <h1 className="text-5xl md:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-indigo-900 to-amber-600 dark:from-white dark:via-indigo-300 dark:to-amber-400 leading-none">
-            Learning Vector
+            Academic Management
           </h1>
           <p className="text-muted-foreground text-lg font-medium leading-relaxed max-w-xl">
-            Orchestrate the educational fabric—from curriculum geometry to departmental spatial resources and temporal cycles.
+            Manage courses, departments, classrooms, and academic terms.
           </p>
         </div>
         
@@ -198,7 +198,7 @@ const AcademicManagementPage = () => {
               <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500/20 transition-all duration-500 border border-white/10">
                 <Plus className="w-8 h-8 text-amber-500" />
               </div>
-              <span className="font-black uppercase tracking-widest text-xs opacity-60 group-hover:opacity-100 italic transition-opacity">Deploy New Course</span>
+              <span className="font-black uppercase tracking-widest text-xs opacity-60 group-hover:opacity-100 italic transition-opacity">Add New Course</span>
               <div className="absolute bottom-4 right-4 opacity-10">
                 <BookOpen className="w-12 h-12" />
               </div>
@@ -257,7 +257,7 @@ const AcademicManagementPage = () => {
             ) : (
               <div className="col-span-12 py-20 text-center">
                 <BookOpen className="w-12 h-12 mx-auto opacity-20 mb-4" />
-                <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 italic">No course vectors initialized in this quadrant.</p>
+                <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 italic">No courses found.</p>
               </div>
             )}
           </div>
@@ -268,7 +268,7 @@ const AcademicManagementPage = () => {
             {isDeptsLoading ? (
               <div className="col-span-12 py-20 text-center">
                 <Loader2 className="w-8 h-8 animate-spin mx-auto opacity-20 mb-4" />
-                <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 italic">Syncing Departmental Matrix...</p>
+                <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 italic">Loading Departments...</p>
               </div>
             ) : departments.length > 0 ? (
               <>
@@ -282,7 +282,7 @@ const AcademicManagementPage = () => {
                         </div>
                         <div>
                            <h2 className="text-3xl font-black tracking-tighter leading-none">{featuredDept.name}</h2>
-                           <p className="text-muted-foreground font-medium mt-1 uppercase tracking-widest text-[10px]">Academic Nucleus / ID: {featuredDept.id}</p>
+                           <p className="text-muted-foreground font-medium mt-1 uppercase tracking-widest text-[10px]">Department Details / ID: {featuredDept.id}</p>
                         </div>
                     </div>
                     <div className="grid grid-cols-3 gap-8 pt-6 border-t border-white/10">
@@ -302,7 +302,7 @@ const AcademicManagementPage = () => {
                     </div>
                   </div>
                   <div className="mt-10 flex gap-4">
-                     <Button className="rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white px-8 font-black uppercase tracking-widest text-[10px]">Configure Pillar</Button>
+                     <Button className="rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white px-8 font-black uppercase tracking-widest text-[10px]">Edit Department</Button>
                      <Button variant="outline" className="rounded-2xl border-white/20 px-8 font-black uppercase tracking-widest text-[10px] backdrop-blur-md">View Roster</Button>
                   </div>
                 </GlassCard>
@@ -321,7 +321,7 @@ const AcademicManagementPage = () => {
                           </div>
                        </div>
                        <div className="flex flex-col items-end">
-                          <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Staff Vector</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Faculty Count</span>
                           <span className="text-xl font-black italic">{dept.user_count}</span>
                        </div>
                     </GlassCard>
@@ -331,15 +331,15 @@ const AcademicManagementPage = () => {
                     className="rounded-3xl border-2 border-dashed border-white/20 p-6 flex items-center justify-center gap-4 text-muted-foreground hover:border-indigo-500 hover:text-indigo-500 hover:bg-indigo-500/5 transition-all group"
                   >
                     <Plus className="w-5 h-5 group-hover:scale-125 transition-transform" />
-                    <span className="font-black uppercase tracking-widest text-[10px]">Initialize New Dept Pillar</span>
+                    <span className="font-black uppercase tracking-widest text-[10px]">Add Department</span>
                   </button>
                 </div>
               </>
             ) : (
               <div className="col-span-12 py-20 text-center">
                  <Building2 className="w-12 h-12 mx-auto opacity-20 mb-4" />
-                 <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 italic">Institution structure uninitialized.</p>
-                 <Button onClick={() => navigate("/admin/academic/departments/new")} variant="outline" className="mt-6 rounded-2xl font-black uppercase tracking-widest text-[10px] px-8">Seed First Department</Button>
+                 <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 italic">No departments found.</p>
+                 <Button onClick={() => navigate("/admin/academic/departments/new")} variant="outline" className="mt-6 rounded-2xl font-black uppercase tracking-widest text-[10px] px-8">Add Department</Button>
               </div>
             )}
           </div>
@@ -350,18 +350,18 @@ const AcademicManagementPage = () => {
               <GlassCard className="col-span-12 lg:col-span-4 p-8 flex flex-col justify-between" noHover>
                  <div className="space-y-6">
                     <div className="space-y-2">
-                       <h3 className="text-2xl font-black tracking-tighter">Facility Registry</h3>
-                       <p className="text-muted-foreground text-sm font-medium">Monitoring <AnimatedNumber value={rooms.length} /> physical nodes across campus</p>
+                       <h3 className="text-2xl font-black tracking-tighter">Room Management</h3>
+                       <p className="text-muted-foreground text-sm font-medium">Managing <AnimatedNumber value={rooms.length} /> classrooms across campus</p>
                     </div>
                     <div className="relative group">
                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-amber-500 transition-colors" />
-                       <input className="w-full bg-white/10 border border-white/20 rounded-2xl h-12 pl-12 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all font-bold placeholder:opacity-40" placeholder="Search facility index..." />
+                       <input className="w-full bg-white/10 border border-white/20 rounded-2xl h-12 pl-12 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all font-bold placeholder:opacity-40" placeholder="Search classrooms..." />
                     </div>
                     <div className="space-y-4 pt-4 border-t border-white/10">
                        {[
                          { label: "Peak Occupancy", value: "88%", color: "text-amber-500" },
                          { label: "Health / Safety", value: "Optimal", color: "text-emerald-500" },
-                         { label: "Active Nodes", value: rooms.filter(r => r.status === "active").length.toString(), color: "text-indigo-500" },
+                         { label: "Available Rooms", value: rooms.filter(r => r.status === "active").length.toString(), color: "text-indigo-500" },
                        ].map((stat) => (
                          <div key={stat.label} className="flex justify-between items-center">
                             <span className="text-[10px] font-black uppercase tracking-widest opacity-60">{stat.label}</span>
@@ -372,7 +372,7 @@ const AcademicManagementPage = () => {
                  </div>
                  {isAdmin && (
                     <Button onClick={() => navigate("/admin/academic/rooms/new")} className="w-full mt-8 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:shadow-lg hover:shadow-emerald-500/20 transition-all font-black uppercase tracking-widest text-[10px] py-6">
-                       Register Facility Node
+                       Add Room
                     </Button>
                  )}
               </GlassCard>
@@ -400,14 +400,14 @@ const AcademicManagementPage = () => {
                             "rounded-full px-4 text-[9px] font-black uppercase tracking-widest border-none shadow-lg",
                             room.status === "active" ? "bg-emerald-500 text-white" : 
                             room.status === "under_maintenance" ? "bg-amber-500 text-white" : "bg-rose-500 text-white"
-                          )}>{room.status === "active" ? "SYNCED" : room.status === "under_maintenance" ? "DEBUGGING" : "OFFLINE"}</Badge>
+                          )}>{room.status === "active" ? "AVAILABLE" : room.status === "under_maintenance" ? "MAINTENANCE" : "UNAVAILABLE"}</Badge>
                        </div>
                        
                        <div className="space-y-3">
                           <div className="flex justify-between items-end">
                              <div className="space-y-1">
-                                <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Spatial Capacity</span>
-                                <p className="text-lg font-black tracking-tighter leading-none italic">{room.capacity || 0} <span className="text-xs uppercase opacity-40 not-italic ml-1">Nodes</span></p>
+                                <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Room Capacity</span>
+                                <p className="text-lg font-black tracking-tighter leading-none italic">{room.capacity || 0} <span className="text-xs uppercase opacity-40 not-italic ml-1">Seats</span></p>
                              </div>
                              <div className="text-right">
                                 <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Building</span>
@@ -450,8 +450,8 @@ const AcademicManagementPage = () => {
                     <CalendarDays className="w-10 h-10 text-amber-500" />
                   </div>
                   <div className="text-center space-y-2 relative z-10">
-                    <span className="text-sm font-black uppercase tracking-widest block italic">Genesis Process</span>
-                    <span className="text-xs font-bold leading-relaxed block max-w-[200px] opacity-60 uppercase tracking-tighter">Initialize New Academic Cycle / Register Term Temporal Matrix</span>
+                    <span className="text-sm font-black uppercase tracking-widest block italic">New Term</span>
+                    <span className="text-xs font-bold leading-relaxed block max-w-[200px] opacity-60 uppercase tracking-tighter">Create a new academic term or semester.</span>
                   </div>
                   <div className="mt-4 p-2 bg-amber-500/10 rounded-xl">
                      <Plus className="w-6 h-6 text-amber-600" />
@@ -506,7 +506,7 @@ const AcademicManagementPage = () => {
                                 <div className="flex items-center gap-4">
                                    <h3 className="text-3xl font-black tracking-tighter italic leading-none">{term.name}</h3>
                                    {active && (
-                                     <Badge className="bg-emerald-500 animate-pulse rounded-lg font-black uppercase tracking-widest text-[8px] py-1 shadow-lg shadow-emerald-500/40">GENESIS://RUNNING</Badge>
+                                     <Badge className="bg-emerald-500 animate-pulse rounded-lg font-black uppercase tracking-widest text-[8px] py-1 shadow-lg shadow-emerald-500/40">CURRENT TERM</Badge>
                                    )}
                                 </div>
                                 <div className="flex items-center gap-4">
@@ -539,7 +539,7 @@ const AcademicManagementPage = () => {
               ) : (
                   <div className="col-span-12 py-20 text-center">
                     <CalendarDays className="w-12 h-12 mx-auto opacity-20 mb-4" />
-                    <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 italic">No temporal matrices initialized.</p>
+                    <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 italic">No academic terms found.</p>
                   </div>
               )}
               </div>

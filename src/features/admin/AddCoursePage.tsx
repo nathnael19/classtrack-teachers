@@ -17,7 +17,7 @@ import {
 import { 
   BookOpen, ArrowLeft, Save, Sparkles, 
   Layers, GraduationCap, Clock, FileText,
-  CheckCircle2, Info, ChevronRight, Zap
+  CheckCircle2, Info, ChevronRight
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -156,13 +156,13 @@ const AddCoursePage = () => {
         term_id: parseInt(data.term),
         description: data.description || ""
       });
-      toast.success("Curriculum Node Integrated!", {
-        description: `${data.code} is now part of the global academic registry.`,
+      toast.success("Course Created!", {
+        description: `${data.code} has been added to the course list.`,
         icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
       });
       navigate("/admin/academic");
     } catch (error: any) {
-      toast.error("Integration Failed", { description: error?.response?.data?.detail || "Could not register course node." });
+      toast.error("Failed to Create Course", { description: error?.response?.data?.detail || "Could not save course details." });
     } finally {
       setIsSubmitting(false);
     }
@@ -182,7 +182,7 @@ const AddCoursePage = () => {
           className="mb-8 text-muted-foreground hover:text-foreground group rounded-xl px-4 py-2 hover:bg-white/10 backdrop-blur-sm border border-transparent hover:border-white/10 transition-all"
         >
           <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-xs font-black uppercase tracking-widest">Global Registry</span>
+          <span className="text-xs font-black uppercase tracking-widest">Back to Courses</span>
         </Button>
 
         <div className="grid lg:grid-cols-12 gap-12 items-start">
@@ -193,13 +193,13 @@ const AddCoursePage = () => {
                  <div className="p-2.5 bg-amber-500/10 rounded-2xl border border-amber-500/20 text-amber-600 dark:text-amber-400 backdrop-blur-md">
                     <Sparkles className="w-5 h-5" />
                  </div>
-                 <Badge variant="outline" className="border-indigo-500/30 text-indigo-600 dark:text-indigo-400 bg-indigo-500/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Registry Portal</Badge>
+                 <Badge variant="outline" className="border-indigo-500/30 text-indigo-600 dark:text-indigo-400 bg-indigo-500/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Course Management</Badge>
               </div>
               <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-indigo-600 dark:from-white dark:via-slate-200 dark:to-indigo-400">
-                Course Synthesis
+                Add New Course
               </h1>
               <p className="text-lg font-medium text-muted-foreground/80 max-w-xl leading-relaxed">
-                Initialize new academic structures with ClassTrack's ultra-premium administrative framework.
+                Create and configure a new course for the system.
               </p>
             </div>
 
@@ -209,7 +209,7 @@ const AddCoursePage = () => {
                   <div className="grid gap-x-8 gap-y-10 md:grid-cols-2">
                     {/* Course Name */}
                     <div className="space-y-3 col-span-2 group">
-                      <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 group-focus-within:opacity-100 transition-opacity">Academic Designation</Label>
+                      <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 group-focus-within:opacity-100 transition-opacity">Course Name</Label>
                       <div className="relative">
                         <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 group-focus-within:text-amber-500 transition-colors" />
                         <Input 
@@ -230,7 +230,7 @@ const AddCoursePage = () => {
 
                     {/* Course Code */}
                     <div className="space-y-3 group">
-                      <Label htmlFor="code" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Identifier</Label>
+                      <Label htmlFor="code" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Course Code</Label>
                       <div className="relative">
                         <Layers className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 transition-colors" />
                         <Input 
@@ -248,7 +248,7 @@ const AddCoursePage = () => {
 
                     {/* Credits */}
                     <div className="space-y-3">
-                      <Label htmlFor="credits" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Academic Weight</Label>
+                      <Label htmlFor="credits" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Credits</Label>
                       <div className="relative">
                         <Clock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 z-10" />
                         <Select onValueChange={(val) => setValue("credits", val)} defaultValue="3">
@@ -258,7 +258,7 @@ const AddCoursePage = () => {
                           <SelectContent className="bg-white/95 dark:bg-black/95 backdrop-blur-2xl border-white/10 rounded-2xl shadow-2xl p-1">
                             {[1, 2, 3, 4, 6].map(num => (
                               <SelectItem key={num} value={num.toString()} className="h-12 rounded-xl focus:bg-amber-500/10 font-bold transition-colors">
-                                {num} Credit Units
+                                {num} Credits
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -268,13 +268,13 @@ const AddCoursePage = () => {
 
                     {/* Department Select */}
                     <div className="space-y-3 group">
-                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Core Faculty Assignment</Label>
+                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Department</Label>
                       <Select disabled={isLoadingData} onValueChange={(val) => setValue("department", val)}>
                         <SelectTrigger className="h-14 bg-white/10 dark:bg-black/40 border-white/10 hover:border-white/20 focus:border-indigo-500/50 rounded-2xl transition-all font-black text-lg">
-                          <SelectValue placeholder="Select faculty network..." />
+                          <SelectValue placeholder="Select department..." />
                         </SelectTrigger>
                         <SelectContent className="bg-white/95 dark:bg-black/95 backdrop-blur-2xl border-white/10 rounded-2xl shadow-2xl p-2 min-w-[300px]">
-                          <div className="text-[10px] font-black uppercase tracking-[0.2em] p-2 opacity-40 border-b border-white/10 mb-2">Academic Domains</div>
+                          <div className="text-[10px] font-black uppercase tracking-[0.2em] p-2 opacity-40 border-b border-white/10 mb-2">Departments</div>
                           {dbDepartments.map(dept => (
                             <SelectItem key={dept.id} value={dept.id.toString()} className="rounded-xl h-14 group transition-all focus:bg-indigo-500/10 focus:text-indigo-600">
                               <div className="flex items-center gap-3">
@@ -292,13 +292,13 @@ const AddCoursePage = () => {
 
                     {/* Term Select */}
                     <div className="space-y-3 group">
-                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Active Term Deployment</Label>
+                      <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Academic Term</Label>
                       <Select disabled={isLoadingData} onValueChange={(val) => setValue("term", val)}>
                         <SelectTrigger className="h-14 bg-white/10 dark:bg-black/40 border-white/10 hover:border-white/20 focus:border-indigo-500/50 rounded-2xl transition-all font-black text-lg">
-                          <SelectValue placeholder="Select term timeline..." />
+                          <SelectValue placeholder="Select term..." />
                         </SelectTrigger>
                         <SelectContent className="bg-white/95 dark:bg-black/95 backdrop-blur-2xl border-white/10 rounded-2xl shadow-2xl p-2 min-w-[200px]">
-                          <div className="text-[10px] font-black uppercase tracking-[0.2em] p-2 opacity-40 border-b border-white/10 mb-2">Temporal Nodes</div>
+                          <div className="text-[10px] font-black uppercase tracking-[0.2em] p-2 opacity-40 border-b border-white/10 mb-2">Terms</div>
                           {dbTerms.map(term => (
                             <SelectItem key={term.id} value={term.id.toString()} className="rounded-xl h-14 group transition-all focus:bg-amber-500/10 focus:text-amber-600">
                               <div className="flex items-center gap-3">
@@ -316,13 +316,13 @@ const AddCoursePage = () => {
 
                     {/* Description */}
                     <div className="space-y-3 col-span-2 group">
-                      <Label htmlFor="description" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Curriculum Syllabus</Label>
+                      <Label htmlFor="description" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Description</Label>
                       <div className="relative">
                         <FileText className="absolute left-4 top-4 h-5 w-5 text-muted-foreground/50 group-focus-within:text-indigo-500 transition-colors" />
                         <textarea 
                           id="description"
                           rows={4}
-                          placeholder="Architect the learning flow and milestone definitions..."
+                          placeholder="Enter course description..."
                           className="w-full pl-12 pt-4 bg-white/10 dark:bg-black/40 border-white/10 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/5 rounded-2xl transition-all resize-none text-base font-bold placeholder:text-muted-foreground/30"
                           {...register("description")}
                         />
@@ -341,12 +341,12 @@ const AddCoursePage = () => {
                       {isSubmitting ? (
                         <div className="flex items-center gap-3">
                           <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Indexing Node...
+                          Saving Course...
                         </div>
                       ) : (
                         <div className="flex items-center justify-center gap-3 uppercase">
                           <Save className="w-5 h-5" />
-                          Commit to Registry
+                          Create Course
                         </div>
                       )}
                     </Button>
@@ -379,8 +379,8 @@ const AddCoursePage = () => {
           {/* Right Preview Section */}
           <div className="hidden xl:flex xl:col-span-4 flex-col gap-8 justify-center min-h-[600px] animate-in slide-in-from-right-12 duration-1000">
              <div className="space-y-2 text-right">
-                <h2 className="text-2xl font-black italic tracking-tighter">Live Intelligence</h2>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Visualizing structural nodes in real-time</p>
+                <h2 className="text-2xl font-black italic tracking-tighter">Preview</h2>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">See how your course will look</p>
              </div>
              
              <div className="relative">
