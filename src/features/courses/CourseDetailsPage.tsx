@@ -31,7 +31,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, formatEthiopianTime } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -209,6 +209,9 @@ const CourseDetailsPage = () => {
               <Calendar className="w-4 h-4" />
               Manage Schedule
             </Button>
+            {activeTab === 'schedule' && (
+              <AddScheduleDialog courseId={id!} onSuccess={() => refetch()} />
+            )}
           </div>
         </div>
       </div>
@@ -487,59 +490,67 @@ const CourseDetailsPage = () => {
         </div>
       ) : (
         <div className="space-y-8">
-          <div className="bg-white rounded-[40px] border border-indigo-50 shadow-sm p-8 flex flex-col items-center justify-center text-center py-20 bg-gradient-to-b from-white to-slate-50/50">
-            <div className="w-24 h-24 rounded-[36px] bg-primary/5 flex items-center justify-center text-primary mb-8 animate-pulse">
-              <Calendar className="w-10 h-10" />
-            </div>
-            <div className="max-w-md mx-auto space-y-4">
-              <h2 className="text-3xl font-black text-slate-900 leading-tight">Weekly Class Schedule</h2>
-              <p className="text-slate-500 font-medium leading-relaxed">Define consistent teaching slots for your sections. These will be visible to your students in their mobile app.</p>
-              <AddScheduleDialog courseId={id!} onSuccess={() => refetch()} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(course?.schedules || []).map((slot) => (
-              <div key={slot.id} className="bg-white p-8 rounded-[32px] border border-indigo-50 shadow-sm hover:shadow-md transition-all group">
-                <div className="flex justify-between items-start mb-6">
-                  <div className="px-4 py-2 bg-primary/5 text-primary rounded-xl text-[10px] font-black uppercase tracking-[0.2em]">
-                    Section {slot.section}
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    onClick={() => handleDeleteSchedule(slot.id)}
-                    className="h-10 w-10 p-0 rounded-xl hover:bg-red-50 hover:text-red-500 text-slate-300 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-[#1E3A8A]">
-                      <Clock className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h4 className="font-black text-lg text-[#1E3A8A]">
-                        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][slot.day_of_week]}
-                      </h4>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                        {slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
-                      <ShieldCheck className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-700">{slot.room}</h4>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Primary Classroom</p>
-                    </div>
-                  </div>
-                </div>
+          {(course?.schedules || []).length === 0 ? (
+            <div className="bg-white rounded-[40px] border border-indigo-50 shadow-sm p-8 flex flex-col items-center justify-center text-center py-20 bg-gradient-to-b from-white to-slate-50/50">
+              <div className="w-24 h-24 rounded-[36px] bg-primary/5 flex items-center justify-center text-primary mb-8">
+                <Calendar className="w-10 h-10" />
               </div>
-            ))}
-          </div>
+              <div className="max-w-md mx-auto space-y-4">
+                <h2 className="text-3xl font-black text-slate-900 leading-tight">No Schedule Set</h2>
+                <p className="text-slate-500 font-medium leading-relaxed">
+                  Start by adding recurring teaching slots. Students will see these in their local Ethiopian time.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {course.schedules.map((slot) => (
+                <div key={slot.id} className="bg-white p-8 rounded-[32px] border border-indigo-50 shadow-sm hover:shadow-md transition-all group">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="px-4 py-2 bg-primary/5 text-primary rounded-xl text-[10px] font-black uppercase tracking-[0.2em]">
+                      Section {slot.section}
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => handleDeleteSchedule(slot.id)}
+                      className="h-10 w-10 p-0 rounded-xl hover:bg-red-50 hover:text-red-500 text-slate-300 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-[#1E3A8A]">
+                        <Clock className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-black text-lg text-[#1E3A8A]">
+                          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][slot.day_of_week]}
+                        </h4>
+                        <div className="flex flex-col">
+                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            {slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)} (Standard)
+                          </p>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">
+                            {formatEthiopianTime(slot.start_time)} - {formatEthiopianTime(slot.end_time)} (Ethiopian)
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                        <ShieldCheck className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-700">{slot.room}</h4>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Location</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
