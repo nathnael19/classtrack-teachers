@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -84,6 +85,7 @@ const GlassCard = ({ children, className = "", noHover = false, style = {} }: Gl
 );
 
 const UsersManagementPage = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
   const [users] = useState(initialUsers);
@@ -128,7 +130,10 @@ const UsersManagementPage = () => {
           <Button variant="outline" className="rounded-2xl h-12 border-white/20 backdrop-blur-xl bg-white/5 hover:bg-white/10 font-black uppercase tracking-widest text-[10px] px-6">
             <Download className="w-4 h-4 mr-2 opacity-60" /> Export Array
           </Button>
-          <Button className="rounded-2xl h-12 bg-purple-600 hover:bg-purple-700 text-white shadow-2xl shadow-purple-500/20 font-black uppercase tracking-widest text-[10px] px-8">
+          <Button 
+            onClick={() => navigate("/admin/users/new")}
+            className="rounded-2xl h-12 bg-purple-600 hover:bg-purple-700 text-white shadow-2xl shadow-purple-500/20 font-black uppercase tracking-widest text-[10px] px-8"
+          >
             <Plus className="w-4 h-4 mr-2" /> Initialize Identity
           </Button>
         </div>
