@@ -27,8 +27,11 @@ const roomSchema = z.object({
   name: z.string().min(2, "Room designation is required"),
   type: z.string().min(1, "Room type is required"),
   capacity: z.string().min(1, "Capacity must be defined"),
-  location: z.string().min(2, "Location coordinates are required"),
-  description: z.string().optional(),
+  location: z.string().min(2, "Building/Location is required"),
+  latitude: z.string().optional().or(z.literal("")),
+  longitude: z.string().optional().or(z.literal("")),
+  geofenceRadius: z.string().min(1, "Radius is required"),
+  description: z.string().optional().or(z.literal("")),
 });
 
 type RoomFormValues = z.infer<typeof roomSchema>;
@@ -68,6 +71,11 @@ const PreviewRoomCard = ({ data }: { data: Partial<RoomFormValues> }) => (
         <p className="font-mono text-[10px] font-black uppercase tracking-widest text-emerald-600">
           🏢 {data.location || "Building Pending"} • {data.type || "TYPE-X"}
         </p>
+        {(data.latitude || data.longitude) && (
+          <p className="font-mono text-[9px] text-muted-foreground/60">
+            GPS: {data.latitude || "0.0"}, {data.longitude || "0.0"} (r:{data.geofenceRadius}m)
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -122,6 +130,9 @@ const AddRoomPage = () => {
       type: "Lecture Hall",
       capacity: "30",
       location: "",
+      latitude: "",
+      longitude: "",
+      geofenceRadius: "100",
       description: "",
     }
   });
@@ -135,7 +146,10 @@ const AddRoomPage = () => {
         name: data.name,
         type: data.type.toLowerCase().replace(/ /g, "_"),
         capacity: parseInt(data.capacity) || null,
-        building: data.location
+        building: data.location,
+        latitude: data.latitude ? parseFloat(data.latitude) : null,
+        longitude: data.longitude ? parseFloat(data.longitude) : null,
+        geofence_radius: parseFloat(data.geofenceRadius) || 100.0
       });
       toast.success("Room Created!", {
         description: `${data.name} has been added to the room list.`,
@@ -147,6 +161,28 @@ const AddRoomPage = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+
+    toast.info("Accessing GPS...", { description: "Please allow location access if prompted." });
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setValue("latitude", position.coords.latitude.toString());
+        setValue("longitude", position.coords.longitude.toString());
+        toast.success("Location Captured!", { 
+          description: `Lat: ${position.coords.latitude.toFixed(4)}, Lng: ${position.coords.longitude.toFixed(4)}` 
+        });
+      },
+      (error) => {
+        toast.error("Location Access Failed", { description: error.message });
+      }
+    );
   };
 
   const amenities = [
@@ -255,7 +291,7 @@ const AddRoomPage = () => {
 
                     {/* Location */}
                     <div className="space-y-3 col-span-2 group">
-                      <Label htmlFor="location" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Location</Label>
+                      <Label htmlFor="location" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Building / Block</Label>
                       <div className="relative">
                         <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 transition-colors" />
                         <Input 
@@ -267,6 +303,54 @@ const AddRoomPage = () => {
                           )}
                           {...register("location")}
                         />
+                      </div>
+                    </div>
+
+                    {/* GPS Coordinates */}
+                    <div className="col-span-2 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">GPS Location</Label>
+                        <Button 
+                          type="button" 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={getCurrentLocation}
+                          className="h-8 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 text-[10px] font-black uppercase tracking-widest px-3 border border-emerald-500/20"
+                        >
+                          <MapPin className="w-3 h-3 mr-2" />
+                          Set Current Coords
+                        </Button>
+                      </div>
+                      
+                      <div className="grid md:grid-cols-3 gap-4">
+                        <div className="space-y-2 group">
+                          <Label htmlFor="latitude" className="text-[9px] font-bold uppercase tracking-widest opacity-30">Latitude</Label>
+                          <Input 
+                            id="latitude"
+                            placeholder="9.0320" 
+                            className="h-12 bg-white/5 dark:bg-black/20 border-white/10 focus:border-emerald-500/30 rounded-xl transition-all font-mono text-sm"
+                            {...register("latitude")}
+                          />
+                        </div>
+                        <div className="space-y-2 group">
+                          <Label htmlFor="longitude" className="text-[9px] font-bold uppercase tracking-widest opacity-30">Longitude</Label>
+                          <Input 
+                            id="longitude"
+                            placeholder="38.7510" 
+                            className="h-12 bg-white/5 dark:bg-black/20 border-white/10 focus:border-emerald-500/30 rounded-xl transition-all font-mono text-sm"
+                            {...register("longitude")}
+                          />
+                        </div>
+                        <div className="space-y-2 group">
+                          <Label htmlFor="geofenceRadius" className="text-[9px] font-bold uppercase tracking-widest opacity-30">Radius (m)</Label>
+                          <Input 
+                            id="geofenceRadius"
+                            type="number"
+                            placeholder="100" 
+                            className="h-12 bg-white/5 dark:bg-black/20 border-white/10 focus:border-emerald-500/30 rounded-xl transition-all font-mono text-sm"
+                            {...register("geofenceRadius")}
+                          />
+                        </div>
                       </div>
                     </div>
 
