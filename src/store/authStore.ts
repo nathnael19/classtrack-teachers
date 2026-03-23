@@ -22,7 +22,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: localStorage.getItem('geoattend_token'),
   isAuthenticated: !!localStorage.getItem('geoattend_token'),
-  isLoading: false,
+  // Start as loading if we have a token (need to rehydrate user from backend)
+  isLoading: !!localStorage.getItem('geoattend_token'),
   login: (user, token) => {
     localStorage.setItem('geoattend_token', token);
     set({ user, token, isAuthenticated: true });
