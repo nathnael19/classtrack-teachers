@@ -46,7 +46,7 @@ const RegisterPage = () => {
         role: 'lecturer' // Hardcoded for teacher registration
       });
       
-      toast.success('Registration successful! Welcome to the mission.');
+      toast.success('Registration successful! Welcome to ClassTrack.');
       navigate('/login');
     } catch (error: any) {
       const message = error.response?.data?.detail || 'Registration failed. Check your data.';
@@ -69,15 +69,15 @@ const RegisterPage = () => {
         <div className="mb-8 text-center sm:text-left">
            <Link to="/login" className="inline-flex items-center gap-2 text-muted-foreground hover:text-emerald-500 transition-colors mb-6 group cursor-pointer justify-center sm:justify-start w-full sm:w-auto">
              <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-             <span className="text-[10px] font-black uppercase tracking-widest">Back to Hangar</span>
+             <span className="text-[10px] font-black uppercase tracking-widest">Back to Login</span>
            </Link>
           <div className="flex items-center justify-center sm:justify-start gap-4 mb-3">
             <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-500 border border-emerald-500/20 shadow-sm">
               <ShieldCheck className="w-8 h-8" />
             </div>
-            <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-foreground">Establish <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-indigo-400 italic">Authority</span></h1>
+            <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-foreground">Create <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-indigo-400 italic">Account</span></h1>
           </div>
-          <p className="text-muted-foreground font-medium tracking-wide">Register as a certified Lecturer to manage academic operations.</p>
+          <p className="text-muted-foreground font-medium tracking-wide">Register as a lecturer to manage your courses and students.</p>
         </div>
 
         <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl rounded-[3rem] overflow-hidden shadow-2xl border border-foreground/10 relative">
@@ -86,7 +86,7 @@ const RegisterPage = () => {
             <form onSubmit={handleRegister} className="space-y-6">
               <div className="grid grid-cols-1 gap-5">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Full Legal Name</Label>
+                  <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Full Name</Label>
                   <div className="relative group">
                     <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors duration-300">
                       <User className="w-5 h-5" />
@@ -167,7 +167,7 @@ const RegisterPage = () => {
                   {loading ? (
                     <div className="flex items-center gap-3">
                       <div className="w-5 h-5 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-                      <span className="tracking-wide">Synchronizing DNA...</span>
+                      <span className="tracking-wide">Creating Account...</span>
                     </div>
                   ) : (
                     <>
@@ -183,14 +183,14 @@ const RegisterPage = () => {
           
           <div className="px-10 py-6 bg-foreground/5 border-t border-foreground/5 text-center transition-colors">
             <p className="text-sm border-transparent font-bold text-muted-foreground">
-              Already have clearance? <Link to="/login" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 transition-all cursor-pointer">Return to Portal</Link>
+              Already have an account? <Link to="/login" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 transition-all cursor-pointer">Log in</Link>
             </p>
           </div>
         </div>
 
         <div className="mt-12 text-center text-muted-foreground">
           <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-80">
-            &copy; 2026 CLASSTRACK &bull; FACULTY AUTHENTICATION
+            &copy; 2026 CLASSTRACK &bull; FACULTY PORTAL
           </p>
         </div>
       </div>

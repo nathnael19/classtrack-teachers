@@ -44,7 +44,7 @@ const LoginPage = () => {
       const user = responseMe.data;
       useAuthStore.getState().login(user, access_token);
 
-      toast.success(`Access Granted. Welcome back, ${user.name}.`);
+      toast.success(`Login successful. Welcome back, ${user.name}.`);
       
       if (user.role === 'admin') {
         navigate('/admin/dashboard');
@@ -52,7 +52,7 @@ const LoginPage = () => {
         navigate('/dashboard');
       }
     } catch (error: any) {
-      const message = error.response?.data?.detail || 'Authentication failed. Check your coordinates.';
+      const message = error.response?.data?.detail || 'Authentication failed. Please check your credentials.';
       toast.error(message);
     } finally {
       setLoading(false);
@@ -72,12 +72,12 @@ const LoginPage = () => {
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/5 backdrop-blur-xl border border-foreground/10 shadow-sm mb-6 animate-in slide-in-from-bottom-2">
             <Sparkles className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">Secure Access Point</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">Secure Login</span>
           </div>
           <h1 className="text-6xl font-black tracking-tighter text-foreground mb-3">
             Class<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-emerald-500 italic">Track</span>
           </h1>
-          <p className="text-muted-foreground font-medium tracking-wide">Unified Administrative Intelligence Portal</p>
+          <p className="text-muted-foreground font-medium tracking-wide">University Management Portal</p>
         </div>
 
         <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl rounded-[3rem] overflow-hidden shadow-2xl border border-foreground/10 relative">
@@ -133,7 +133,7 @@ const LoginPage = () => {
                 {loading ? (
                   <div className="flex items-center gap-3">
                     <div className="w-5 h-5 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-                    <span className="tracking-wide">Authorizing...</span>
+                    <span className="tracking-wide">Signing in...</span>
                   </div>
                 ) : (
                   <>
@@ -149,7 +149,7 @@ const LoginPage = () => {
                 <span className="w-full border-t border-foreground/10" />
               </div>
               <div className="relative flex justify-center text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground">
-                <span className="bg-background px-4 rounded-full border border-foreground/5 py-1">Satellite Gateway</span>
+                <span className="bg-background px-4 rounded-full border border-foreground/5 py-1">Or sign in with</span>
               </div>
             </div>
 
@@ -165,14 +165,14 @@ const LoginPage = () => {
 
           <div className="px-10 py-6 bg-foreground/5 border-t border-foreground/5 text-center transition-colors">
             <p className="text-sm border-transparent font-bold text-muted-foreground">
-              New Commander? <Link to="/register" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 transition-all cursor-pointer">Establish Liaison</Link>
+              New to ClassTrack? <Link to="/register" className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 transition-all cursor-pointer">Create an account</Link>
             </p>
           </div>
         </div>
 
         <div className="mt-12 text-center text-muted-foreground">
           <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-80">
-            &copy; 2026 CLASSTRACK &bull; DEEP INTELLIGENCE SYSTEMS
+            &copy; 2026 CLASSTRACK &bull; MODERN EDUCATION MANAGEMENT
           </p>
         </div>
       </div>
