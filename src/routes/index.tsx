@@ -7,7 +7,6 @@ import SessionCreationPage from "@/features/sessions/SessionCreationPage";
 import LiveSessionPage from "@/features/sessions/LiveSessionPage";
 import AnalyticsPage from "@/features/analytics/AnalyticsPage";
 import ReportsPage from "@/features/reports/ReportsPage";
-import ClassroomsPage from "@/features/classrooms/ClassroomsPage";
 import SettingsPage from "@/features/settings/SettingsPage";
 import LoginPage from "@/features/auth/LoginPage";
 import RegisterPage from "@/features/auth/RegisterPage";
@@ -107,7 +106,6 @@ export const router = createBrowserRouter([
               { path: "sessions/live", element: <LiveSessionPage /> },
               { path: "analytics", element: <AnalyticsPage /> },
               { path: "reports", element: <ReportsPage /> },
-              { path: "classrooms", element: <ClassroomsPage /> },
               { path: "settings", element: <SettingsPage /> },
             ],
           },
