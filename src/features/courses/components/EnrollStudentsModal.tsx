@@ -62,8 +62,8 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
       return (await api.post(`/courses/${courseId}/enroll`, { students: validStudents })).data;
     },
     onSuccess: (data) => {
-      toast.success('Strategy Executed', {
-        description: `Successfully enrolled ${data.total_enrolled} students into the vector.`,
+      toast.success('Students Enrolled', {
+        description: `Successfully enrolled ${data.total_enrolled} students into the course.`,
         icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
       });
       queryClient.invalidateQueries({ queryKey: ['courses'] });
@@ -71,8 +71,8 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
       setStudents([{ name: '', student_id: '', section: '' }]);
     },
     onError: (error: any) => {
-      toast.error('Strategic Failure', {
-        description: error.response?.data?.detail || error.message || 'The enrollment protocol failed to synchronize.'
+      toast.error('Enrollment Failed', {
+        description: error.response?.data?.detail || error.message || 'Failed to enroll students.'
       });
     }
   });
@@ -112,8 +112,8 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
       setStudents(parsedRows);
       setIngestMode(false);
       setRawText('');
-      toast.info('Ingest Phase Complete', {
-        description: `${parsedRows.length} student vectors projected into the grid.`
+      toast.info('Import Complete', {
+        description: `${parsedRows.length} students added to the list.`
       });
     }
   };
@@ -127,7 +127,7 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
       <DialogTrigger asChild>
         <Button variant="ghost" className="rounded-xl gap-4 py-4 w-full justify-start cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group/item">
           <Users className="w-5 h-5 text-muted-foreground group-hover/item:text-primary transition-colors" /> 
-          <span className="font-black text-sm uppercase tracking-wider">Enroll Strategy</span>
+          <span className="font-black text-sm uppercase tracking-wider">Enroll Students</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden rounded-[3rem] border-none shadow-2xl bg-white flex flex-col focus:outline-none focus:ring-0">
@@ -161,7 +161,7 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
             
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3 py-1 italic">Tactical Enrollment</Badge>
+                <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3 py-1 italic">Batch Enrollment</Badge>
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Biometric Database Ready</span>
@@ -171,7 +171,7 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
                 Enroll Students
               </DialogTitle>
               <DialogDescription className="text-slate-500 font-semibold text-lg max-w-lg">
-                Populate your module ecosystem with student identities via batch ingestion.
+                Enroll multiple students at once into this course.
               </DialogDescription>
             </div>
           </div>
@@ -189,7 +189,7 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
               )}
             >
               <Upload className="w-3.5 h-3.5" />
-              Smart Ingest
+              Batch Import
             </Button>
             <Button 
               size="sm" 
@@ -227,8 +227,8 @@ Jane Smith,S2024002,B"
                  className="w-full h-80 rounded-[2rem] bg-slate-50 border-2 border-dashed border-slate-200 p-8 font-mono text-sm focus:outline-none focus:border-primary/50 transition-all shadow-inner"
                />
                <div className="flex gap-4">
-                  <Button onClick={() => setIngestMode(false)} variant="ghost" className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest">Cancel Phase</Button>
-                  <Button onClick={handleIngest} className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary/90 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-primary/10">Project Vectors</Button>
+                  <Button onClick={() => setIngestMode(false)} variant="ghost" className="flex-1 h-12 rounded-xl font-black uppercase text-[10px] tracking-widest">Cancel</Button>
+                  <Button onClick={handleIngest} className="flex-[2] h-12 rounded-xl bg-primary hover:bg-primary/90 font-black uppercase text-[10px] tracking-widest shadow-lg shadow-primary/10">Import Students</Button>
                </div>
             </div>
           ) : (
@@ -237,8 +237,8 @@ Jane Smith,S2024002,B"
                 <TableHeader className="bg-slate-50/80">
                   <TableRow className="hover:bg-transparent border-none">
                     <TableHead className="w-12"></TableHead>
-                    <TableHead className="py-5 font-black uppercase text-[9px] tracking-[0.3em] text-slate-400">Student Full Identity</TableHead>
-                    <TableHead className="py-5 font-black uppercase text-[9px] tracking-[0.3em] text-slate-400">System ID Credential</TableHead>
+                    <TableHead className="py-5 font-black uppercase text-[9px] tracking-[0.3em] text-slate-400">Student Name</TableHead>
+                    <TableHead className="py-5 font-black uppercase text-[9px] tracking-[0.3em] text-slate-400">Student ID</TableHead>
                     <TableHead className="py-5 font-black uppercase text-[9px] tracking-[0.3em] text-slate-400">Section</TableHead>
                     <TableHead className="w-16"></TableHead>
                   </TableRow>
@@ -297,9 +297,9 @@ Jane Smith,S2024002,B"
                    <ShieldCheck className="w-5 h-5" strokeWidth={2.5} />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Authorization Lock</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Data Security</span>
                   <p className="text-[10px] font-bold text-slate-500 max-w-[240px]">
-                    Validated data will be synchronized across the distributed network.
+                    Enrolled students will be able to mark attendance for this course.
                   </p>
                 </div>
               </div>
@@ -310,7 +310,7 @@ Jane Smith,S2024002,B"
                   onClick={() => setOpen(false)}
                   className="flex-1 sm:px-8 h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest text-slate-400 hover:text-slate-600 transition-all"
                 >
-                  Terminate
+                  Cancel
                 </Button>
                 <Button 
                   onClick={onSubmit}
@@ -322,7 +322,7 @@ Jane Smith,S2024002,B"
                   ) : (
                     <Upload className="w-4 h-4" />
                   )}
-                  Synchronize Vectors
+                  Enroll Students
                 </Button>
               </div>
            </div>

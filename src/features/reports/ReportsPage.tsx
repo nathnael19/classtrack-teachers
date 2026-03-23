@@ -116,7 +116,7 @@ const ReportsPage = () => {
           <Loader2 className="w-16 h-16 animate-spin text-primary opacity-20" />
           <Database className="w-8 h-8 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
         </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Synchronizing Records Hub...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Loading Reports...</p>
       </div>
     );
   }
@@ -145,7 +145,7 @@ const ReportsPage = () => {
             <DropdownMenuTrigger asChild>
               <Button disabled={isExporting} className="rounded-3xl h-14 px-8 bg-slate-900 hover:bg-slate-800 text-white transition-all gap-4 shadow-2xl shadow-slate-900/20 border-none group">
                 <Download className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
-                <span className="font-black uppercase tracking-widest text-xs">Export Intelligence</span>
+                <span className="font-black uppercase tracking-widest text-xs">Export Report</span>
                 <ChevronDown className="w-4 h-4 opacity-40" />
               </Button>
             </DropdownMenuTrigger>
