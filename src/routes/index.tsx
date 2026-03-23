@@ -26,6 +26,9 @@ const AddCoursePage = lazy(() => import("@/features/admin/AddCoursePage"));
 const AddDepartmentPage = lazy(() => import("@/features/admin/AddDepartmentPage"));
 const AddRoomPage = lazy(() => import("@/features/admin/AddRoomPage"));
 const AddTermPage = lazy(() => import("@/features/admin/AddTermPage"));
+const EditDepartmentPage = lazy(() => import("@/features/admin/EditDepartmentPage"));
+const EditRoomPage = lazy(() => import("@/features/admin/EditRoomPage"));
+const EditTermPage = lazy(() => import("@/features/admin/EditTermPage"));
 const AdminSettingsPage = lazy(() => import("@/features/admin/AdminSettingsPage"));
 
 /** Standard Loading Fallback */
@@ -137,6 +140,9 @@ export const router = createBrowserRouter([
               { path: "admin/academic/departments/new", element: <Suspense fallback={<PageLoader />}><AddDepartmentPage /></Suspense> },
               { path: "admin/academic/rooms/new", element: <Suspense fallback={<PageLoader />}><AddRoomPage /></Suspense> },
               { path: "admin/academic/terms/new", element: <Suspense fallback={<PageLoader />}><AddTermPage /></Suspense> },
+              { path: "admin/academic/departments/edit/:id", element: <Suspense fallback={<PageLoader />}><EditDepartmentPage /></Suspense> },
+              { path: "admin/academic/rooms/edit/:id", element: <Suspense fallback={<PageLoader />}><EditRoomPage /></Suspense> },
+              { path: "admin/academic/terms/edit/:id", element: <Suspense fallback={<PageLoader />}><EditTermPage /></Suspense> },
               { path: "admin/settings", element: <Suspense fallback={<PageLoader />}><AdminSettingsPage /></Suspense> },
             ],
           },
