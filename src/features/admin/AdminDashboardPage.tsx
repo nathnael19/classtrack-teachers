@@ -99,7 +99,7 @@ const AdminDashboardPage = () => {
         <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
            <div className="flex flex-col items-center gap-6">
               <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-              <p className="text-[10px] font-black uppercase tracking-[0.5em] animate-pulse">Synchronizing Command Nucleus...</p>
+              <p className="text-[10px] font-black uppercase tracking-[0.5em] animate-pulse">Loading Admin Dashboard...</p>
            </div>
         </div>
      );
@@ -131,17 +131,17 @@ const AdminDashboardPage = () => {
              <div className="p-2.5 bg-primary/10 rounded-2xl border border-primary/20 text-primary backdrop-blur-md">
                 <LayoutGrid className="w-5 h-5" />
              </div>
-             <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Command Nucleus</Badge>
+             <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 px-4 rounded-full font-black uppercase tracking-[0.2em] text-[10px]">Admin Dashboard</Badge>
           </div>
           <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-indigo-600 dark:from-white dark:via-slate-200 dark:to-indigo-400">
-            System <span className="italic">Orchestra</span>
+            System <span className="italic">Overview</span>
           </h1>
           <p className="text-xl font-medium text-muted-foreground/80 max-w-2xl leading-relaxed flex items-center gap-3">
              <span className="relative flex h-3 w-3">
                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
              </span>
-             Omniscient control over the ClassTrack enterprise ecosystem.
+             Manage users, courses, and system settings across the platform.
           </p>
         </div>
         
@@ -155,7 +155,7 @@ const AdminDashboardPage = () => {
            <div className="w-[1px] h-8 bg-white/20 mx-2" />
            <Button className="h-14 px-8 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-[1.8rem] font-black uppercase tracking-widest flex items-center gap-3 shadow-xl hover:scale-105 active:scale-95 transition-all">
               <Plus className="w-5 h-5" />
-              <span>Provision User</span>
+              <span>Create User</span>
            </Button>
         </div>
       </div>
@@ -165,12 +165,12 @@ const AdminDashboardPage = () => {
         
         {/* KPI: Users */}
         <div className="lg:col-span-3">
-          <KPICard title="Total Nuclei" value={stats.total_users} change={stats.user_growth_change} icon={Users} colorClass="text-indigo-500" />
+          <KPICard title="Total Users" value={stats.total_users} change={stats.user_growth_change} icon={Users} colorClass="text-indigo-500" />
         </div>
 
         {/* KPI: Courses */}
         <div className="lg:col-span-3">
-          <KPICard title="Active Orbs" value={stats.total_courses} change={stats.course_growth_change} icon={BookOpen} colorClass="text-amber-500" delay="100ms" />
+          <KPICard title="Active Courses" value={stats.total_courses} change={stats.course_growth_change} icon={BookOpen} colorClass="text-amber-500" delay="100ms" />
         </div>
 
         {/* Global Performance: Area Chart */}
@@ -178,7 +178,7 @@ const AdminDashboardPage = () => {
           <div className="flex justify-between items-start mb-8">
             <div className="space-y-1">
                <h3 className="text-xl font-black tracking-tight">Enterprise Scaling</h3>
-               <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">Global Onboarding Velocity</p>
+               <p className="text-xs font-bold text-muted-foreground/60 uppercase tracking-widest">New User Trends</p>
             </div>
             <div className="px-4 py-1.5 bg-emerald-500/10 rounded-full border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest text-emerald-500 flex items-center gap-2">
                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -216,19 +216,19 @@ const AdminDashboardPage = () => {
 
         {/* KPI: Sessions */}
         <div className="lg:col-span-3">
-          <KPICard title="Live Loops" value={stats.live_sessions} icon={Activity} colorClass="text-emerald-500" delay="200ms" />
+          <KPICard title="Active Sessions" value={stats.live_sessions} icon={Activity} colorClass="text-emerald-500" delay="200ms" />
         </div>
 
         {/* KPI: Security */}
         <div className="lg:col-span-3">
-          <KPICard title="Shield Vector" value={stats.security_alerts} change={stats.security_alerts > 0 ? "Action Required" : "Nodes Secure"} icon={AlertCircle} colorClass="text-rose-500" delay="300ms" />
+          <KPICard title="Security Alerts" value={stats.security_alerts} change={stats.security_alerts > 0 ? "Action Required" : "No Alerts"} icon={AlertCircle} colorClass="text-rose-500" delay="300ms" />
         </div>
 
         {/* System Journal: Activity feed */}
         <GlassCard className="lg:col-span-4 lg:row-span-2 p-8 space-y-8" noHover>
            <div className="flex justify-between items-center">
-              <h3 className="text-xl font-black tracking-tight">System Journal</h3>
-              <Badge variant="outline" className="font-mono text-[10px] opacity-40">STREAMS://LOGS</Badge>
+              <h3 className="text-xl font-black tracking-tight">System Logs</h3>
+              <Badge variant="outline" className="font-mono text-[10px] opacity-40">ACTIVITY://LOGS</Badge>
            </div>
            <div className="space-y-6">
               {activityWithIcons.map((item: any, i: number) => (
@@ -247,7 +247,7 @@ const AdminDashboardPage = () => {
               ))}
            </div>
            <Button variant="ghost" className="w-full h-12 rounded-[1.2rem] font-black uppercase tracking-widest text-[10px] hover:bg-white/5 border border-white/5">
-              Access Full Archive
+              View All Logs
            </Button>
         </GlassCard>
 
@@ -255,7 +255,7 @@ const AdminDashboardPage = () => {
         <GlassCard className="lg:col-span-4 lg:row-span-2 p-8" noHover>
            <h3 className="text-xl font-black tracking-tight mb-8 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-amber-500" />
-              Orb Engagement
+              Course Engagement
            </h3>
            <div className="h-[300px] w-full mt-4">
               <ResponsiveContainer width="100%" height="100%">
@@ -282,15 +282,15 @@ const AdminDashboardPage = () => {
                     <ShieldCheck className="w-6 h-6 text-indigo-400" />
                  </div>
                  <div className="flex flex-col">
-                    <span className="text-[10px] font-black text-indigo-400/60 uppercase tracking-[0.2em]">Shield Status</span>
-                    <span className="text-lg font-black text-white tracking-tight">Active Parity</span>
+                    <span className="text-[10px] font-black text-indigo-400/60 uppercase tracking-[0.2em]">Security Status</span>
+                    <span className="text-lg font-black text-white tracking-tight">All Systems Operational</span>
                  </div>
               </div>
               <div className="space-y-6 flex-1">
                  {[
-                   { label: "API CLUSTER", value: system_health.api_cluster, color: "bg-indigo-500", icon: Server, status: system_health.api_cluster > 90 ? "Healthy" : "Load" },
+                   { label: "API NODES", value: system_health.api_cluster, color: "bg-indigo-500", icon: Server, status: system_health.api_cluster > 90 ? "Healthy" : "Load" },
                    { label: "DATABASE", value: system_health.database, color: "bg-emerald-500", icon: Database, status: "Stable" },
-                   { label: "STORAGE CORE", value: system_health.storage_core, color: "bg-amber-500", icon: ServerCrash, status: "Peak" }
+                   { label: "CLOUD STORAGE", value: system_health.storage_core, color: "bg-amber-500", icon: ServerCrash, status: "Peak" }
                  ].map((item) => (
                    <div key={item.label} className="space-y-2">
                       <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-white/40">
@@ -305,7 +305,7 @@ const AdminDashboardPage = () => {
               </div>
               <Button className="mt-8 w-full h-12 bg-white text-slate-900 font-black uppercase tracking-widest rounded-2xl hover:bg-slate-200 transition-all">
                  <Zap className="w-4 h-4 mr-2" />
-                 Audit Nodes
+                 System Audit
               </Button>
            </div>
         </GlassCard>
@@ -316,12 +316,12 @@ const AdminDashboardPage = () => {
       <div className="mt-12 flex flex-col md:flex-row items-center justify-between border-t border-white/10 pt-8 opacity-30 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700 font-mono text-[9px] tracking-[0.5em] uppercase">
          <div className="flex items-center gap-4">
             <Hexagon className="w-3 h-3" />
-            <span>ClassTrack Central Command Node</span>
+            <span>ClassTrack Administration</span>
          </div>
          <div className="flex items-center gap-4">
             <span>Uptime: 99.999%</span>
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Cluster parity synced</span>
+            <span>Systems synchronized</span>
          </div>
       </div>
     </div>

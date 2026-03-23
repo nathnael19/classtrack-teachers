@@ -104,7 +104,7 @@ const AnalyticsPage = () => {
           <Loader2 className="w-16 h-16 animate-spin text-primary opacity-20" />
           <BrainCircuit className="w-8 h-8 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
         </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Aggregating Intelligence Vectors...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground animate-pulse">Loading Analytics...</p>
       </div>
     );
   }
@@ -121,7 +121,7 @@ const AnalyticsPage = () => {
             Live Intelligence Stream
           </div>
           <h1 className="text-6xl font-black tracking-tighter text-slate-900 leading-tight">
-            Data <span className="italic text-primary">Nexus</span>
+            Analytics <span className="italic text-primary">Hub</span>
           </h1>
           <p className="text-slate-500 text-xl font-medium max-w-xl">
             Real-time multi-dimensional analysis of institutional attendance performance and student engagement.
