@@ -10,28 +10,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import api from "@/services/api";
 
-const userGrowthData = [
-  { name: 'Week 1', users: 400 },
-  { name: 'Week 2', users: 650 },
-  { name: 'Week 3', users: 850 },
-  { name: 'Week 4', users: 1234 },
-];
 
-const activeCoursesData = [
-  { name: 'CS101', students: 120 },
-  { name: 'ENG201', students: 85 },
-  { name: 'MAT301', students: 65 },
-  { name: 'PHY101', students: 150 },
-  { name: 'HIS102', students: 90 },
-];
-
-const recentActivity = [
-  { id: 1, action: "New course created", detail: "Dr. Smith published 'Advanced Physics'", time: "2h ago", icon: BookOpen, color: "text-blue-500", bg: "bg-blue-500/10" },
-  { id: 2, action: "User flagged", detail: "Suspicious login attempt from 192.168.1.1", time: "4h ago", icon: AlertCircle, color: "text-rose-500", bg: "bg-rose-500/10" },
-  { id: 3, action: "Bulk import", detail: "Added 250 new student records", time: "1d ago", icon: Users, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-  { id: 4, action: "System update", detail: "v2.1 kernel deployment successful", time: "1d ago", icon: Server, color: "text-indigo-500", bg: "bg-indigo-500/10" },
-];
 
 const AnimatedNumber = ({ value }: { value: number }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -96,6 +77,47 @@ const KPICard = ({ title, value, change, icon: Icon, colorClass, delay = "0ms" }
 );
 
 const AdminDashboardPage = () => {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const response = await api.get('/admin/analytics/dashboard');
+        setData(response.data);
+      } catch (error) {
+        console.error("Dashboard Sync Failed:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboard();
+  }, []);
+
+  if (loading) {
+     return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+           <div className="flex flex-col items-center gap-6">
+              <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+              <p className="text-[10px] font-black uppercase tracking-[0.5em] animate-pulse">Synchronizing Command Nucleus...</p>
+           </div>
+        </div>
+     );
+  }
+
+  const { stats, user_growth, course_engagement, recent_activity, system_health } = data || {
+    stats: { total_users: 0, total_courses: 0, live_sessions: 0, security_alerts: 0, user_growth_change: "0%", is_growth_positive: true },
+    user_growth: [],
+    course_engagement: [],
+    recent_activity: [],
+    system_health: { api_cluster: 0, database: 0, storage_core: 0 }
+  };
+
+  const activityWithIcons = recent_activity.map((a: any) => ({
+    ...a,
+    icon: a.icon === "Users" ? Users : BookOpen
+  }));
+
   return (
     <div className="relative min-h-screen p-4 md:p-8 space-y-8 font-sans overflow-hidden">
       {/* Immersive Background Decorations */}
@@ -143,12 +165,12 @@ const AdminDashboardPage = () => {
         
         {/* KPI: Users */}
         <div className="lg:col-span-3">
-          <KPICard title="Total Nuclei" value={1234} change="+24.2%" icon={Users} colorClass="text-indigo-500" />
+          <KPICard title="Total Nuclei" value={stats.total_users} change={stats.user_growth_change} icon={Users} colorClass="text-indigo-500" />
         </div>
 
         {/* KPI: Courses */}
         <div className="lg:col-span-3">
-          <KPICard title="Active Orbs" value={56} change="+5 New" icon={BookOpen} colorClass="text-amber-500" delay="100ms" />
+          <KPICard title="Active Orbs" value={stats.total_courses} change={stats.course_growth_change} icon={BookOpen} colorClass="text-amber-500" delay="100ms" />
         </div>
 
         {/* Global Performance: Area Chart */}
@@ -165,7 +187,7 @@ const AdminDashboardPage = () => {
           </div>
           <div className="flex-1 w-full min-h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={userGrowthData}>
+              <AreaChart data={user_growth}>
                 <defs>
                   <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
@@ -194,12 +216,12 @@ const AdminDashboardPage = () => {
 
         {/* KPI: Sessions */}
         <div className="lg:col-span-3">
-          <KPICard title="Live Loops" value={12} icon={Activity} colorClass="text-emerald-500" delay="200ms" />
+          <KPICard title="Live Loops" value={stats.live_sessions} icon={Activity} colorClass="text-emerald-500" delay="200ms" />
         </div>
 
         {/* KPI: Security */}
         <div className="lg:col-span-3">
-          <KPICard title="Shield Vector" value={2} change="Action Required" icon={AlertCircle} colorClass="text-rose-500" delay="300ms" />
+          <KPICard title="Shield Vector" value={stats.security_alerts} change={stats.security_alerts > 0 ? "Action Required" : "Nodes Secure"} icon={AlertCircle} colorClass="text-rose-500" delay="300ms" />
         </div>
 
         {/* System Journal: Activity feed */}
@@ -209,7 +231,7 @@ const AdminDashboardPage = () => {
               <Badge variant="outline" className="font-mono text-[10px] opacity-40">STREAMS://LOGS</Badge>
            </div>
            <div className="space-y-6">
-              {recentActivity.map((item, i) => (
+              {activityWithIcons.map((item: any, i: number) => (
                 <div key={item.id} className="flex gap-4 group animate-in fade-in slide-in-from-left-4 duration-500" style={{ animationDelay: `${i * 100}ms` }}>
                    <div className={cn("mt-1 p-2 rounded-xl border border-white/10 shrink-0 transform group-hover:rotate-12 transition-transform", item.bg)}>
                       <item.icon className={cn("w-4 h-4", item.color)} />
@@ -237,12 +259,12 @@ const AdminDashboardPage = () => {
            </h3>
            <div className="h-[300px] w-full mt-4">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={activeCoursesData} layout="vertical" margin={{ top: 0, right: 30, bottom: 0, left: 10 }}>
+                <BarChart data={course_engagement} layout="vertical" margin={{ top: 0, right: 30, bottom: 0, left: 10 }}>
                   <XAxis type="number" hide />
                   <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 900 }} stroke="currentColor" className="opacity-80" />
                   <Tooltip cursor={{ fill: 'currentColor', opacity: 0.05 }} contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'black' }} />
                   <Bar dataKey="students" radius={[0, 20, 20, 0]} barSize={20}>
-                    {activeCoursesData.map((_entry, index) => (
+                    {course_engagement.map((_entry: any, index: number) => (
                       <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#f59e0b' : '#fb923c'} />
                     ))}
                   </Bar>
@@ -266,9 +288,9 @@ const AdminDashboardPage = () => {
               </div>
               <div className="space-y-6 flex-1">
                  {[
-                   { label: "API CLUSTER", value: 12, color: "bg-indigo-500", icon: Server, status: "Healthy" },
-                   { label: "DATABASE", value: 45, color: "bg-emerald-500", icon: Database, status: "Stable" },
-                   { label: "STORAGE CORE", value: 78, color: "bg-amber-500", icon: ServerCrash, status: "Peak" }
+                   { label: "API CLUSTER", value: system_health.api_cluster, color: "bg-indigo-500", icon: Server, status: system_health.api_cluster > 90 ? "Healthy" : "Load" },
+                   { label: "DATABASE", value: system_health.database, color: "bg-emerald-500", icon: Database, status: "Stable" },
+                   { label: "STORAGE CORE", value: system_health.storage_core, color: "bg-amber-500", icon: ServerCrash, status: "Peak" }
                  ].map((item) => (
                    <div key={item.label} className="space-y-2">
                       <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-white/40">
