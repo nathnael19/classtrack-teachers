@@ -12,6 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import api from "@/services/api";
 import { toast } from "sonner";
+import { useAuthStore } from "@/store/authStore";
 
 interface Course {
   id: number;
@@ -88,6 +89,8 @@ const GlassCard = ({ children, className = "", noHover = false, style = {} }: { 
 
 const AcademicManagementPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === 'admin';
   const [activeTab, setActiveTab] = useState("courses");
   const [courses, setCourses] = useState<Course[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -367,9 +370,11 @@ const AcademicManagementPage = () => {
                        ))}
                     </div>
                  </div>
-                 <Button onClick={() => navigate("/admin/academic/rooms/new")} className="w-full mt-8 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:shadow-lg hover:shadow-emerald-500/20 transition-all font-black uppercase tracking-widest text-[10px] py-6">
-                    Register Facility Node
-                 </Button>
+                 {isAdmin && (
+                    <Button onClick={() => navigate("/admin/academic/rooms/new")} className="w-full mt-8 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:shadow-lg hover:shadow-emerald-500/20 transition-all font-black uppercase tracking-widest text-[10px] py-6">
+                       Register Facility Node
+                    </Button>
+                 )}
               </GlassCard>
 
               <div className="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
