@@ -29,14 +29,14 @@ const HeroSection = () => {
             to="/register"
             className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-[#0C4A6E] dark:bg-primary text-white font-black text-xl shadow-2xl shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1.5 active:scale-95 transition-all flex items-center justify-center space-x-3 group border border-white/10"
           >
-            <span>Begin Integration</span>
+            <span>Get Started</span>
             <ArrowRight className="w-6 h-6 group-hover:translate-x-1.5 transition-transform" />
           </Link>
           <a
             href="#features"
             className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-white/40 dark:bg-white/5 backdrop-blur-xl text-[#0C4A6E] dark:text-white font-black text-xl border border-white/20 hover:bg-white/60 transition-all flex items-center justify-center cursor-pointer shadow-xl shadow-black/5"
           >
-            Review Modules
+            Explore Features
           </a>
         </div>
 
@@ -55,11 +55,11 @@ const HeroSection = () => {
                 </div>
                 <div className="h-6 w-px bg-white/10 mx-2" />
                 <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Atkinson_Hyperlegible']">
-                  ClassTrack Admin // Protocol 04
+                  ClassTrack Admin Dashboard
                 </div>
               </div>
               <div className="px-3 py-1 rounded-full bg-[#F97316]/10 border border-[#F97316]/20 text-[#F97316] text-[10px] font-black uppercase tracking-tighter animate-pulse">
-                Live Terminal
+                Live Dashboard
               </div>
             </div>
 

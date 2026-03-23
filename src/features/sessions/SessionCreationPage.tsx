@@ -199,7 +199,7 @@ const SessionCreationPage = () => {
           New Session
         </div>
         <h1 className="text-6xl font-black tracking-tighter text-slate-900 leading-none">
-          Initialize <span className="italic text-primary">Session</span>
+          Start New <span className="italic text-primary">Session</span>
         </h1>
         <p className="text-slate-500 mt-4 text-xl font-semibold max-w-2xl mx-auto">
           Create a new attendance session for your class.
@@ -215,9 +215,9 @@ const SessionCreationPage = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-3xl font-black tracking-tight text-slate-900 uppercase italic">
-                        Session Profile
+                        Session Details
                       </h2>
-                      <p className="text-sm text-slate-400 mt-2 font-bold uppercase tracking-widest">Temporal & Spatial Calibration</p>
+                      <p className="text-sm text-slate-400 mt-2 font-bold uppercase tracking-widest">Time and Location Settings</p>
                     </div>
                     <div className="w-16 h-1 bg-gradient-to-r from-primary to-transparent rounded-full" />
                   </div>
@@ -234,7 +234,7 @@ const SessionCreationPage = () => {
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus:ring-4 focus:ring-primary/5 transition-all font-black text-slate-900 group">
-                                <SelectValue placeholder="Identify Module..." />
+                                <SelectValue placeholder="Select Course..." />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent className="rounded-[1.5rem] border-indigo-50/50 backdrop-blur-2xl bg-white/95 p-3 shadow-2xl animate-in zoom-in-95 duration-200">
@@ -261,7 +261,7 @@ const SessionCreationPage = () => {
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger className="h-16 bg-slate-50 border-none rounded-[1.25rem] px-6 shadow-inner focus:ring-4 focus:ring-primary/5 transition-all font-black text-slate-900">
-                                <SelectValue placeholder="Assign Infrastructure..." />
+                                <SelectValue placeholder="Select Room..." />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent className="rounded-[1.5rem] border-indigo-50/50 backdrop-blur-2xl bg-white/95 p-3 shadow-2xl animate-in zoom-in-95 duration-200">
@@ -399,7 +399,7 @@ const SessionCreationPage = () => {
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-center justify-between rounded-[1.25rem] bg-slate-50 p-6 shadow-inner mt-8">
                           <div className="space-y-0.5">
-                            <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Schedule Mode</FormLabel>
+                            <FormLabel className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Schedule for Later</FormLabel>
                             <FormDescription className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Enable for future sessions</FormDescription>
                           </div>
                           <FormControl>
@@ -492,9 +492,9 @@ const SessionCreationPage = () => {
             </h3>
             <div className="space-y-8">
               {[
-                { id: "01", text: "Ensure high-precision GPS signal synchronization before QR generation phases." },
-                { id: "02", text: "Optimal geofence vectors are established between 40-60 meters for interior zones." },
-                { id: "03", text: "Continuous biometric monitoring is recommended for high-capacity lecture sessions." }
+                { id: "01", text: "Ensure students have GPS enabled for accurate attendance tracking." },
+                { id: "02", text: "The recommended attendance radius is between 40-60 meters for most classrooms." },
+                { id: "03", text: "Verify attendance records after each session to ensure accuracy." }
               ].map((item) => (
                 <div key={item.id} className="flex gap-5 group">
                   <div className="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center font-black text-xs text-primary shrink-0 group-hover:bg-primary group-hover:text-white transition-all duration-300">
@@ -530,19 +530,19 @@ const SessionCreationPage = () => {
 
               <div className="grid grid-cols-2 gap-6">
                 <div className="p-6 bg-white/5 rounded-[1.5rem] border border-white/10 flex flex-col items-center gap-1 group hover:bg-white/10 transition-colors">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Success</span>
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Attendance Rate</span>
                   <span className="font-black text-2xl text-emerald-400">{context?.success_rate || '0%'}</span>
                 </div>
                 <div className="p-6 bg-white/5 rounded-[1.5rem] border border-white/10 flex flex-col items-center gap-1 group hover:bg-white/10 transition-colors">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Scans</span>
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Check-ins</span>
                   <span className="font-black text-2xl text-white">{context?.total_scans || 0}</span>
                 </div>
               </div>
 
               <div className="p-6 bg-primary/10 rounded-[1.5rem] border border-primary/20 flex items-center justify-between">
                 <div className="flex flex-col gap-1">
-                  <span className="text-[9px] font-black text-primary uppercase tracking-widest">Issues Found</span>
-                  <span className="font-black text-xl text-white">{context?.outliers || 0} Outliers</span>
+                  <span className="text-[9px] font-black text-primary uppercase tracking-widest">Data Anomalies</span>
+                  <span className="font-black text-xl text-white">{context?.outliers || 0} Anomalies</span>
                 </div>
                 <div className="w-3 h-3 rounded-full bg-primary animate-ping" />
               </div>
