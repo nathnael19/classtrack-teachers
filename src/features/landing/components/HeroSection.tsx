@@ -8,14 +8,14 @@ const HeroSection = () => {
         {/* Badge */}
         <div className="inline-flex items-center space-x-2 bg-white/40 dark:bg-white/5 backdrop-blur-xl border border-white/20 rounded-full px-4 py-2 mb-10 animate-fade-in cursor-default group hover:bg-white/60 transition-all duration-500 shadow-xl shadow-primary/5">
           <Sparkles className="w-4 h-4 text-[#F97316] group-hover:rotate-12 transition-transform" />
-          <span className="text-sm font-bold text-[#0C4A6E] dark:text-[#38BDF8] font-['Atkinson_Hyperlegible'] tracking-tight">The New Standard in Academic Presence</span>
+          <span className="text-sm font-bold text-[#0C4A6E] dark:text-[#38BDF8] font-['Atkinson_Hyperlegible'] tracking-tight">The Modern Way to Track Attendance</span>
         </div>
 
         {/* Headlines */}
         <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-[#0C4A6E] dark:text-white max-w-5xl mb-8 font-['Crimson_Pro'] leading-[0.95]">
-          Master Your{' '}
+          Streamline Your <br/>
           <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary via-[#0EA5E9] to-accent italic px-2">
-            Academic Pulse
+            Classroom
           </span>
         </h1>
 
