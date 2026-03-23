@@ -5,6 +5,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -15,12 +22,20 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import api from "@/services/api";
+import { useQuery } from "@tanstack/react-query";
+
+interface Organization {
+  id: number;
+  name: string;
+  domain: string;
+}
 
 const deptSchema = z.object({
   name: z.string().min(3, "Department name must be at least 3 characters"),
   head: z.string().min(3, "Head of Department is required"),
   location: z.string().min(2, "Location is required"),
   description: z.string().optional(),
+  organization_id: z.string().optional(),
 });
 
 type DeptFormValues = z.infer<typeof deptSchema>;
@@ -96,6 +111,7 @@ const AddDepartmentPage = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     control,
     formState: { errors },
   } = useForm<DeptFormValues>({
@@ -105,15 +121,23 @@ const AddDepartmentPage = () => {
       head: "",
       location: "",
       description: "",
+      organization_id: "",
     }
   });
 
   const formData = useWatch({ control });
+  const { data: organizations = [] } = useQuery<Organization[]>({
+    queryKey: ["organizations"],
+    queryFn: async () => (await api.get("/organizations/")).data,
+  });
 
   const onSubmit = async (data: DeptFormValues) => {
     setIsSubmitting(true);
     try {
-      await api.post('/departments/', { name: data.name });
+      await api.post('/departments/', {
+        name: data.name,
+        organization_id: data.organization_id ? parseInt(data.organization_id) : null,
+      });
       toast.success("Department Created!", {
         description: `${data.name} is now added to the department list.`,
         icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
@@ -165,6 +189,23 @@ const AddDepartmentPage = () => {
               <div className="bg-white/5 dark:bg-black/20 p-8 md:p-12 h-full rounded-[inherit]">
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
                   <div className="grid gap-x-8 gap-y-10 md:grid-cols-2">
+                    {/* Organization */}
+                    {organizations.length > 0 && (
+                      <div className="space-y-3 col-span-2">
+                        <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">Organization (Optional)</Label>
+                        <Select onValueChange={(val: string) => setValue("organization_id", val)}>
+                          <SelectTrigger className="h-14 bg-white/10 dark:bg-black/40 border-white/10 focus:border-amber-500/50 rounded-2xl">
+                            <SelectValue placeholder="Select organization" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {organizations.map((org) => (
+                              <SelectItem key={org.id} value={String(org.id)}>{org.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
                     {/* Dept Name */}
                     <div className="space-y-3 col-span-2 group">
                       <Label htmlFor="name" className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40 group-focus-within:opacity-100 transition-opacity">Department Name</Label>
