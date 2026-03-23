@@ -26,12 +26,12 @@ const AnalyticsSection = () => {
             </div>
             
             <h2 className="text-5xl md:text-6xl font-black font-['Crimson_Pro'] text-[#0C4A6E] dark:text-white leading-[0.95] tracking-tighter">
-              Intelligence <br />
+              Academic <br />
               <span className="italic text-primary">Insights for Every Session.</span>
             </h2>
             
             <p className="text-xl text-[#0C4A6E]/70 dark:text-white/60 font-['Atkinson_Hyperlegible'] font-medium leading-relaxed max-w-md">
-              Transform raw attendance data into actionable academic insights. Monitor cohort health, session integrity, and temporal flux in a single, high-fidelity command center.
+              Transform raw attendance data into actionable academic insights. Monitor cohort health, session trends, and attendance patterns in a single, high-fidelity dashboard.
             </p>
 
             <div className="grid grid-cols-2 gap-6 pt-4 font-['Atkinson_Hyperlegible']">
@@ -60,8 +60,8 @@ const AnalyticsSection = () => {
                     <Zap className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-black text-[#0C4A6E] dark:text-white font-['Atkinson_Hyperlegible']">Global Session Matrix</h4>
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Fira_Code']">Node: CT-PROT-ALPHA</p>
+                    <h4 className="text-sm font-black text-[#0C4A6E] dark:text-white font-['Atkinson_Hyperlegible']">Session Attendance Data</h4>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-['Fira_Code']">Active Course Session</p>
                   </div>
                 </div>
                 <div className="flex space-x-2">
@@ -114,7 +114,7 @@ const AnalyticsSection = () => {
                 <div className="bg-white/40 dark:bg-white/5 p-4 rounded-2xl border border-white/20">
                   <div className="flex items-center space-x-2 mb-2">
                     <Users className="w-4 h-4 text-[#0EA5E9]" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#0C4A6E]/50 dark:text-white/50">Flux</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#0C4A6E]/50 dark:text-white/50">Trend</span>
                   </div>
                   <div className="text-lg font-black text-[#0C4A6E] dark:text-white">+12.4%</div>
                 </div>

@@ -57,7 +57,7 @@ const SetupPasswordPage = () => {
         new_password: data.password,
       });
       
-      toast.success("Identity Secured!", {
+      toast.success("Password Set Successfully!", {
         description: "Your password has been set. You can now login.",
         icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
       });
@@ -88,7 +88,7 @@ const SetupPasswordPage = () => {
                 Setup Password
               </h1>
               <p className="text-sm font-medium text-muted-foreground max-w-[280px]">
-                Finalize your account synthesis by defining your unique access vector.
+                Set a strong password to secure your account.
               </p>
            </div>
         </div>
@@ -151,7 +151,7 @@ const SetupPasswordPage = () => {
 
         <div className="flex items-center justify-center gap-4 opacity-30">
            <Shield className="w-4 h-4" />
-           <span className="text-[9px] font-black uppercase tracking-[0.4em]">Encrypted Layer v2.4</span>
+           <span className="text-[9px] font-black uppercase tracking-[0.4em]">Secure Connection Active</span>
         </div>
       </div>
     </div>
