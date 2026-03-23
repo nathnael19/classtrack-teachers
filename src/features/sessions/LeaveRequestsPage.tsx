@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   FileText,
-  Loader2,
   CheckCircle2,
   XCircle,
   User,
@@ -10,16 +9,14 @@ import {
   ExternalLink,
   ClipboardList,
   Filter,
+  ArrowRight,
+  Clock,
+  Check,
+  X,
+  LayoutGrid,
+  List,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import {
   Select,
   SelectContent,
@@ -33,6 +30,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/services/api';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface LeaveRequest {
   id: number;
@@ -48,13 +46,30 @@ interface LeaveRequest {
   reviewed_by?: number;
 }
 
+const StatCard = ({ label, value, icon: Icon, color }: { label: string; value: number; icon: any; color: string }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="liquid-glass rounded-3xl p-6 flex items-center gap-5 group hover:border-white/40 transition-all duration-500"
+  >
+    <div className={cn("p-4 rounded-2xl bg-gradient-to-br transition-transform duration-500 group-hover:scale-110", color)}>
+      <Icon className="w-6 h-6 text-white" />
+    </div>
+    <div>
+      <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/60 mb-0.5">{label}</p>
+      <p className="text-3xl font-black tracking-tighter text-premium">{value}</p>
+    </div>
+  </motion.div>
+);
+
 const LeaveRequestsPage = () => {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const { data: requests = [], isLoading } = useQuery<LeaveRequest[]>({
     queryKey: ['leave-requests'],
-    queryFn: async () => (await api.get('/leave_requests')).data,
+    queryFn: async () => (await api.get('/leave_requests/')).data,
   });
 
   const reviewMutation = useMutation({
@@ -63,7 +78,7 @@ const LeaveRequestsPage = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leave-requests'] });
-      toast.success('Leave request updated');
+      toast.success('Leave request updated successfully');
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.detail || 'Failed to update leave request');
@@ -76,44 +91,72 @@ const LeaveRequestsPage = () => {
   });
 
   const pendingCount = requests.filter((r) => r.status === 'pending').length;
+  const approvedCount = requests.filter((r) => r.status === 'approved').length;
+  const rejectedCount = requests.filter((r) => r.status === 'rejected').length;
 
   if (isLoading && requests.length === 0) {
     return (
-      <div className="flex flex-col h-[70vh] items-center justify-center gap-6">
-        <Loader2 className="w-16 h-16 animate-spin text-primary" />
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground animate-pulse">
-          Loading Leave Requests...
+      <div className="flex flex-col h-[70vh] items-center justify-center gap-8">
+        <div className="relative">
+          <div className="w-20 h-20 border-4 border-primary/10 border-t-primary rounded-full animate-spin" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <ClipboardList className="w-8 h-8 text-primary animate-pulse" />
+          </div>
+        </div>
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-muted-foreground animate-pulse">
+          Synchronizing Leave Data...
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className="max-w-7xl mx-auto space-y-12 pb-20">
+      {/* Header Section */}
+      <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between px-2">
         <div>
-          <h1 className="text-3xl font-black tracking-tighter flex items-center gap-3">
-            <ClipboardList className="w-8 h-8 text-primary" />
-            Leave Requests
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3 mb-2"
+          >
+            <div className="h-1 w-12 bg-gold-gradient rounded-full" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60">Approvals Engine</span>
+          </motion.div>
+          <h1 className="text-5xl font-black tracking-tighter text-premium">
+            Leave Requests <span className="text-primary/20">.</span>
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Review and approve or reject student leave requests.
+          <p className="text-muted-foreground mt-3 text-lg font-medium max-w-xl leading-relaxed">
+            Manage academic absence requests with high-fidelity review tools and real-time status tracking.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          {pendingCount > 0 && (
-            <Badge variant="secondary" className="text-amber-600 bg-amber-500/10 border-amber-500/20">
-              {pendingCount} pending
-            </Badge>
-          )}
+
+        <div className="flex items-center gap-4 bg-white/40 dark:bg-black/20 p-2 rounded-2xl backdrop-blur-md border border-white/20">
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn("rounded-xl h-10 w-10 transition-all", viewMode === 'grid' && "bg-white shadow-sm text-primary")}
+            onClick={() => setViewMode('grid')}
+          >
+            <LayoutGrid className="w-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn("rounded-xl h-10 w-10 transition-all", viewMode === 'list' && "bg-white shadow-sm text-primary")}
+            onClick={() => setViewMode('list')}
+          >
+            <List className="w-5 h-5" />
+          </Button>
+          <div className="w-px h-6 bg-border/40 mx-2" />
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[160px]">
-              <Filter className="w-4 h-4 mr-2" />
-              <SelectValue placeholder="Filter by status" />
+            <SelectTrigger className="w-[180px] bg-transparent border-none shadow-none focus:ring-0 text-sm font-bold uppercase tracking-wider">
+              <Filter className="w-4 h-4 mr-2 opacity-50" />
+              <SelectValue placeholder="All Status" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
+            <SelectContent className="rounded-2xl border-white/20 backdrop-blur-xl">
+              <SelectItem value="all">Global View</SelectItem>
+              <SelectItem value="pending">Pending Review</SelectItem>
               <SelectItem value="approved">Approved</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>
@@ -121,123 +164,195 @@ const LeaveRequestsPage = () => {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
-        {filteredRequests.length === 0 ? (
-          <div className="p-16 text-center text-muted-foreground">
-            <FileText className="w-16 h-16 mx-auto mb-4 opacity-30" />
-            <p className="font-bold">No leave requests found</p>
-            <p className="text-sm mt-1">
-              {statusFilter !== 'all'
-                ? `No ${statusFilter} requests. Try changing the filter.`
-                : 'Students can submit leave requests from the mobile app.'}
-            </p>
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Student</TableHead>
-                <TableHead>Course / Session</TableHead>
-                <TableHead>Reason</TableHead>
-                <TableHead>Document</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredRequests.map((req) => (
-                <TableRow key={req.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-semibold">{req.student_name || `#${req.student_id}`}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <span className="font-medium">{req.course_name || '—'}</span>
-                      {req.session_start && (
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Calendar className="w-3.5 h-3.5" />
-                          {format(new Date(req.session_start), 'MMM d, yyyy HH:mm')}
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-2">
+        <StatCard label="Total Submissions" value={requests.length} icon={ClipboardList} color="bg-primary shadow-lg shadow-primary/20" />
+        <StatCard label="Pending Approval" value={pendingCount} icon={Clock} color="bg-amber-500 shadow-lg shadow-amber-500/20" />
+        <StatCard label="Approved" value={approvedCount} icon={Check} color="bg-emerald-500 shadow-lg shadow-emerald-500/20" />
+        <StatCard label="Rejected" value={rejectedCount} icon={X} color="bg-rose-500 shadow-lg shadow-rose-500/20" />
+      </div>
+
+      {/* Content Section */}
+      <div className="px-2">
+        <AnimatePresence mode="wait">
+          {filteredRequests.length === 0 ? (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="liquid-glass rounded-[3rem] p-24 text-center border-dashed border-2 border-white/40"
+            >
+              <div className="w-24 h-24 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-8">
+                <FileText className="w-12 h-12 text-primary/20" />
+              </div>
+              <h3 className="text-2xl font-black tracking-tight text-premium mb-2">No Records Found</h3>
+              <p className="text-muted-foreground font-medium max-w-sm mx-auto">
+                {statusFilter !== 'all'
+                  ? `There are currently no requests with "${statusFilter}" status.`
+                  : 'Start by encouraging students to submit leave requests through the ClassTrack mobile app.'}
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div
+              key={viewMode}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={cn(
+                "gap-6",
+                viewMode === 'grid' ? "grid grid-cols-1 lg:grid-cols-3" : "flex flex-col"
+              )}
+            >
+              {filteredRequests.map((req, index) => (
+                <motion.div
+                  key={req.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="liquid-glass rounded-[2rem] p-8 flex flex-col group hover:border-primary/20 transition-all duration-500"
+                >
+                  <div className="flex items-start justify-between mb-8">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                        <User className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="text-xl font-black tracking-tight text-premium underline decoration-primary/10 decoration-2 underline-offset-4">
+                          {req.student_name || `Student #${req.student_id}`}
+                        </h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-primary/30" />
+                          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60 leading-none">
+                            {req.course_name || 'General Inquiry'}
+                          </p>
                         </div>
-                      )}
-                      {req.session_room && (
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <MapPin className="w-3.5 h-3.5" />
-                          {req.session_room}
-                        </div>
-                      )}
+                      </div>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <p className="max-w-[200px] truncate" title={req.reason}>
-                      {req.reason}
-                    </p>
-                  </TableCell>
-                  <TableCell>
-                    {req.document_url ? (
-                      <a
-                        href={req.document_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-primary hover:underline text-sm"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        View
-                      </a>
-                    ) : (
-                      <span className="text-muted-foreground text-sm">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
                     <Badge
-                      variant={
-                        req.status === 'approved'
-                          ? 'default'
-                          : req.status === 'rejected'
-                            ? 'destructive'
-                            : 'secondary'
-                      }
                       className={cn(
-                        req.status === 'pending' && 'bg-amber-500/10 text-amber-700 border-amber-500/20'
+                        "rounded-full px-4 py-1 border-none font-black text-[10px] uppercase tracking-widest transition-all duration-500",
+                        req.status === 'approved' && "bg-emerald-500/10 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white",
+                        req.status === 'rejected' && "bg-rose-500/10 text-rose-600 group-hover:bg-rose-500 group-hover:text-white",
+                        req.status === 'pending' && "bg-amber-500/10 text-amber-600 group-hover:bg-amber-500 group-hover:text-white"
                       )}
                     >
                       {req.status}
                     </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {req.status === 'pending' && (
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/10"
-                          onClick={() => reviewMutation.mutate({ id: req.id, status: 'approved' })}
-                          disabled={reviewMutation.isPending}
-                        >
-                          <CheckCircle2 className="w-4 h-4 mr-1.5" />
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-rose-600 border-rose-500/30 hover:bg-rose-500/10"
-                          onClick={() => reviewMutation.mutate({ id: req.id, status: 'rejected' })}
-                          disabled={reviewMutation.isPending}
-                        >
-                          <XCircle className="w-4 h-4 mr-1.5" />
-                          Reject
-                        </Button>
+                  </div>
+
+                  <div className="space-y-4 mb-8 flex-1">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 rounded-lg bg-muted/50 mt-1">
+                        <Calendar className="w-4 h-4 text-muted-foreground" />
                       </div>
-                    )}
-                  </TableCell>
-                </TableRow>
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground/40 mb-1">Scheduled Period</p>
+                        <p className="text-sm font-semibold text-premium">
+                          {req.session_start ? format(new Date(req.session_start), 'MMMM d, yyyy • HH:mm') : 'Indefinite'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 rounded-lg bg-muted/50 mt-1">
+                        <MapPin className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-widest text-muted-foreground/40 mb-1">Location Context</p>
+                        <p className="text-sm font-semibold text-premium">{req.session_room || 'Remote Session'}</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-muted/30 p-5 rounded-2xl border border-border/50">
+                      <p className="text-xs font-black uppercase tracking-widest text-muted-foreground/40 mb-2 flex items-center gap-2">
+                        <ArrowRight className="w-3 h-3 text-primary" /> Reason for Absence
+                      </p>
+                      <p className="text-sm font-medium leading-relaxed italic text-muted-foreground">
+                        "{req.reason}"
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-6 border-t border-border/40">
+                    <div className="flex items-center gap-4">
+                      {req.document_url ? (
+                        <a
+                          href={req.document_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/5 hover:bg-primary hover:text-white text-xs font-bold uppercase tracking-widest transition-all duration-300"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          Doc
+                        </a>
+                      ) : (
+                        <div className="px-4 py-2 rounded-xl bg-muted/50 text-[10px] font-black uppercase tracking-widest text-muted-foreground/30 flex items-center gap-2">
+                          <XCircle className="w-4 h-4 opacity-10" />
+                          No Support
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex gap-2">
+                      {req.status === 'pending' ? (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-10 px-5 rounded-xl text-rose-500 hover:bg-rose-500 hover:text-white font-black text-[10px] uppercase tracking-widest transition-all duration-300"
+                            onClick={() => reviewMutation.mutate({ id: req.id, status: 'rejected' })}
+                            disabled={reviewMutation.isPending}
+                          >
+                            <XCircle className="w-4 h-4 mr-2" />
+                            Reject
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="h-10 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-500/20 transition-all duration-300"
+                            onClick={() => reviewMutation.mutate({ id: req.id, status: 'approved' })}
+                            disabled={reviewMutation.isPending}
+                          >
+                            <CheckCircle2 className="w-4 h-4 mr-2" />
+                            Approve
+                          </Button>
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500/10 border border-orange-500/20">
+                          <Clock className="w-3 h-3 text-orange-500" />
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-600">Decision Finalized</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
               ))}
-            </TableBody>
-          </Table>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
+
+      <style>{`
+        .bg-gold-gradient {
+          background: linear-gradient(135deg, #CA8A04 0%, #EAB308 100%);
+        }
+        .liquid-glass {
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+        .dark .liquid-glass {
+          background: rgba(0, 0, 0, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .text-premium {
+          font-family: 'Satoshi', sans-serif;
+          tracking-tight: -0.02em;
+        }
+        .text-body-premium {
+          font-family: 'DM Sans', sans-serif;
+        }
+      `}</style>
     </div>
   );
 };
