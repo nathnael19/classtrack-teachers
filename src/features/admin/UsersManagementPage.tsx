@@ -137,7 +137,7 @@ const UsersManagementPage = () => {
 
   const handleEditUser = (userId: string) => {
     toast.info("Neural link established. Redirecting to edit portal...");
-    // navigate(`/admin/users/edit/${userId}`); 
+    navigate(`/admin/users/edit/${userId}`); 
   };
 
   const getInitials = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
