@@ -9,6 +9,18 @@ import {
   TrendingUp, Activity, BarChart3, GraduationCap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import api from "@/services/api";
+import { toast } from "sonner";
+
+interface Course {
+  id: number;
+  name: string;
+  code: string;
+  credit_hours: number;
+  student_count: number;
+  is_active: boolean;
+  description?: string;
+}
 
 const AnimatedNumber = ({ value }: { value: number }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -52,6 +64,24 @@ const GlassCard = ({ children, className = "", noHover = false, style = {} }: { 
 const AcademicManagementPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("courses");
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await api.get("/courses/");
+        setCourses(response.data);
+      } catch (error) {
+        console.error("Failed to fetch courses:", error);
+        toast.error("Critical failure during course vector synchronization");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   return (
     <div className="relative space-y-10 font-sans p-4 mb-20">
@@ -126,42 +156,62 @@ const AcademicManagementPage = () => {
               </div>
             </button>
 
-            {[
-              { code: "CS101", name: "Intro to Computer Science", credits: 3, students: 120, status: "Active", trend: "+12%" },
-              { code: "SWE204", name: "Software Architecture", credits: 4, students: 85, status: "Active", trend: "+5%" },
-              { code: "MAT301", name: "Discrete Math II", credits: 3, students: 45, status: "Active", trend: "-2%" },
-              { code: "PHY101", name: "Modern Physics", credits: 4, students: 150, status: "Active", trend: "+20%" },
-              { code: "HIS102", name: "World History: Middle Ages", credits: 3, students: 60, status: "Inactive", trend: "0%" },
-              { code: "ENG101", name: "Academic Writing", credits: 2, students: 200, status: "Active", trend: "+15%" },
-            ].map((course) => (
-              <GlassCard key={course.code} className="col-span-12 md:col-span-4 lg:col-span-3 p-8 flex flex-col justify-between group h-full">
-                <div>
+            {isLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <GlassCard key={i} className="col-span-12 md:col-span-4 lg:col-span-3 p-8 group h-full animate-pulse">
                   <div className="flex justify-between items-start mb-6">
-                    <Badge variant="outline" className="font-mono text-[9px] border-amber-500/30 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-lg">{course.code}</Badge>
-                    <div className="flex items-center gap-1 text-[9px] font-black uppercase tracking-tighter text-emerald-500">
-                      <TrendingUp className="w-3 h-3" /> {course.trend}
+                    <div className="w-12 h-4 bg-white/10 rounded" />
+                    <div className="w-8 h-3 bg-white/10 rounded" />
+                  </div>
+                  <div className="w-3/4 h-6 bg-white/10 rounded mb-4" />
+                  <div className="mt-8 space-y-4">
+                    <div className="h-1 w-full bg-white/10 rounded-full" />
+                    <div className="flex items-center justify-between">
+                      <div className="w-20 h-3 bg-white/10 rounded" />
+                      <div className="w-12 h-4 bg-white/10 rounded" />
                     </div>
                   </div>
-                  <h3 className="text-xl font-black tracking-tighter leading-none group-hover:text-amber-500 transition-colors">{course.name}</h3>
-                </div>
+                </GlassCard>
+              ))
+            ) : courses.length > 0 ? (
+              courses.map((course) => (
+                <GlassCard key={course.id} className="col-span-12 md:col-span-4 lg:col-span-3 p-8 flex flex-col justify-between group h-full">
+                  <div>
+                    <div className="flex justify-between items-start mb-6">
+                      <Badge variant="outline" className="font-mono text-[9px] border-amber-500/30 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-lg">{course.code}</Badge>
+                      <div className="flex items-center gap-1 text-[9px] font-black uppercase tracking-tighter text-emerald-500">
+                        <TrendingUp className="w-3 h-3" /> {/* Fixed trend for now or add to API */} +5%
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-black tracking-tighter leading-none group-hover:text-amber-500 transition-colors uppercase italic">{course.name}</h3>
+                    {course.description && (
+                      <p className="text-[10px] text-muted-foreground mt-2 line-clamp-2 font-medium">{course.description}</p>
+                    )}
+                  </div>
 
-                <div className="mt-8 space-y-4">
-                  <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-indigo-500 to-amber-500" style={{ width: `${(course.students / 250) * 100}%` }} />
+                  <div className="mt-8 space-y-4">
+                    <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-indigo-500 to-amber-500" style={{ width: `${Math.min((course.student_count / 100) * 100, 100)}%` }} />
+                    </div>
+                    <div className="flex items-center justify-between">
+                       <div className="flex items-center gap-2">
+                          <Users className="w-3.5 h-3.5 opacity-40" />
+                          <span className="text-[10px] font-black uppercase tracking-widest"><AnimatedNumber value={course.student_count} /> Enrolled</span>
+                       </div>
+                       <Badge className={cn(
+                         "rounded-lg px-2 py-0 text-[8px] font-black uppercase tracking-widest",
+                         course.is_active ? "bg-emerald-500 text-white" : "bg-white/10 text-muted-foreground"
+                       )}>{course.is_active ? "Active" : "Inactive"}</Badge>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                     <div className="flex items-center gap-2">
-                        <Users className="w-3.5 h-3.5 opacity-40" />
-                        <span className="text-[10px] font-black uppercase tracking-widest"><AnimatedNumber value={course.students} /> Enrolled</span>
-                     </div>
-                     <Badge className={cn(
-                       "rounded-lg px-2 py-0 text-[8px] font-black uppercase tracking-widest",
-                       course.status === "Active" ? "bg-emerald-500 text-white" : "bg-white/10 text-muted-foreground"
-                     )}>{course.status}</Badge>
-                  </div>
-                </div>
-              </GlassCard>
-            ))}
+                </GlassCard>
+              ))
+            ) : (
+              <div className="col-span-12 py-20 text-center">
+                <BookOpen className="w-12 h-12 mx-auto opacity-20 mb-4" />
+                <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 italic">No course vectors initialized in this quadrant.</p>
+              </div>
+            )}
           </div>
         )}
 
