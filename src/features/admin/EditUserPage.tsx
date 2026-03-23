@@ -58,9 +58,9 @@ const PreviewUserCard = ({ data, originalData }: { data: Partial<UserFormValues>
         <div className="flex flex-col items-end gap-1">
           <Badge className={cn(
              "border-none px-3 py-1 text-[10px] font-black uppercase tracking-widest whitespace-nowrap",
-             (data.account_status || data.state) === 'active' ? "bg-emerald-500/10 text-emerald-600" : "bg-amber-500/10 text-amber-600"
+             (data.account_status) === 'active' ? "bg-emerald-500/10 text-emerald-600" : "bg-amber-500/10 text-amber-600"
           )}>
-            {data.account_status || data.state || 'Pending'}
+            {data.account_status || 'Pending'}
           </Badge>
           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 italic">User Profile</span>
         </div>
