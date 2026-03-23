@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import api from "@/services/api";
 
 const termSchema = z.object({
   name: z.string().min(3, "Semester designation is required"),
@@ -128,14 +129,22 @@ const AddTermPage = () => {
 
   const onSubmit = async (data: TermFormValues) => {
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log("Ultra Premium Term Submit:", data);
-    toast.success("Timeline Node Integrated!", {
-      description: `${data.name} is now part of the master academic calendar.`,
-      icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
-    });
-    setIsSubmitting(false);
-    navigate("/admin/academic");
+    try {
+      await api.post('/terms/', {
+        name: data.name,
+        start_date: data.startDate,
+        end_date: data.endDate
+      });
+      toast.success("Timeline Node Integrated!", {
+        description: `${data.name} is now part of the master academic calendar.`,
+        icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
+      });
+      navigate("/admin/academic");
+    } catch (error: any) {
+      toast.error("Integration Failed", { description: error?.response?.data?.detail || "Could not register term timeline." });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
