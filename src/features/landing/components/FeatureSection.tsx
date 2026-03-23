@@ -77,7 +77,7 @@ const FeatureSection = () => {
              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center mb-6 text-indigo-500">
                 <Clock className="w-6 h-6" />
              </div>
-             <h3 className="text-2xl font-black mb-2 font-['Crimson_Pro'] text-[#0C4A6E] dark:text-white">Temporal Efficiency</h3>
+             <h3 className="text-2xl font-black mb-2 font-['Crimson_Pro'] text-[#0C4A6E] dark:text-white">Time Saving</h3>
              <p className="text-sm text-[#0C4A6E]/70 dark:text-white/60 font-bold">
                 Reclaim 12-15 minutes of instructional time per session through automated validation.
              </p>

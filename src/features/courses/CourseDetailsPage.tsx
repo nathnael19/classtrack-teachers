@@ -241,7 +241,7 @@ const CourseDetailsPage = () => {
               <div className="relative flex-1 group">
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
                 <Input 
-                  placeholder="Search tactical assets by name or ID..." 
+                  placeholder="Search students by name or ID..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="h-14 pl-14 pr-10 rounded-2xl border-indigo-100/50 bg-white focus:ring-4 focus:ring-primary/5 transition-all font-medium font-['FiraSans']"
@@ -393,8 +393,8 @@ const CourseDetailsPage = () => {
               <Calendar className="w-10 h-10" />
             </div>
             <div className="max-w-md mx-auto space-y-4">
-              <h2 className="text-3xl font-black text-slate-900 leading-tight">Weekly Tactical Timetable</h2>
-              <p className="text-slate-500 font-medium leading-relaxed">Define consistent teaching slots for your sections. These will be visible to your students in their mobile dispatch.</p>
+              <h2 className="text-3xl font-black text-slate-900 leading-tight">Weekly Class Schedule</h2>
+              <p className="text-slate-500 font-medium leading-relaxed">Define consistent teaching slots for your sections. These will be visible to your students in their mobile app.</p>
               <AddScheduleDialog courseId={id!} onSuccess={() => refetch()} />
             </div>
           </div>
