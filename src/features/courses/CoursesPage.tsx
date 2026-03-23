@@ -100,7 +100,7 @@ const CoursesPage = () => {
         </div>
         <div className="flex flex-col items-center gap-1">
           <p className="text-muted-foreground font-black tracking-[0.3em] uppercase text-[10px]">Courses</p>
-          <span className="text-sm font-bold opacity-40">Syncing database records...</span>
+          <span className="text-sm font-bold opacity-40">Loading courses...</span>
         </div>
       </div>
     );

@@ -193,7 +193,7 @@ export const EditCourseModal = ({ course }: EditCourseModalProps) => {
                     <ShieldCheck className="w-4 h-4" />
                   </div>
                   <p className="text-[10px] font-bold text-slate-500 leading-tight">
-                    Confirming these changes will immediately update all related system instances and database projections.
+                    These changes will be applied immediately across the platform.
                   </p>
                 </div>
 
