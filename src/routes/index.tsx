@@ -14,6 +14,8 @@ import RegisterPage from "@/features/auth/RegisterPage";
 import LandingPage from "@/features/landing/LandingPage";
 import AdminDashboardPage from "@/features/admin/AdminDashboardPage";
 import UsersManagementPage from "@/features/admin/UsersManagementPage";
+import AddUserPage from "@/features/admin/AddUserPage";
+import SetupPasswordPage from "@/features/auth/SetupPasswordPage";
 import AcademicManagementPage from "@/features/admin/AcademicManagementPage";
 import AddCoursePage from "@/features/admin/AddCoursePage";
 import AddDepartmentPage from "@/features/admin/AddDepartmentPage";
@@ -54,6 +56,7 @@ export const router = createBrowserRouter([
           { path: "settings", element: <SettingsPage /> },
           { path: "admin/dashboard", element: <AdminDashboardPage /> },
           { path: "admin/users", element: <UsersManagementPage /> },
+          { path: "admin/users/new", element: <AddUserPage /> },
           { path: "admin/academic", element: <AcademicManagementPage /> },
           { path: "admin/academic/courses/new", element: <AddCoursePage /> },
           { path: "admin/academic/departments/new", element: <AddDepartmentPage /> },
@@ -71,5 +74,9 @@ export const router = createBrowserRouter([
   {
     path: "/register",
     element: <RegisterPage />,
+  },
+  {
+    path: "/setup-password",
+    element: <SetupPasswordPage />,
   },
 ]);
