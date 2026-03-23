@@ -74,7 +74,7 @@ export const CreateCourseModal = () => {
       <DialogTrigger asChild>
         <Button className="w-full md:w-auto gap-4 rounded-2xl px-10 h-14 bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] active:scale-95 text-sm font-black uppercase tracking-widest border-b-4 border-indigo-700 active:border-b-0 group">
           <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" strokeWidth={3} />
-          Deploy Module
+          Create Course
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden rounded-[2.5rem] border-none shadow-2xl bg-white focus:outline-none focus:ring-0">
@@ -201,7 +201,7 @@ export const CreateCourseModal = () => {
                     <ShieldCheck className="w-4 h-4" />
                   </div>
                   <p className="text-[10px] font-bold text-slate-500 leading-tight">
-                    By initializing this module, you confirm strict adherence to the academic protocol and resource allocation guidelines.
+                    By creating this course, you agree to follow the academic guidelines for resource management.
                   </p>
                 </div>
 

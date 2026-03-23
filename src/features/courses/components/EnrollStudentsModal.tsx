@@ -154,7 +154,7 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
               </div>
               <div className="h-10 w-[2px] bg-slate-100 hidden sm:block" />
               <div className="hidden sm:flex flex-col">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Target Module</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Selected Course</span>
                 <span className="text-sm font-black text-primary truncate max-w-[200px]">{courseName}</span>
               </div>
             </div>
@@ -164,7 +164,7 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
                 <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase tracking-widest px-3 py-1 italic">Batch Enrollment</Badge>
                 <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Biometric Database Ready</span>
+                  <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Ready to enroll</span>
                 </div>
               </div>
               <DialogTitle className="text-4xl font-black tracking-tighter text-slate-900 uppercase italic leading-none">
@@ -214,7 +214,7 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
                <div className="flex items-center gap-3 p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100">
                  <Info className="w-4 h-4 text-indigo-500" />
                  <p className="text-[10px] font-bold text-indigo-600 leading-tight uppercase tracking-wider">
-                   Strategy: Paste student data from Excel or CSV. Format: [Name][Tab/Comma][ID]
+                   Tip: Paste student data from Excel or CSV. Format: [Name][Tab/Comma][ID]
                  </p>
                </div>
                <textarea
