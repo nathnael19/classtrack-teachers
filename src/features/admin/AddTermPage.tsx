@@ -22,6 +22,13 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import api from "@/services/api";
+import { useQuery } from "@tanstack/react-query";
+
+interface Organization {
+  id: number;
+  name: string;
+  domain: string;
+}
 
 const termSchema = z.object({
   name: z.string().min(3, "Semester designation is required"),
@@ -29,6 +36,7 @@ const termSchema = z.object({
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().min(1, "End date is required"),
   status: z.enum(["Upcoming", "Active", "Completed"]),
+  organization_id: z.string().optional(),
 });
 
 type TermFormValues = z.infer<typeof termSchema>;
@@ -122,10 +130,15 @@ const AddTermPage = () => {
       startDate: "",
       endDate: "",
       status: "Upcoming",
+      organization_id: "",
     }
   });
 
   const formData = useWatch({ control });
+  const { data: organizations = [] } = useQuery<Organization[]>({
+    queryKey: ["organizations"],
+    queryFn: async () => (await api.get("/organizations/")).data,
+  });
 
   const onSubmit = async (data: TermFormValues) => {
     setIsSubmitting(true);
@@ -133,7 +146,8 @@ const AddTermPage = () => {
       await api.post('/terms/', {
         name: data.name,
         start_date: data.startDate,
-        end_date: data.endDate
+        end_date: data.endDate,
+        organization_id: data.organization_id ? parseInt(data.organization_id) : null,
       });
       toast.success("Term Created!", {
         description: `${data.name} has been added to the academic calendar.`,
