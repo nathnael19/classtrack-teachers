@@ -6,7 +6,7 @@ const FeatureSection = () => {
       <div className="max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-24">
           <h2 className="text-5xl md:text-7xl font-black mb-8 font-['Crimson_Pro'] text-[#0C4A6E] dark:text-white tracking-tight">
-            Advanced Academic Infrastructure
+            Modern Academic Platform
           </h2>
           <p className="text-xl md:text-2xl text-[#0C4A6E]/70 dark:text-white/60 font-['Atkinson_Hyperlegible'] font-medium">
             ClassTrack replaces outdated roll calls with a fast, modern system built for 21st-century educators.
@@ -21,7 +21,7 @@ const FeatureSection = () => {
              <div className="w-20 h-20 rounded-[2rem] bg-[#0C4A6E] flex items-center justify-center mb-8 shadow-2xl shadow-primary/20 transition-transform group-hover:scale-110 duration-500">
                 <Zap className="w-10 h-10 text-white animate-pulse" />
              </div>
-             <h3 className="text-4xl font-black mb-4 font-['Crimson_Pro'] text-[#0C4A6E] dark:text-white">Dynamic QR Protocol</h3>
+             <h3 className="text-4xl font-black mb-4 font-['Crimson_Pro'] text-[#0C4A6E] dark:text-white">QR Code Attendance</h3>
              <p className="text-lg text-[#0C4A6E]/70 dark:text-white/60 max-w-sm font-bold">
                 Proprietary QR refresh logic prevents proxy attendance by regenerating secure tokens every 5 seconds.
              </p>

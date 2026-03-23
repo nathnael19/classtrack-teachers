@@ -61,7 +61,7 @@ const LandingNav = () => {
             className="text-sm font-bold px-6 py-3 rounded-2xl bg-gradient-to-r from-[#0C4A6E] to-[#0EA5E9] dark:from-primary dark:to-[#38BDF8] text-white shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-1 transition-all flex items-center space-x-2 border border-white/10"
           >
             <UserPlus className="w-4 h-4" />
-            <span className="hidden sm:inline font-black tracking-wide">Enter Protocol</span>
+            <span className="hidden sm:inline font-black tracking-wide">Sign In</span>
           </Link>
         </div>
       </div>
