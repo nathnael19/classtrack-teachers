@@ -132,7 +132,7 @@ const LiveSessionPage = () => {
 
     ws.onopen = () => {
       console.log("📡 WebSocket connected to:", wsUrl);
-      toast.info("Live feed synchronized.", {
+      toast.info("Attendance feed connected.", {
         icon: <Signal className="w-4 h-4 text-emerald-500" />
       });
     };
@@ -172,7 +172,7 @@ const LiveSessionPage = () => {
 
     ws.onerror = (err) => {
       console.error("❌ WebSocket error:", err);
-      toast.error("Live feed connection error.");
+      toast.error("Attendance feed connection error.");
     };
 
     ws.onclose = (event) => {
@@ -299,7 +299,7 @@ const LiveSessionPage = () => {
       !stopSessionMutation.isPending
     ) {
       hasAutoTerminated.current = true;
-      toast.info("Session time expired. Terminating protocol...");
+      toast.info("Session time expired. Closing session...");
       stopSessionMutation.mutate();
     }
   }, [timeLeft, session?.id, isLoadingSession, isFetchingSession, stopSessionMutation]);
@@ -357,7 +357,7 @@ const LiveSessionPage = () => {
               </div>
               <div>
                 <CardTitle className="text-2xl font-black tracking-tighter uppercase italic text-slate-900">
-                  {session.topic || session.course?.name || 'Academic Module'}
+                  {session.topic || session.course?.name || 'Course Session'}
                 </CardTitle>
                 <CardDescription className="font-bold text-xs uppercase tracking-widest text-slate-400 mt-1">
                   {session.course?.code || 'CS-XXX'} • {session.room}
@@ -365,7 +365,7 @@ const LiveSessionPage = () => {
                 {session.notes && (
                   <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-100/50">
                     <p className="text-[10px] items-center gap-2 flex font-black text-slate-400 uppercase tracking-widest mb-1">
-                      <Signal className="w-3 h-3 text-primary" /> Operational Directives
+                      <Signal className="w-3 h-3 text-primary" /> Session Instructions
                     </p>
                     <p className="text-sm font-semibold text-slate-700 italic">"{session.notes}"</p>
                   </div>
@@ -398,19 +398,19 @@ const LiveSessionPage = () => {
               <div className="text-center space-y-2 my-10 relative">
                 <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] mb-3 ml-1">Attendance Code</h3>
                 <div className="text-5xl font-black tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-600 to-indigo-800 tabular-nums font-mono">
-                  {activeToken || 'SYST'}
+                  {activeToken || 'CODE'}
                 </div>
                 <div className="flex items-center justify-center gap-2 mt-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest tabular-nums">
-                    Rotates in {Math.floor(qrTimeLeft / 60)}:{String(qrTimeLeft % 60).padStart(2, '0')}
+                    Refresh in {Math.floor(qrTimeLeft / 60)}:{String(qrTimeLeft % 60).padStart(2, '0')}
                   </span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-6 w-full">
                 <div className="flex flex-col items-center p-6 rounded-[2rem] bg-white border border-indigo-50 shadow-sm transition-all hover:shadow-md">
-                  <div className="text-[9px] font-black text-slate-400 mb-2 uppercase tracking-widest">Timer Status</div>
+                  <div className="text-[9px] font-black text-slate-400 mb-2 uppercase tracking-widest">Time Remaining</div>
                   <div className={cn(
                     "text-3xl font-black tabular-nums tracking-tight",
                     timeLeft !== null && timeLeft < 300 ? 'text-red-500 animate-pulse' : 'text-slate-900'
@@ -419,7 +419,7 @@ const LiveSessionPage = () => {
                   </div>
                 </div>
                 <div className="flex flex-col items-center p-6 rounded-[2rem] bg-white border border-indigo-50 shadow-sm transition-all hover:shadow-md">
-                  <div className="text-[9px] font-black text-slate-400 mb-2 uppercase tracking-widest">Active Scans</div>
+                  <div className="text-[9px] font-black text-slate-400 mb-2 uppercase tracking-widest">Students Present</div>
                   <div className="text-3xl font-black text-slate-900 tabular-nums tracking-tight">
                     {attendance.length}
                   </div>
@@ -453,7 +453,7 @@ const LiveSessionPage = () => {
             <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl -mr-10 -mt-10" />
             <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-8 flex items-center gap-3">
               <Signal className="w-4 h-4 text-primary" />
-              Telemetry Data
+              Session Security
             </h3>
             <div className="space-y-6">
                <div className="flex justify-between items-center group">
@@ -470,7 +470,7 @@ const LiveSessionPage = () => {
                      <div className="p-2 bg-purple-500/10 rounded-xl text-purple-600 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
                        <ArrowRightLeft className="w-4 h-4" />
                      </div>
-                     <span className="text-xs font-black uppercase tracking-widest text-slate-500">Auth Type</span>
+                     <span className="text-xs font-black uppercase tracking-widest text-slate-500">Security Protocol</span>
                    </div>
                    <Badge className="bg-purple-500/10 text-purple-600 border-none text-[9px] font-black">HMAC-SHA256</Badge>
                 </div>
@@ -500,7 +500,7 @@ const LiveSessionPage = () => {
               </div>
               <div className="flex gap-4">
                  <div className="hidden sm:flex flex-col items-end gap-1 px-6 py-3 bg-white/60 border border-indigo-50 rounded-2xl shadow-sm">
-                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Population</span>
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Present</span>
                     <span className="font-black text-xl text-primary">{attendance.length} Verified</span>
                  </div>
               </div>
@@ -511,8 +511,8 @@ const LiveSessionPage = () => {
                   <TableRow className="border-none hover:bg-transparent">
                     <TableHead className="py-6 px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">Student</TableHead>
                     <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sec</TableHead>
-                    <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Credential ID</TableHead>
-                    <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Time-Stamp</TableHead>
+                    <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Student ID</TableHead>
+                    <TableHead className="text-[10px] font-black uppercase tracking-widest text-slate-400">Time</TableHead>
                     <TableHead className="text-right px-6 text-[10px] font-black uppercase tracking-widest text-slate-400">
                       <div className="flex items-center justify-end gap-4">
                         Status
@@ -530,42 +530,42 @@ const LiveSessionPage = () => {
                                   Manual Attendance
                                 </DialogTitle>
                                 <DialogDescription className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-2">
-                                  Mark attendance for students without smartphone hardware.
+                                  Manually mark attendance for students.
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="mt-8 relative">
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                                 <Input 
-                                  placeholder="IDENTIFY STUDENT BY NAME OR CREDENTIAL..." 
+                                  placeholder="Search by name or ID..." 
                                   className="bg-white/10 border-white/10 h-14 pl-12 rounded-2xl font-black text-xs uppercase tracking-[0.2em] placeholder:text-slate-600 focus-visible:ring-primary/50"
                                   value={searchQuery}
                                   onChange={(e) => setSearchQuery(e.target.value)}
                                 />
-                              </div>
-                            </div>
-                            <div className="bg-white p-4 max-h-[500px] overflow-auto custom-scrollbar">
-                              <Table>
-                                <TableHeader>
-                                  <TableRow className="border-none hover:bg-transparent bg-slate-50/50">
-                                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400 py-4">Student</TableHead>
-                                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400">Sec</TableHead>
-                                    <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400">ID</TableHead>
-                                    <TableHead className="text-right text-[9px] font-black uppercase tracking-widest text-slate-400">Action</TableHead>
+                             </div>
+                          </div>
+                          <div className="bg-white p-4 max-h-[500px] overflow-auto custom-scrollbar">
+                            <Table>
+                              <TableHeader>
+                                <TableRow className="border-none hover:bg-transparent bg-slate-50/50">
+                                  <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400 py-4">Student</TableHead>
+                                  <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400">Sec</TableHead>
+                                  <TableHead className="text-[9px] font-black uppercase tracking-widest text-slate-400">ID</TableHead>
+                                  <TableHead className="text-right text-[9px] font-black uppercase tracking-widest text-slate-400">Action</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {isLoadingEnrolled ? (
+                                  <TableRow>
+                                    <TableCell colSpan={3} className="text-center py-20">
+                                      <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary opacity-20" />
+                                    </TableCell>
                                   </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                  {isLoadingEnrolled ? (
-                                    <TableRow>
-                                      <TableCell colSpan={3} className="text-center py-20">
-                                        <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary opacity-20" />
-                                      </TableCell>
-                                    </TableRow>
-                                  ) : filteredStudents.length === 0 ? (
-                                    <TableRow>
-                                      <TableCell colSpan={3} className="text-center py-20 text-slate-400 font-bold italic text-sm">
-                                        No matching identity found in enrollment records.
-                                      </TableCell>
-                                    </TableRow>
+                                ) : filteredStudents.length === 0 ? (
+                                  <TableRow>
+                                    <TableCell colSpan={3} className="text-center py-20 text-slate-400 font-bold italic text-sm">
+                                      No students found.
+                                    </TableCell>
+                                  </TableRow>
                                   ) : filteredStudents.map((s) => (
                                     <TableRow key={s.id} className="group border-b border-slate-50">
                                       <TableCell className="py-4">
@@ -634,7 +634,7 @@ const LiveSessionPage = () => {
                         </Badge>
                       </TableCell>
                       <TableCell className="font-mono text-[10px] font-black text-slate-400 tracking-tighter uppercase">
-                        {student.student_code || 'S-UNKNOWN'}
+                        {student.student_code || 'ID-UNKNOWN'}
                       </TableCell>
                       <TableCell className="text-slate-500 font-bold">
                         <div className="flex items-center gap-2 tabular-nums">

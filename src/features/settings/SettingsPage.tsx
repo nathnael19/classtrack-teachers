@@ -168,11 +168,11 @@ const SettingsPage = () => {
 
   const handleResetPassword = () => {
     if (passwords.new !== passwords.confirm) {
-      toast.error('Cypher sequence mismatch.');
+      toast.error('Passwords do not match.');
       return;
     }
     if (!passwords.new) {
-      toast.error('Empty cypher sequence rejected.');
+      toast.error('Password cannot be empty.');
       return;
     }
     updateProfile.mutate({ password: passwords.new });
@@ -189,7 +189,7 @@ const SettingsPage = () => {
 
     // Validate size (1MB limit as per UI)
     if (file.size > 1024 * 1024) {
-      toast.error('Quantum Static overloaded: Keep payload under 1.0MB');
+      toast.error('File size too large: Keep under 1.0MB');
       return;
     }
 
@@ -207,9 +207,9 @@ const SettingsPage = () => {
       
       setFormData(prev => ({ ...prev, profile_picture_url: response.data.profile_picture_url }));
       queryClient.invalidateQueries({ queryKey: ['user-profile'] });
-      toast.success('Neural signature updated!');
+      toast.success('Profile picture updated!');
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'Identity sync projection failed.');
+      toast.error(error.response?.data?.detail || 'Profile update failed.');
     } finally {
       setIsUploading(false);
       setIsRotating(false);
@@ -237,13 +237,13 @@ const SettingsPage = () => {
       <div className="mb-16 pt-8 space-y-4">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em]">
           <Sparkles className="w-3 h-3 fill-current" />
-          System Core Configuration
+          User Settings
         </div>
         <h1 className="text-6xl font-black tracking-tighter text-slate-900 leading-tight">
-          System <span className="italic text-primary">Preferences</span>
+          Account <span className="italic text-primary">Settings</span>
         </h1>
         <p className="text-slate-500 text-xl font-medium max-w-xl">
-          Orchestrate your workspace environment and secure multi-factor authentication protocols.
+          Manage your profile, security, and preferences.
         </p>
       </div>
 
@@ -255,11 +255,11 @@ const SettingsPage = () => {
               <div className="p-4 bg-primary/10 rounded-2xl text-primary group-hover:rotate-12 transition-transform duration-500">
                 <User className="w-8 h-8" />
               </div>
-              Identity Profile
+              My Profile
             </h2>
             <div className="flex items-center gap-3 px-6 py-2 bg-slate-100 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
               <RefreshCw className={`w-3 h-3 ${updateProfile.isPending ? 'animate-spin text-primary' : ''}`} />
-              {updateProfile.isPending ? 'Syncing' : 'Persistent'}
+              {updateProfile.isPending ? 'Saving' : 'Saved'}
             </div>
           </div>
           
@@ -301,16 +301,16 @@ const SettingsPage = () => {
                 </Button>
               </div>
               <div className="text-center md:text-left space-y-2">
-                <h3 className="text-2xl font-black text-slate-900 tracking-tight">{profile?.role.toUpperCase()} ENTITY</h3>
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">{profile?.role.toUpperCase()} PROFILE</h3>
                 <p className="text-xs font-black text-slate-400 uppercase tracking-[0.4em] leading-relaxed">
-                  Format: Multi-Vector Bio-Link <br/> Threshold: 1.0MB Quantum Static
+                  Recommended size: Less than 1MB
                 </p>
               </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               <div className="space-y-4">
-                <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Legal Designation</Label>
+                <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Full Name</Label>
                 <div className="relative group">
                   <User className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors" />
                   <Input 
@@ -323,7 +323,7 @@ const SettingsPage = () => {
                 </div>
               </div>
               <div className="space-y-4">
-                <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Network Identifier (EMail)</Label>
+                <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Email Address</Label>
                 <div className="relative group">
                   <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors" />
                   <Input 
@@ -339,7 +339,7 @@ const SettingsPage = () => {
 
               {/* Shared Additional Fields */}
               <div className="space-y-4">
-                <Label htmlFor="phone" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Comms Link (Phone)</Label>
+                <Label htmlFor="phone" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Phone Number</Label>
                 <div className="relative group">
                   <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors" />
                   <Input 
@@ -354,7 +354,7 @@ const SettingsPage = () => {
               </div>
 
               <div className="space-y-4">
-                <Label htmlFor="dob" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Origin Date (DOB)</Label>
+                <Label htmlFor="dob" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Date of Birth</Label>
                 <div className="relative group">
                   <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors" />
                   <Input 
@@ -368,7 +368,7 @@ const SettingsPage = () => {
               </div>
 
               <div className="space-y-4">
-                <Label htmlFor="em_name" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Emergency Proxy name</Label>
+                <Label htmlFor="em_name" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Emergency Contact Name</Label>
                 <div className="relative group">
                   <HeartPulse className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors" />
                   <Input 
@@ -383,7 +383,7 @@ const SettingsPage = () => {
               </div>
 
               <div className="space-y-4">
-                <Label htmlFor="em_phone" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Emergency Proxy link</Label>
+                <Label htmlFor="em_phone" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Emergency Contact Phone</Label>
                 <div className="relative group">
                   <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors" />
                   <Input 
@@ -402,7 +402,7 @@ const SettingsPage = () => {
             {profile?.role === 'student' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-6 border-t border-slate-100/50">
                 <div className="space-y-4">
-                  <Label htmlFor="program" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Academic Protocol (Program)</Label>
+                  <Label htmlFor="program" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Program / Degree</Label>
                   <div className="relative group">
                     <GraduationCap className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-indigo-500 transition-colors" />
                     <Input 
@@ -436,7 +436,7 @@ const SettingsPage = () => {
             {(profile?.role === 'lecturer' || profile?.role === 'admin') && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-6 border-t border-slate-100/50">
                 <div className="space-y-4">
-                  <Label htmlFor="title" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Academic Rank/Title</Label>
+                  <Label htmlFor="title" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Title</Label>
                   <div className="relative group">
                     <Briefcase className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-purple-500 transition-colors" />
                     <Input 
@@ -451,7 +451,7 @@ const SettingsPage = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <Label htmlFor="office_location" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Command Center (Office Location)</Label>
+                  <Label htmlFor="office_location" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Office Location</Label>
                   <div className="relative group">
                     <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-purple-500 transition-colors" />
                     <Input 
@@ -466,7 +466,7 @@ const SettingsPage = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  <Label htmlFor="office_hours" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Active Frequencies (Office Hours)</Label>
+                  <Label htmlFor="office_hours" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Office Hours</Label>
                   <div className="relative group">
                     <Clock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-purple-500 transition-colors" />
                     <Input 
@@ -481,7 +481,7 @@ const SettingsPage = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  <Label htmlFor="linkedin" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">External Link (LinkedIn)</Label>
+                  <Label htmlFor="linkedin" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">LinkedIn Profile</Label>
                   <div className="relative group">
                     <Globe className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-purple-500 transition-colors" />
                     <Input 
@@ -498,14 +498,14 @@ const SettingsPage = () => {
             )}
           </CardContent>
           <div className="px-12 py-10 border-t border-slate-100 bg-slate-50/50 backdrop-blur-md flex justify-end items-center gap-6">
-            {updateProfile.isPending && <span className="text-[10px] font-black text-primary animate-pulse tracking-widest uppercase">Transmitting...</span>}
+            {updateProfile.isPending && <span className="text-[10px] font-black text-primary animate-pulse tracking-widest uppercase">Saving...</span>}
             <Button 
               onClick={handleSaveProfile} 
               disabled={updateProfile.isPending} 
               className="gap-4 rounded-3xl px-12 h-16 bg-slate-900 hover:bg-slate-800 text-white shadow-2xl shadow-slate-900/20 active:scale-95 transition-all font-black text-xs uppercase tracking-widest group"
             >
               <Check className="w-5 h-5 group-hover:scale-125 transition-transform" /> 
-              Persist Identity
+              Save Changes
             </Button>
           </div>
         </div>
@@ -517,14 +517,14 @@ const SettingsPage = () => {
               <div className="p-4 bg-slate-900/10 rounded-2xl text-slate-900 group-hover:scale-110 transition-transform duration-500">
                 <Lock className="w-8 h-8" />
               </div>
-              Vault Access Cyphers
+              Security & Password
             </h2>
           </div>
           
           <CardContent className="p-12 space-y-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
               <div className="space-y-4">
-                <Label htmlFor="new-pass" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">New Sequence</Label>
+                <Label htmlFor="new-pass" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">New Password</Label>
                 <div className="relative group">
                   <Shield className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-slate-900 transition-colors" />
                   <Input 
@@ -538,7 +538,7 @@ const SettingsPage = () => {
                 </div>
               </div>
               <div className="space-y-4">
-                <Label htmlFor="confirm-pass" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Confirm Sequence</Label>
+                <Label htmlFor="confirm-pass" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Confirm Password</Label>
                 <div className="relative group">
                   <Shield className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-slate-900 transition-colors" />
                   <Input 
@@ -554,7 +554,7 @@ const SettingsPage = () => {
             </div>
             <div className="p-6 bg-slate-50 rounded-3xl flex items-center gap-4 border border-slate-100">
                 <div className="w-3 h-3 rounded-full bg-slate-400 opacity-20" />
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-relaxed">Vault protocols require 12+ characters with high entropy markers for tactical parity.</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-relaxed">Passwords should be at least 12 characters long for better security.</p>
             </div>
           </CardContent>
           <div className="px-12 py-10 border-t border-slate-100 bg-slate-50/50 backdrop-blur-md flex justify-end">
@@ -571,14 +571,14 @@ const SettingsPage = () => {
               <div className="p-4 bg-emerald-500/10 rounded-2xl text-emerald-600 group-hover:rotate-6 transition-transform">
                 <Smartphone className="w-8 h-8" />
               </div>
-              Orchestration Defaults
+              Attendance Settings
             </h2>
           </div>
           
           <CardContent className="p-12 space-y-10">
              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div className="space-y-4">
-                  <Label htmlFor="def-duration" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Temporal Window (MINS)</Label>
+                  <Label htmlFor="def-duration" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Default Session Duration (min)</Label>
                   <Input 
                     id="def-duration" 
                     type="number" 
@@ -588,7 +588,7 @@ const SettingsPage = () => {
                   />
                 </div>
                 <div className="space-y-4">
-                  <Label htmlFor="def-radius" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Geospatial Radius (METERS)</Label>
+                  <Label htmlFor="def-radius" className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 ml-2">Attendance Radius (meters)</Label>
                   <Input 
                     id="def-radius" 
                     type="number" 
@@ -598,11 +598,11 @@ const SettingsPage = () => {
                   />
                 </div>
              </div>
-             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest bg-emerald-500/5 p-6 rounded-3xl border border-emerald-500/10">Default parameters for new class sessions. Dynamically inherited during initialization.</p>
+             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest bg-emerald-500/5 p-6 rounded-3xl border border-emerald-500/10">Default settings for new class sessions.</p>
           </CardContent>
           <div className="px-12 py-10 border-t border-slate-100 bg-emerald-500/5 backdrop-blur-md flex justify-end">
              <Button onClick={handleSaveOrchestration} disabled={updateProfile.isPending} className="gap-4 rounded-3xl px-12 h-16 bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xl shadow-emerald-500/20 active:scale-95 transition-all font-black text-xs uppercase tracking-widest">
-               Update Orchestration Core
+               Save Settings
              </Button>
           </div>
         </div>
