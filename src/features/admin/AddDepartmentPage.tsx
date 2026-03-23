@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import api from "@/services/api";
 
 const deptSchema = z.object({
   name: z.string().min(3, "Department name must be at least 3 characters"),
@@ -111,14 +112,18 @@ const AddDepartmentPage = () => {
 
   const onSubmit = async (data: DeptFormValues) => {
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log("Ultra Premium Dept Submit:", data);
-    toast.success("Department Node Synthesized!", {
-      description: `${data.name} is now registered in the academic infrastructure.`,
-      icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
-    });
-    setIsSubmitting(false);
-    navigate("/admin/academic");
+    try {
+      await api.post('/departments/', { name: data.name });
+      toast.success("Department Node Synthesized!", {
+        description: `${data.name} is now registered in the academic infrastructure.`,
+        icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />,
+      });
+      navigate("/admin/academic");
+    } catch (error: any) {
+      toast.error("Synthesis Failed", { description: error?.response?.data?.detail || "Could not register department." });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
