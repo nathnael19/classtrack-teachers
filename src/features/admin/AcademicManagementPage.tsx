@@ -6,7 +6,8 @@ import {
   Plus, BookOpen, Building2, MapPin, CalendarDays, 
   Search, Layers, Globe, Clock,
   ChevronRight, Users, Trash2, Pencil,
-  TrendingUp, Activity, BarChart3, GraduationCap
+  TrendingUp, Activity, BarChart3, GraduationCap,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import api from "@/services/api";
@@ -20,6 +21,14 @@ interface Course {
   student_count: number;
   is_active: boolean;
   description?: string;
+}
+
+interface Department {
+  id: number;
+  name: string;
+  user_count: number;
+  course_count: number;
+  organization_id?: number;
 }
 
 const AnimatedNumber = ({ value }: { value: number }) => {
@@ -65,23 +74,33 @@ const AcademicManagementPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("courses");
   const [courses, setCourses] = useState<Course[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [isCoursesLoading, setIsCoursesLoading] = useState(true);
+  const [isDeptsLoading, setIsDeptsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.get("/courses/");
-        setCourses(response.data);
+        const [coursesRes, deptsRes] = await Promise.all([
+          api.get("/courses/"),
+          api.get("/departments/")
+        ]);
+        setCourses(coursesRes.data);
+        setDepartments(deptsRes.data);
       } catch (error) {
-        console.error("Failed to fetch courses:", error);
-        toast.error("Critical failure during course vector synchronization");
+        console.error("Failed to fetch academic vectors:", error);
+        toast.error("Critical failure during academic vector synchronization");
       } finally {
-        setIsLoading(false);
+        setIsCoursesLoading(false);
+        setIsDeptsLoading(false);
       }
     };
 
-    fetchCourses();
+    fetchData();
   }, []);
+
+  const featuredDept = departments[0];
+  const otherDepts = departments.slice(1);
 
   return (
     <div className="relative space-y-10 font-sans p-4 mb-20">
@@ -156,7 +175,7 @@ const AcademicManagementPage = () => {
               </div>
             </button>
 
-            {isLoading ? (
+            {isCoursesLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
                 <GlassCard key={i} className="col-span-12 md:col-span-4 lg:col-span-3 p-8 group h-full animate-pulse">
                   <div className="flex justify-between items-start mb-6">
@@ -217,71 +236,83 @@ const AcademicManagementPage = () => {
 
         {activeTab === "departments" && (
           <div className="grid grid-cols-12 gap-6">
-            {/* Hero / Featured Dept */}
-            <GlassCard className="col-span-12 lg:col-span-7 p-10 flex flex-col justify-between overflow-hidden relative group" noHover>
-              <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-indigo-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
-              <div className="relative z-10 space-y-6">
-                 <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-[2rem] bg-indigo-600 flex items-center justify-center text-white shadow-2xl shadow-indigo-500/40">
-                       <Building2 className="w-8 h-8" />
-                    </div>
-                    <div>
-                       <h2 className="text-3xl font-black tracking-tighter leading-none">School of Computer Science</h2>
-                       <p className="text-muted-foreground font-medium mt-1">Academic Nucleus / Established 1998</p>
-                    </div>
-                 </div>
-                 <div className="grid grid-cols-3 gap-8 pt-6 border-t border-white/10">
-                    {[
-                      { label: "Faculty", value: 42, icon: Users },
-                      { label: "Grants", value: "$4.2M", icon: Globe },
-                      { label: "Assets", value: 156, icon: Layers },
-                    ].map((idx) => (
-                      <div key={idx.label} className="space-y-1">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <idx.icon className="w-3 h-3" />
-                          <span className="text-[10px] font-black uppercase tracking-widest">{idx.label}</span>
+            {isDeptsLoading ? (
+              <div className="col-span-12 py-20 text-center">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto opacity-20 mb-4" />
+                <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 italic">Syncing Departmental Matrix...</p>
+              </div>
+            ) : departments.length > 0 ? (
+              <>
+                {/* Hero / Featured Dept */}
+                <GlassCard className="col-span-12 lg:col-span-7 p-10 flex flex-col justify-between overflow-hidden relative group" noHover>
+                  <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-indigo-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
+                  <div className="relative z-10 space-y-6">
+                    <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 rounded-[2rem] bg-indigo-600 flex items-center justify-center text-white shadow-2xl shadow-indigo-500/40">
+                           <Building2 className="w-8 h-8" />
                         </div>
-                        <p className="text-2xl font-black tracking-tighter">{idx.value}</p>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-              <div className="mt-10 flex gap-4">
-                 <Button className="rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white px-8 font-black uppercase tracking-widest text-[10px]">Configure Pillar</Button>
-                 <Button variant="outline" className="rounded-2xl border-white/20 px-8 font-black uppercase tracking-widest text-[10px] backdrop-blur-md">View Roster</Button>
-              </div>
-            </GlassCard>
-
-            {/* Other Depts Grid */}
-            <div className="col-span-12 lg:col-span-5 grid grid-cols-1 gap-6">
-              {[
-                { name: "Faculty of Applied Mathematics", head: "Prof. Robert Chen", staff: 28, color: "text-rose-500", bg: "bg-rose-500/10" },
-                { name: "Institute of Natural Sciences", head: "Dr. Elena Volkov", staff: 56, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-              ].map((dept) => (
-                <GlassCard key={dept.name} className="p-6 flex items-center justify-between group">
-                   <div className="flex items-center gap-6">
-                      <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner border border-white/10", dept.bg)}>
-                         <Activity className={cn("w-6 h-6", dept.color)} />
-                      </div>
-                      <div>
-                         <h3 className="text-lg font-black tracking-tight leading-tight group-hover:text-indigo-500 transition-colors">{dept.name}</h3>
-                         <p className="text-xs font-bold text-muted-foreground mt-1 tracking-tight italic">Head: {dept.head}</p>
-                      </div>
-                   </div>
-                   <div className="flex flex-col items-end">
-                      <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Staff Vector</span>
-                      <span className="text-xl font-black italic">{dept.staff}</span>
-                   </div>
+                        <div>
+                           <h2 className="text-3xl font-black tracking-tighter leading-none">{featuredDept.name}</h2>
+                           <p className="text-muted-foreground font-medium mt-1 uppercase tracking-widest text-[10px]">Academic Nucleus / ID: {featuredDept.id}</p>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-8 pt-6 border-t border-white/10">
+                        {[
+                          { label: "Faculty", value: featuredDept.user_count, icon: Users },
+                          { label: "Courses", value: featuredDept.course_count, icon: BookOpen },
+                          { label: "Assets", value: 156, icon: Layers }, // Placeholder
+                        ].map((stat) => (
+                          <div key={stat.label} className="space-y-1">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <stat.icon className="w-3 h-3" />
+                              <span className="text-[10px] font-black uppercase tracking-widest">{stat.label}</span>
+                            </div>
+                            <p className="text-2xl font-black tracking-tighter italic">{stat.value}</p>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                  <div className="mt-10 flex gap-4">
+                     <Button className="rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white px-8 font-black uppercase tracking-widest text-[10px]">Configure Pillar</Button>
+                     <Button variant="outline" className="rounded-2xl border-white/20 px-8 font-black uppercase tracking-widest text-[10px] backdrop-blur-md">View Roster</Button>
+                  </div>
                 </GlassCard>
-              ))}
-              <button 
-                onClick={() => navigate("/admin/academic/departments/new")}
-                className="rounded-3xl border-2 border-dashed border-white/20 p-6 flex items-center justify-center gap-4 text-muted-foreground hover:border-indigo-500 hover:text-indigo-500 hover:bg-indigo-500/5 transition-all group"
-              >
-                <Plus className="w-5 h-5 group-hover:scale-125 transition-transform" />
-                <span className="font-black uppercase tracking-widest text-[10px]">Initialize New Dept Pillar</span>
-              </button>
-            </div>
+
+                {/* Other Depts Grid */}
+                <div className="col-span-12 lg:col-span-5 grid grid-cols-1 gap-6">
+                  {otherDepts.map((dept) => (
+                    <GlassCard key={dept.id} className="p-6 flex items-center justify-between group">
+                       <div className="flex items-center gap-6">
+                          <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner border border-white/10 bg-indigo-500/10")}>
+                             <Activity className={cn("w-6 h-6 text-indigo-500")} />
+                          </div>
+                          <div>
+                             <h3 className="text-lg font-black tracking-tight leading-tight group-hover:text-indigo-500 transition-colors uppercase italic">{dept.name}</h3>
+                             <p className="text-xs font-bold text-muted-foreground mt-1 tracking-tight italic">Courses: {dept.course_count}</p>
+                          </div>
+                       </div>
+                       <div className="flex flex-col items-end">
+                          <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Staff Vector</span>
+                          <span className="text-xl font-black italic">{dept.user_count}</span>
+                       </div>
+                    </GlassCard>
+                  ))}
+                  <button 
+                    onClick={() => navigate("/admin/academic/departments/new")}
+                    className="rounded-3xl border-2 border-dashed border-white/20 p-6 flex items-center justify-center gap-4 text-muted-foreground hover:border-indigo-500 hover:text-indigo-500 hover:bg-indigo-500/5 transition-all group"
+                  >
+                    <Plus className="w-5 h-5 group-hover:scale-125 transition-transform" />
+                    <span className="font-black uppercase tracking-widest text-[10px]">Initialize New Dept Pillar</span>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="col-span-12 py-20 text-center">
+                 <Building2 className="w-12 h-12 mx-auto opacity-20 mb-4" />
+                 <p className="text-xs font-black uppercase tracking-[0.3em] opacity-40 italic">Institution structure uninitialized.</p>
+                 <Button onClick={() => navigate("/admin/academic/departments/new")} variant="outline" className="mt-6 rounded-2xl font-black uppercase tracking-widest text-[10px] px-8">Seed First Department</Button>
+              </div>
+            )}
           </div>
         )}
 
