@@ -86,7 +86,7 @@ const LoginPage = () => {
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-5">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Command Identity</Label>
+                  <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Email Address</Label>
                   <div className="relative group">
                     <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors duration-300">
                       <Mail className="w-5 h-5" />
@@ -105,7 +105,7 @@ const LoginPage = () => {
 
                 <div className="space-y-2">
                   <div className="flex justify-between items-center px-1">
-                    <Label htmlFor="pass" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Security Cypher</Label>
+                    <Label htmlFor="pass" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Password</Label>
                     <button type="button" className="text-[10px] font-black text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 transition-colors uppercase tracking-widest cursor-pointer">Reset</button>
                   </div>
                   <div className="relative group">
@@ -137,7 +137,7 @@ const LoginPage = () => {
                   </div>
                 ) : (
                   <>
-                    <span className="tracking-wide">Initialize Session</span>
+                    <span className="tracking-wide">Login</span>
                     <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
                   </>
                 )}

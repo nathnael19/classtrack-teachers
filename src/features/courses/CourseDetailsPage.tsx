@@ -88,7 +88,7 @@ const CourseDetailsPage = () => {
   });
 
   const handleDeleteSchedule = async (scheduleId: number) => {
-    if (!window.confirm("Are you sure you want to decommission this tactical slot?")) return;
+    if (!window.confirm("Are you sure you want to delete this schedule slot?")) return;
     try {
       await api.delete(`/courses/schedules/${scheduleId}`);
       refetch();
@@ -126,19 +126,19 @@ const CourseDetailsPage = () => {
           <div className="p-1.5 rounded-lg group-hover:bg-primary/10 transition-colors">
             <ChevronLeft className="w-4 h-4" />
           </div>
-          <span className="text-xs font-black uppercase tracking-widest">Back to Modules</span>
+          <span className="text-xs font-black uppercase tracking-widest">Back to Courses</span>
         </Link>
         
         <div className="flex items-end justify-between">
           <div className="space-y-2">
             <Badge variant="outline" className="rounded-md border-primary/20 text-primary font-mono text-[10px] uppercase tracking-widest px-3 py-1 bg-primary/5">
-              Ref: {course.code}
+              Code: {course.code}
             </Badge>
             <h1 className="text-5xl font-black tracking-tight text-foreground">
               {course.name}
             </h1>
             <p className="text-muted-foreground font-semibold">
-              Real-time academic performance and student engagement analytics.
+              Track attendance and student performance in real-time.
             </p>
           </div>
           
@@ -170,7 +170,7 @@ const CourseDetailsPage = () => {
             activeTab === 'students' ? "bg-white text-primary border border-primary/20 shadow-sm" : "text-muted-foreground hover:bg-white/50"
           )}
         >
-          Student Registry
+          Students
         </button>
         <button 
           onClick={() => setActiveTab('schedule')}
@@ -179,7 +179,7 @@ const CourseDetailsPage = () => {
             activeTab === 'schedule' ? "bg-white text-primary border border-primary/20 shadow-sm" : "text-muted-foreground hover:bg-white/50"
           )}
         >
-          Weekly Timetable
+          Schedule
         </button>
       </div>
 
@@ -187,7 +187,7 @@ const CourseDetailsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
           { 
-            label: "Deployed Assets", 
+            label: "Students", 
             value: course.student_count, 
             sub: "Total Students", 
             icon: Users,
@@ -195,7 +195,7 @@ const CourseDetailsPage = () => {
             bg: "bg-blue-50"
           },
           { 
-            label: "Mission Count", 
+            label: "Sessions", 
             value: course.total_sessions, 
             sub: "Total Sessions", 
             icon: Calendar,
@@ -203,7 +203,7 @@ const CourseDetailsPage = () => {
             bg: "bg-emerald-50"
           },
           { 
-            label: "Strategic Yield", 
+            label: "Attendance Rate", 
             value: `${Math.round(course.average_attendance)}%`, 
             sub: "Avg. Attendance", 
             icon: TrendingUp,
@@ -249,7 +249,7 @@ const CourseDetailsPage = () => {
               </div>
               <Button variant="outline" className="rounded-2xl h-14 px-8 border-indigo-100 hover:bg-primary/5 gap-3 font-black text-xs uppercase tracking-widest transition-all">
                 <Filter className="w-4 h-4 text-muted-foreground" />
-                Intelligence
+                Filter
               </Button>
             </div>
             
@@ -264,11 +264,11 @@ const CourseDetailsPage = () => {
             <Table>
               <TableHeader className="bg-slate-50/50 border-b border-indigo-50/50">
                 <TableRow className="hover:bg-transparent border-none">
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40 w-[300px]">Student Asset</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40 w-[300px]">Student</TableHead>
                   <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Sec</TableHead>
                   <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">University ID</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Engagement</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Temporal Activity</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Attendance</TableHead>
+                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Last Seen</TableHead>
                   <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40">Status</TableHead>
                   <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-muted-foreground/40 text-right">Actions</TableHead>
                 </TableRow>
@@ -287,7 +287,7 @@ const CourseDetailsPage = () => {
                           </span>
                           <div className="flex items-center gap-2 opacity-50">
                              <Mail className="w-3 h-3" />
-                             <span className="text-[10px] font-black uppercase tracking-widest">Digital ID: {student.id}</span>
+                             <span className="text-[10px] font-black uppercase tracking-widest">ID: {student.id}</span>
                           </div>
                         </div>
                       </div>
@@ -306,7 +306,7 @@ const CourseDetailsPage = () => {
                       <div className="flex items-center gap-4">
                         <div className="flex flex-col gap-1.5 w-full max-w-[120px]">
                           <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-[#1E3A8A]">
-                            <span>Growth</span>
+                            <span>Attendance</span>
                             <span>{Math.round(student.attendance_rate)}%</span>
                           </div>
                           <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
@@ -331,7 +331,7 @@ const CourseDetailsPage = () => {
                           <span className="font-black text-sm text-foreground">
                             {student.last_seen ? format(new Date(student.last_seen), 'MMM dd, HH:mm') : 'Never'}
                           </span>
-                          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Last Engagement</span>
+                          <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Last Seen</span>
                         </div>
                       </div>
                     </TableCell>
@@ -356,7 +356,7 @@ const CourseDetailsPage = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-indigo-50 shadow-xl">
-                          <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2 py-2">Engagement Control</DropdownMenuLabel>
+                          <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-2 py-2">Actions</DropdownMenuLabel>
                           <DropdownMenuItem className="rounded-xl p-3 gap-3 font-bold text-sm cursor-pointer">
                             <Mail className="w-4 h-4" />
                             Send Notification
@@ -379,8 +379,8 @@ const CourseDetailsPage = () => {
                   <Search className="w-10 h-10" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-foreground">No tactical matches found</h3>
-                  <p className="text-muted-foreground font-medium">Verify your intelligence query or search parameters.</p>
+                  <h3 className="text-xl font-black text-foreground">No students found</h3>
+                  <p className="text-muted-foreground font-medium">Try adjusting your search parameters.</p>
                 </div>
               </div>
             )}
