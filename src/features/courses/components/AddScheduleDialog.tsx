@@ -191,12 +191,12 @@ export const AddScheduleDialog = ({ courseId, onSuccess }: AddScheduleDialogProp
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger className="h-12 rounded-xl border-indigo-100">
-                        <SelectValue placeholder="Select facility" />
+                        <SelectValue placeholder="Select classroom" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="rounded-xl border-indigo-50">
                       {rooms.length === 0 ? (
-                        <SelectItem disabled value="no-rooms">No facilities available</SelectItem>
+                        <SelectItem disabled value="no-rooms">No classrooms available</SelectItem>
                       ) : (
                         rooms.map((room) => (
                           <SelectItem key={room.id} value={room.name}>{room.building ? `${room.building} - ${room.name}` : room.name}</SelectItem>

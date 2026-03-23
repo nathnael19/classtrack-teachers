@@ -6,7 +6,6 @@ import {
   Radio,
   BarChart3,
   FileText,
-  MapPin,
   Settings,
   ChevronRight,
   PanelLeftClose,
@@ -86,7 +85,7 @@ const Sidebar = () => {
             {!sidebarCollapsed && (
               <div className="flex flex-col animate-in fade-in slide-in-from-left-2 duration-500">
                 <h2 className="text-2xl font-bold tracking-tight text-foreground leading-none">ClassTrack</h2>
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 mt-1.5">Enterprise</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 mt-1.5">Academic Edition</span>
               </div>
             )}
           </div>
