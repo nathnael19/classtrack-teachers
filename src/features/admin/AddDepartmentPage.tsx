@@ -136,6 +136,9 @@ const AddDepartmentPage = () => {
     try {
       await api.post('/departments/', {
         name: data.name,
+        head: data.head,
+        location: data.location,
+        description: data.description,
         organization_id: data.organization_id ? parseInt(data.organization_id) : null,
       });
       toast.success("Department Created!", {
