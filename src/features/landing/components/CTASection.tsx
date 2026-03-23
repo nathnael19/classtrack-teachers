@@ -17,8 +17,8 @@ const CTASection = () => {
             </div>
             
             <h2 className="text-5xl md:text-7xl font-black mb-8 text-[#0C4A6E] dark:text-white font-['Crimson_Pro'] tracking-tighter leading-none">
-              Ready to Reclaim <br />
-              <span className="italic text-primary">Your Teaching Time?</span>
+              Ready to Save <br />
+              <span className="italic text-primary">Teaching Time?</span>
             </h2>
             
             <p className="text-xl md:text-2xl text-[#0C4A6E]/70 dark:text-white/60 mb-12 max-w-2xl mx-auto font-['Atkinson_Hyperlegible'] font-bold leading-relaxed">
@@ -31,7 +31,7 @@ const CTASection = () => {
                 to="/register"
                 className="px-10 py-5 rounded-2xl bg-[#0C4A6E] dark:bg-primary text-white font-black text-xl shadow-2xl shadow-primary/30 hover:shadow-primary/50 hover:scale-105 active:scale-95 transition-all flex items-center space-x-3 group border border-white/10"
               >
-                <span>Initialize Protocol</span>
+                <span>Get Started</span>
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1.5 transition-transform" />
               </Link>
             </div>

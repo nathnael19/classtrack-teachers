@@ -2,7 +2,7 @@ import { Quote, Star } from 'lucide-react';
 
 const testimonials = [
   {
-    quote: "ClassTrack has fundamentally shifted how we monitor student engagement. The real-time verification protocol is leagues ahead of traditional systems.",
+    quote: "ClassTrack has fundamentally shifted how we monitor student engagement. The real-time attendance tracking is leagues ahead of traditional systems.",
     author: "Dr. Elena Vance",
     role: "Dean of Computer Science",
     institution: "St. Jude's University",
