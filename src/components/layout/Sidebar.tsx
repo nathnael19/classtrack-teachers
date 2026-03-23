@@ -28,7 +28,6 @@ const navItems = [
   { icon: Radio, label: 'Live Session', path: '/sessions/live' },
   { icon: BarChart3, label: 'Analytics', path: '/analytics' },
   { icon: FileText, label: 'Reports', path: '/reports' },
-  { icon: MapPin, label: 'Classrooms', path: '/classrooms' },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
