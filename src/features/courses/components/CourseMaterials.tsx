@@ -33,6 +33,7 @@ interface Material {
   title: string;
   description: string | null;
   file_path: string;
+  original_filename?: string;
   file_type: string;
   file_size: number;
   course_id: number;
@@ -114,6 +115,24 @@ const CourseMaterials: React.FC<CourseMaterialsProps> = ({ courseId, courseLectu
     formData.append('file', uploadData.file);
 
     uploadMutation.mutate(formData);
+  };
+
+  const handleDownload = async (materialId: number, filename: string) => {
+    try {
+      const response = await api.get(`/materials/${materialId}/download`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      toast.error('Failed to download material');
+    }
   };
 
   const formatFileSize = (bytes: number) => {
@@ -277,15 +296,13 @@ const CourseMaterials: React.FC<CourseMaterialsProps> = ({ courseId, courseLectu
                     </div>
                   </div>
 
-                  <a 
-                    href={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/static/${item.file_path}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                  <button 
+                    onClick={() => handleDownload(item.id, item.original_filename || item.title)}
                     className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-stone-100 text-stone-600 hover:bg-stone-900 hover:text-white font-black text-[10px] uppercase tracking-widest transition-all duration-300 no-underline"
                   >
                     <Download className="w-3.5 h-3.5" />
                     Download File
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
