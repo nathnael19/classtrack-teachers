@@ -124,69 +124,88 @@ const LiveSessionPage = () => {
   useEffect(() => {
     if (!session?.id) return;
 
-    // Derive WS URL from API URL
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
-    const wsUrl = apiUrl.replace(/^http/, 'ws') + `/sessions/${session.id}/ws`;
-    
-    const ws = new WebSocket(wsUrl);
+    let ws: WebSocket;
+    let reconnectTimer: ReturnType<typeof setTimeout>;
+    let isComponentMounted = true;
+    let reconnectAttempts = 0;
 
-    ws.onopen = () => {
-      console.log("📡 WebSocket connected to:", wsUrl);
-      toast.info("Attendance feed connected.", {
-        icon: <Signal className="w-4 h-4 text-emerald-500" />
-      });
+    const connectToWebSocket = () => {
+      if (!isComponentMounted) return;
+      
+      // Derive WS URL from API URL
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+      const wsUrl = apiUrl.replace(/^http/, 'ws') + `/sessions/${session.id}/ws`;
+      
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        reconnectAttempts = 0; // Reset on success
+        console.log("📡 WebSocket connected to:", wsUrl);
+        toast.info("Attendance feed connected.", {
+          icon: <Signal className="w-4 h-4 text-emerald-500" />,
+          id: 'ws-connection'
+        });
+      };
+
+      ws.onmessage = (event) => {
+        console.log("📥 WS Message received:", event.data);
+        try {
+          const message = JSON.parse(event.data);
+          if (message.type === 'attendance_recorded') {
+            const newRecord: AttendanceRecord = {
+              id: Date.now(),
+              student_id: message.student.id,
+              student_name: message.student.name,
+              student_code: message.student.student_id,
+              timestamp: message.student.timestamp,
+              status: message.student.status,
+              section: message.student.section,
+            };
+
+            // Optimistically update the query cache
+            queryClient.setQueryData(['session-attendance', session.id], (old: AttendanceRecord[] | undefined) => {
+              const list = old || [];
+              if (list.some(r => r.student_id === newRecord.student_id)) return list;
+              return [...list, newRecord];
+            });
+
+            toast.success(`📡 ${newRecord.student_name} just checked in!`, {
+              description: `ID: ${newRecord.student_code}`,
+              icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+            });
+          }
+        } catch (err) {
+          console.error("WebSocket message error:", err);
+        }
+      };
+
+      ws.onerror = (err) => {
+        console.error("❌ WebSocket error:", err);
+        if (reconnectAttempts === 0) {
+          toast.error("Feed connection lost. Reconnecting...", { id: 'ws-connection' });
+        }
+      };
+
+      ws.onclose = (event) => {
+        console.log(`🔌 WebSocket disconnected (code: ${event.code}). Retrying...`);
+        if (isComponentMounted) {
+          reconnectAttempts++;
+          // Exponential backoff up to 10 seconds
+          const delay = Math.min(1000 * Math.pow(1.5, reconnectAttempts), 10000);
+          reconnectTimer = setTimeout(connectToWebSocket, delay);
+        }
+      };
     };
 
-    ws.onmessage = (event) => {
-      console.log("📥 WS Message received:", event.data);
-      try {
-        const message = JSON.parse(event.data);
-        if (message.type === 'attendance_recorded') {
-          const newRecord: AttendanceRecord = {
-            id: Date.now(), // Temporary ID for list key if backend doesn't provide one in broadcast
-            student_id: message.student.id,
-            student_name: message.student.name,
-            student_code: message.student.student_id,
-            timestamp: message.student.timestamp,
-            status: message.student.status,
-            section: message.student.section,
-          };
+    connectToWebSocket();
 
-          // Optimistically update the query cache
-          queryClient.setQueryData(['session-attendance', session.id], (old: AttendanceRecord[] | undefined) => {
-            const list = old || [];
-            // Avoid duplicates
-            if (list.some(r => r.student_id === newRecord.student_id)) return list;
-            return [...list, newRecord];
-          });
-
-          toast.success(`📡 ${newRecord.student_name} just checked in!`, {
-            description: `ID: ${newRecord.student_code}`,
-            icon: <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-          });
-        }
-      } catch (err) {
-        console.error("WebSocket message error:", err);
+    return () => {
+      isComponentMounted = false;
+      clearTimeout(reconnectTimer);
+      if (ws) {
+        ws.close();
       }
     };
-
-    ws.onerror = (err) => {
-      console.error("❌ WebSocket error:", err);
-      toast.error("Attendance feed connection error.");
-    };
-
-    ws.onclose = (event) => {
-      console.log(`🔌 WebSocket disconnected (code: ${event.code}). Retrying in 5s...`);
-      const timer = setTimeout(() => {
-        // This will trigger a re-run of the useEffect because of the dependency on session?.id
-        // but we need to force it if session.id hasn't changed.
-        // Actually, just letting it close is fine for now as we can't easily force-retry
-        // without a state change. Adding a retry counter state would be better.
-      }, 5000);
-      return () => clearTimeout(timer);
-    };
-
-    return () => ws.close();
   }, [session?.id, queryClient]);
 
   // 3. Fetch All Enrolled Students (for manual marking)
