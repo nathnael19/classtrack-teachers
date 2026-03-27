@@ -165,14 +165,11 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" className="rounded-xl gap-4 py-4 w-full justify-start cursor-pointer hover:bg-primary/5 focus:bg-primary/5 group/item group transition-all duration-300">
-          <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-            <Users className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+        <Button variant="ghost" className="rounded-2xl h-14 px-8 border border-slate-200 hover:bg-primary/5 font-black text-xs uppercase tracking-widest gap-2 transition-all active:scale-95 group">
+          <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+            <Users className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
-          <div className="flex flex-col items-start translate-x-0 group-hover:translate-x-1 transition-transform">
-            <span className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 group-hover:text-primary/70 transition-colors leading-none mb-1">Module Access</span>
-            <span className="font-black text-sm uppercase tracking-wider text-slate-600 group-hover:text-slate-900 transition-colors">Enroll Students</span>
-          </div>
+          <span className="font-black text-sm uppercase tracking-wider text-slate-600 group-hover:text-slate-900 transition-colors">Enroll Students</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[95vw] sm:max-w-[900px] p-0 overflow-hidden rounded-[2rem] sm:rounded-[3rem] border-none shadow-2xl bg-white flex flex-col focus:outline-none focus:ring-0 max-h-[90vh] [&>button]:hidden">
@@ -202,6 +199,22 @@ export const EnrollStudentsModal = ({ courseId, courseName }: EnrollStudentsModa
                 <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.4em] text-slate-400 mb-0.5 sm:mb-1">IDENTITY TARGET</span>
                 <span className="text-sm sm:text-xl font-black text-slate-800 tracking-tight italic uppercase truncate">{courseName}</span>
               </div>
+            </div>
+
+            <div className="space-y-2 sm:space-y-3">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <Badge className="bg-primary text-white border-none text-[8px] sm:text-[10px] font-black uppercase tracking-[0.1em] sm:tracking-[0.2em] px-2 sm:px-4 py-1 sm:py-1.5 rounded-full shadow-lg shadow-primary/20">BATCH_OPS_v2.0</Badge>
+                <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-4 py-1 sm:py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                  <span className="text-[8px] sm:text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none">Socket Active</span>
+                </div>
+              </div>
+              <DialogDescription className="text-slate-400 font-bold uppercase text-[9px] tracking-widest">
+                Batch portal for multi-identity synchronization and enrollment.
+              </DialogDescription>
+              <DialogTitle className="text-2xl sm:text-5xl font-black tracking-tighter text-slate-900 uppercase italic leading-none block">
+                Bulk Enrollment
+              </DialogTitle>
             </div>
           </div>
         </div>
