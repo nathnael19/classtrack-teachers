@@ -1,12 +1,12 @@
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { 
-  ChevronLeft, 
-  Users, 
-  Calendar, 
-  TrendingUp, 
-  Search, 
-  Filter, 
+import {
+  ChevronLeft,
+  Users,
+  Calendar,
+  TrendingUp,
+  Search,
+  Filter,
   Download,
   MoreHorizontal,
   Mail,
@@ -38,6 +38,12 @@ import {
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
+  DropdownMenuSubContent,
 } from '@/components/ui/dropdown-menu';
 import { AddScheduleDialog } from './components/AddScheduleDialog';
 import { EnrollStudentsModal } from './components/EnrollStudentsModal';
@@ -84,6 +90,9 @@ interface CourseDetail {
 const CourseDetailsPage = () => {
   const { id } = useParams();
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilters, setStatusFilters] = useState<string[]>([]);
+  const [deptFilters, setDeptFilters] = useState<string[]>([]);
+  const [yearFilters, setYearFilters] = useState<number[]>([]);
   const [activeTab, setActiveTab] = useState<'students' | 'schedule' | 'materials'>('students');
   const { data: course, isLoading, refetch } = useQuery<CourseDetail>({
     queryKey: ['course', id],
@@ -103,14 +112,34 @@ const CourseDetailsPage = () => {
     }
   };
 
+  const availableDepartments = useMemo(() => {
+    if (!course?.students) return [];
+    const depts = new Set(course.students.map(s => s.department).filter(Boolean) as string[]);
+    return Array.from(depts).sort();
+  }, [course?.students]);
+
+  const availableYears = useMemo(() => {
+    if (!course?.students) return [];
+    const years = new Set(course.students.map(s => s.enrollment_year).filter(Boolean) as number[]);
+    return Array.from(years).sort((a,b) => b - a);
+  }, [course?.students]);
+
   const filteredStudents = useMemo(() => {
     if (!course?.students) return [];
-    return course.students.filter((student: StudentActivity) => 
-      student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.student_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.department?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [course?.students, searchQuery]);
+    return course.students.filter((student: StudentActivity) => {
+      const matchesSearch = student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        student.student_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        student.department?.toLowerCase().includes(searchQuery.toLowerCase());
+        
+      const matchesStatus = statusFilters.length === 0 || statusFilters.includes(student.status);
+      const matchesDept = deptFilters.length === 0 || (student.department && deptFilters.includes(student.department));
+      const matchesYear = yearFilters.length === 0 || (student.enrollment_year && yearFilters.includes(student.enrollment_year));
+      
+      return matchesSearch && matchesStatus && matchesDept && matchesYear;
+    });
+  }, [course?.students, searchQuery, statusFilters, deptFilters, yearFilters]);
+  
+  const activeFilterCount = statusFilters.length + deptFilters.length + yearFilters.length;
 
   if (isLoading) {
     return (
@@ -126,8 +155,8 @@ const CourseDetailsPage = () => {
     <div className="p-8 max-w-[1600px] mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header & Back Button */}
       <div className="flex flex-col gap-6">
-        <Link 
-          to="/courses" 
+        <Link
+          to="/courses"
           className="group flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors w-fit"
         >
           <div className="p-1.5 rounded-lg group-hover:bg-primary/10 transition-colors">
@@ -135,7 +164,7 @@ const CourseDetailsPage = () => {
           </div>
           <span className="text-xs font-black uppercase tracking-widest">Back to Courses</span>
         </Link>
-        
+
         <div className="flex items-end justify-between">
           <div className="space-y-2">
             <Badge variant="outline" className="rounded-md border-primary/20 text-primary font-mono text-[10px] uppercase tracking-widest px-3 py-1 bg-primary/5">
@@ -148,14 +177,14 @@ const CourseDetailsPage = () => {
               Track attendance and student performance in real-time.
             </p>
           </div>
-          
+
           <div className="flex items-center gap-3">
-              <EnrollStudentsModal courseId={course.id} courseName={course.name} />
-              
-              <Button variant="outline" className="rounded-2xl h-14 px-8 border-border hover:bg-primary/5 font-black text-xs uppercase tracking-widest gap-2">
-                <Download className="w-4 h-4" />
-                Export Report
-              </Button>
+            <EnrollStudentsModal courseId={course.id} courseName={course.name} />
+
+            <Button variant="outline" className="rounded-2xl h-14 px-8 border-border hover:bg-primary/5 font-black text-xs uppercase tracking-widest gap-2">
+              <Download className="w-4 h-4" />
+              Export Report
+            </Button>
             {activeTab === 'schedule' && (
               <AddScheduleDialog courseId={id!} onSuccess={() => refetch()} />
             )}
@@ -166,7 +195,7 @@ const CourseDetailsPage = () => {
 
       {/* Navigation Tabs */}
       <div className="flex gap-4 mb-8">
-        <button 
+        <button
           onClick={() => setActiveTab('students')}
           className={cn(
             "px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all",
@@ -175,7 +204,7 @@ const CourseDetailsPage = () => {
         >
           Students
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab('schedule')}
           className={cn(
             "px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all",
@@ -184,7 +213,7 @@ const CourseDetailsPage = () => {
         >
           Schedule
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab('materials')}
           className={cn(
             "px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center gap-2",
@@ -200,26 +229,26 @@ const CourseDetailsPage = () => {
       {activeTab === 'students' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
-            { 
-              label: "Students", 
-              value: course.student_count, 
-              sub: "Total Students", 
+            {
+              label: "Students",
+              value: course.student_count,
+              sub: "Total Students",
               icon: Users,
               color: "text-blue-600",
               bg: "bg-blue-50"
             },
-            { 
-              label: "Sessions", 
-              value: course.total_sessions, 
-              sub: "Total Sessions", 
+            {
+              label: "Sessions",
+              value: course.total_sessions,
+              sub: "Total Sessions",
               icon: Calendar,
               color: "text-emerald-600",
               bg: "bg-emerald-50"
             },
-            { 
-              label: "Attendance Rate", 
-              value: `${Math.round(course.average_attendance)}%`, 
-              sub: "Avg. Attendance", 
+            {
+              label: "Attendance Rate",
+              value: `${Math.round(course.average_attendance)}%`,
+              sub: "Avg. Attendance",
               icon: TrendingUp,
               color: "text-amber-600",
               bg: "bg-amber-50"
@@ -255,19 +284,129 @@ const CourseDetailsPage = () => {
             <div className="flex items-center gap-6 flex-1 max-w-2xl">
               <div className="relative flex-1 group">
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400 group-focus-within:text-stone-900 transition-colors" />
-                <Input 
-                  placeholder="Search students by name or ID..." 
+                <Input
+                  placeholder="Search students by name or ID..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="h-14 pl-14 pr-10 rounded-2xl border-stone-200 bg-white focus:ring-4 focus:ring-stone-900/5 transition-all font-medium"
                 />
               </div>
-              <Button variant="outline" className="rounded-2xl h-14 px-8 border-stone-200 hover:bg-stone-50 gap-3 font-black text-xs uppercase tracking-widest transition-all">
-                <Filter className="w-4 h-4 text-stone-500" />
-                Filter
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className={cn(
+                      "rounded-2xl h-14 px-8 border-stone-200 transition-all font-black text-xs uppercase tracking-widest gap-3",
+                      activeFilterCount > 0 
+                        ? "bg-stone-900 text-white hover:bg-stone-800 border-stone-900" 
+                        : "hover:bg-stone-50 text-stone-700"
+                    )}
+                  >
+                    <Filter className={cn("w-4 h-4", activeFilterCount > 0 ? "text-white" : "text-stone-500")} />
+                    Filter {activeFilterCount > 0 && `(${activeFilterCount})`}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-stone-200 shadow-xl">
+                  <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400 px-2 py-2">
+                    Active Filters
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-stone-100" />
+                  
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="rounded-xl py-2.5 px-3 font-bold text-sm text-stone-700 focus:bg-stone-100 cursor-pointer">
+                      Status {statusFilters.length > 0 && <span className="ml-auto text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">{statusFilters.length}</span>}
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                      <DropdownMenuSubContent className="w-48 p-2 rounded-2xl border-stone-200 shadow-xl animate-in zoom-in-95">
+                        {['Consistent', 'Moderate', 'At Risk', 'Inactive'].map((status) => (
+                          <DropdownMenuCheckboxItem
+                            key={status}
+                            checked={statusFilters.includes(status)}
+                            onCheckedChange={(checked) => {
+                              setStatusFilters(prev => 
+                                checked ? [...prev, status] : prev.filter(s => s !== status)
+                              );
+                            }}
+                            className="rounded-xl cursor-pointer py-2.5 px-3 font-bold text-sm text-stone-700 focus:bg-stone-100"
+                          >
+                            {status}
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
+
+                  {availableDepartments.length > 0 && (
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="rounded-xl py-2.5 px-3 font-bold text-sm text-stone-700 focus:bg-stone-100 cursor-pointer">
+                        Department {deptFilters.length > 0 && <span className="ml-auto text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">{deptFilters.length}</span>}
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent className="w-56 p-2 rounded-2xl border-stone-200 shadow-xl max-h-[300px] overflow-y-auto animate-in zoom-in-95">
+                          {availableDepartments.map((dept) => (
+                            <DropdownMenuCheckboxItem
+                              key={dept}
+                              checked={deptFilters.includes(dept)}
+                              onCheckedChange={(checked) => {
+                                setDeptFilters(prev => 
+                                  checked ? [...prev, dept] : prev.filter(d => d !== dept)
+                                );
+                              }}
+                              className="rounded-xl cursor-pointer py-2.5 px-3 font-bold text-xs text-stone-700 focus:bg-stone-100 line-clamp-1"
+                            >
+                              {dept}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                  )}
+
+                  {availableYears.length > 0 && (
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="rounded-xl py-2.5 px-3 font-bold text-sm text-stone-700 focus:bg-stone-100 cursor-pointer">
+                        Enrollment Year {yearFilters.length > 0 && <span className="ml-auto text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">{yearFilters.length}</span>}
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent className="w-40 p-2 rounded-2xl border-stone-200 shadow-xl animate-in zoom-in-95">
+                          {availableYears.map((year) => (
+                            <DropdownMenuCheckboxItem
+                              key={year}
+                              checked={yearFilters.includes(year)}
+                              onCheckedChange={(checked) => {
+                                setYearFilters(prev => 
+                                  checked ? [...prev, year] : prev.filter(y => y !== year)
+                                );
+                              }}
+                              className="rounded-xl cursor-pointer py-2.5 px-3 font-bold text-sm text-stone-700 focus:bg-stone-100"
+                            >
+                              {year}
+                            </DropdownMenuCheckboxItem>
+                          ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                  )}
+                  
+                  {activeFilterCount > 0 && (
+                    <>
+                      <DropdownMenuSeparator className="bg-stone-100 mt-2" />
+                      <button 
+                        onClick={() => {
+                          setStatusFilters([]);
+                          setDeptFilters([]);
+                          setYearFilters([]);
+                        }}
+                        className="w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 rounded-lg mt-1 transition-colors"
+                      >
+                        Clear All Filters
+                      </button>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            
+
             <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-stone-400">
               <Clock className="w-3 h-3" />
               Last Sync: {format(new Date(), 'HH:mm')}
@@ -303,8 +442,8 @@ const CourseDetailsPage = () => {
                             {student.name}
                           </span>
                           <div className="flex items-center gap-2 opacity-50">
-                             <Mail className="w-3 h-3" />
-                             <span className="text-[10px] font-black uppercase tracking-widest">ID: {student.id}</span>
+                            <Mail className="w-3 h-3" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">ID: {student.id}</span>
                           </div>
                         </div>
                       </div>
@@ -340,11 +479,11 @@ const CourseDetailsPage = () => {
                             <span>{Math.round(student.attendance_rate)}%</span>
                           </div>
                           <div className="h-1.5 w-full bg-stone-100 rounded-full overflow-hidden">
-                            <div 
+                            <div
                               className={cn(
                                 "h-full transition-all duration-1000",
                                 student.attendance_rate >= 80 ? "bg-stone-900" :
-                                student.attendance_rate >= 50 ? "bg-stone-600" : "bg-stone-400"
+                                  student.attendance_rate >= 50 ? "bg-stone-600" : "bg-stone-400"
                               )}
                               style={{ width: `${student.attendance_rate}%` }}
                             />
@@ -369,9 +508,9 @@ const CourseDetailsPage = () => {
                       <Badge className={cn(
                         "rounded-full px-4 py-1.5 font-black text-[9px] uppercase tracking-[0.2em] border-none shadow-sm whitespace-nowrap",
                         student.status === 'Consistent' ? "bg-stone-900 text-stone-50" :
-                        student.status === 'Moderate' ? "bg-stone-200 text-stone-700" :
-                        student.status === 'At Risk' ? "bg-yellow-100 text-yellow-700" :
-                        "bg-red-50 text-red-600"
+                          student.status === 'Moderate' ? "bg-stone-200 text-stone-700" :
+                            student.status === 'At Risk' ? "bg-yellow-100 text-yellow-700" :
+                              "bg-red-50 text-red-600"
                       )}>
                         {student.status === 'Consistent' && <ShieldCheck className="w-3 h-3 mr-1.5 inline" />}
                         {student.status === 'At Risk' && <AlertCircle className="w-3 h-3 mr-1.5 inline" />}
@@ -387,15 +526,15 @@ const CourseDetailsPage = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-stone-200 shadow-xl">
                           <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-stone-400 px-2 py-2">Actions</DropdownMenuLabel>
-                          
-                          <SendNotificationModal 
-                            studentId={student.id} 
-                            studentName={student.name} 
+
+                          <SendNotificationModal
+                            studentId={student.id}
+                            studentName={student.name}
                           />
-                          
-                          <StudentHistoryModal 
-                            studentId={student.id} 
-                            studentName={student.name} 
+
+                          <StudentHistoryModal
+                            studentId={student.id}
+                            studentName={student.name}
                             courseId={course.id}
                             courseName={course.name}
                           />
@@ -406,7 +545,7 @@ const CourseDetailsPage = () => {
                 ))}
               </TableBody>
             </Table>
-            
+
             {filteredStudents.length === 0 && (
               <div className="p-20 flex flex-col items-center justify-center text-center space-y-4">
                 <div className="w-20 h-20 rounded-[32px] bg-stone-50 flex items-center justify-center text-stone-200">
@@ -434,7 +573,7 @@ const CourseDetailsPage = () => {
                   No recurring teaching slots have been defined yet. Define your schedule to track attendance with precision.
                 </p>
                 <div className="pt-4 flex justify-center">
-                   <AddScheduleDialog courseId={id!} onSuccess={() => refetch()} />
+                  <AddScheduleDialog courseId={id!} onSuccess={() => refetch()} />
                 </div>
               </div>
             </div>
@@ -443,9 +582,9 @@ const CourseDetailsPage = () => {
               {[0, 1, 2, 3, 4, 5, 6].map((dayIndex) => {
                 const daySchedules = course.schedules.filter(s => s.day_of_week === dayIndex);
                 if (daySchedules.length === 0) return null;
-                
+
                 const dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][dayIndex];
-                
+
                 return (
                   <div key={dayIndex} className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-700">
                     <div className="flex items-center gap-6">
@@ -458,12 +597,12 @@ const CourseDetailsPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                       {daySchedules.sort((a, b) => a.start_time.localeCompare(b.start_time)).map((slot) => (
-                        <div 
-                          key={slot.id} 
+                        <div
+                          key={slot.id}
                           className="group relative bg-white p-10 rounded-[40px] border border-stone-200/60 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer overflow-hidden"
                         >
                           <div className="absolute top-0 right-0 w-32 h-32 bg-stone-900/5 rounded-full -mr-16 -mt-16 group-hover:bg-yellow-500/10 transition-colors duration-500" />
-                          
+
                           <div className="flex justify-between items-start mb-8 relative">
                             <div className="flex flex-col gap-1">
                               <span className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">Section</span>
@@ -471,8 +610,8 @@ const CourseDetailsPage = () => {
                                 {slot.section}
                               </div>
                             </div>
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               onClick={() => handleDeleteSchedule(slot.id)}
                               className="h-10 w-10 p-0 rounded-2xl hover:bg-red-50 hover:text-red-500 text-stone-300 transition-all"
                             >
@@ -511,7 +650,7 @@ const CourseDetailsPage = () => {
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="mt-8 pt-8 border-t border-stone-100 flex items-center justify-between">
                             <div className="flex -space-x-2">
                               {[1, 2, 3].map(i => (
@@ -531,9 +670,9 @@ const CourseDetailsPage = () => {
           )}
         </div>
       ) : (
-        <CourseMaterials 
-          courseId={Number(id)} 
-          courseLecturerId={course.lecturer_id} 
+        <CourseMaterials
+          courseId={Number(id)}
+          courseLecturerId={course.lecturer_id}
           lecturers={course.lecturers}
         />
       )}
