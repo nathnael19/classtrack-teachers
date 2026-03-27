@@ -36,7 +36,6 @@ import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/authStore';
 import { CreateCourseModal } from './components/CreateCourseModal';
 import { EditCourseModal } from './components/EditCourseModal';
-import { EnrollStudentsModal } from './components/EnrollStudentsModal';
 import { toast } from 'sonner';
 
 interface Course {
@@ -236,8 +235,6 @@ const CoursesPage = () => {
                         </DropdownMenuItem>
 
                         <EditCourseModal course={course} />
-
-                        <EnrollStudentsModal courseId={course.id} courseName={course.name} />
 
                         <DropdownMenuItem 
                           onClick={() => handleViewAnalytics(course.id, true)}
