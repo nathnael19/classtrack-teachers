@@ -41,6 +41,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { AddScheduleDialog } from './components/AddScheduleDialog';
+import { EnrollStudentsModal } from './components/EnrollStudentsModal';
 import CourseMaterials from './components/CourseMaterials';
 
 interface StudentActivity {
@@ -145,6 +146,8 @@ const CourseDetailsPage = () => {
           </div>
           
           <div className="flex items-center gap-3">
+              <EnrollStudentsModal courseId={course.id} courseName={course.name} />
+              
               <Button variant="outline" className="rounded-2xl h-14 px-8 border-border hover:bg-primary/5 font-black text-xs uppercase tracking-widest gap-2">
                 <Download className="w-4 h-4" />
                 Export Report
