@@ -6,7 +6,6 @@ import {
   Calendar,
   TrendingUp,
   Search,
-  Filter,
   Download,
   MoreHorizontal,
   Mail,
@@ -40,10 +39,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuPortal,
-  DropdownMenuSubContent,
 } from '@/components/ui/dropdown-menu';
 import { AddScheduleDialog } from './components/AddScheduleDialog';
 import { EnrollStudentsModal } from './components/EnrollStudentsModal';
@@ -121,7 +116,7 @@ const CourseDetailsPage = () => {
   const availableYears = useMemo(() => {
     if (!course?.students) return [];
     const years = new Set(course.students.map(s => s.enrollment_year).filter(Boolean) as number[]);
-    return Array.from(years).sort((a,b) => b - a);
+    return Array.from(years).sort((a, b) => b - a);
   }, [course?.students]);
 
   const filteredStudents = useMemo(() => {
@@ -130,15 +125,15 @@ const CourseDetailsPage = () => {
       const matchesSearch = student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         student.student_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
         student.department?.toLowerCase().includes(searchQuery.toLowerCase());
-        
+
       const matchesStatus = statusFilters.length === 0 || statusFilters.includes(student.status);
       const matchesDept = deptFilters.length === 0 || (student.department && deptFilters.includes(student.department));
       const matchesYear = yearFilters.length === 0 || (student.enrollment_year && yearFilters.includes(student.enrollment_year));
-      
+
       return matchesSearch && matchesStatus && matchesDept && matchesYear;
     });
   }, [course?.students, searchQuery, statusFilters, deptFilters, yearFilters]);
-  
+
   const activeFilterCount = statusFilters.length + deptFilters.length + yearFilters.length;
 
   if (isLoading) {
@@ -281,130 +276,122 @@ const CourseDetailsPage = () => {
         <div className="bg-white rounded-[40px] border border-stone-200/60 shadow-sm overflow-hidden flex flex-col">
           {/* Table Header Controls */}
           <div className="p-8 border-b border-stone-100 flex items-center justify-between gap-6 bg-stone-50/30">
-            <div className="flex items-center gap-6 flex-1 max-w-2xl">
-              <div className="relative flex-1 group">
+            <div className="flex flex-wrap items-center gap-4 flex-1">
+              <div className="relative flex-1 min-w-[200px] max-w-sm group">
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400 group-focus-within:text-stone-900 transition-colors" />
                 <Input
-                  placeholder="Search students by name or ID..."
+                  placeholder="Search students..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="h-14 pl-14 pr-10 rounded-2xl border-stone-200 bg-white focus:ring-4 focus:ring-stone-900/5 transition-all font-medium"
                 />
               </div>
+
+              {/* Status Filter Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className={cn(
-                      "rounded-2xl h-14 px-8 border-stone-200 transition-all font-black text-xs uppercase tracking-widest gap-3",
-                      activeFilterCount > 0 
-                        ? "bg-stone-900 text-white hover:bg-stone-800 border-stone-900" 
-                        : "hover:bg-stone-50 text-stone-700"
+                      "rounded-2xl h-14 px-6 border-stone-200 transition-all font-black text-[10px] uppercase tracking-widest gap-2",
+                      statusFilters.length > 0 ? "bg-stone-900 text-white hover:bg-stone-800 border-stone-900" : "hover:bg-stone-50 text-stone-700"
                     )}
                   >
-                    <Filter className={cn("w-4 h-4", activeFilterCount > 0 ? "text-white" : "text-stone-500")} />
-                    Filter {activeFilterCount > 0 && `(${activeFilterCount})`}
+                    Status {statusFilters.length > 0 && <span className="text-[10px] bg-stone-100/20 text-current px-2 py-0.5 rounded-full">{statusFilters.length}</span>}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-stone-200 shadow-xl">
-                  <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400 px-2 py-2">
-                    Active Filters
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-stone-100" />
-                  
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="rounded-xl py-2.5 px-3 font-bold text-sm text-stone-700 focus:bg-stone-100 cursor-pointer">
-                      Status {statusFilters.length > 0 && <span className="ml-auto text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">{statusFilters.length}</span>}
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuPortal>
-                      <DropdownMenuSubContent className="w-48 p-2 rounded-2xl border-stone-200 shadow-xl animate-in zoom-in-95">
-                        {['Consistent', 'Moderate', 'At Risk', 'Inactive'].map((status) => (
-                          <DropdownMenuCheckboxItem
-                            key={status}
-                            checked={statusFilters.includes(status)}
-                            onCheckedChange={(checked) => {
-                              setStatusFilters(prev => 
-                                checked ? [...prev, status] : prev.filter(s => s !== status)
-                              );
-                            }}
-                            className="rounded-xl cursor-pointer py-2.5 px-3 font-bold text-sm text-stone-700 focus:bg-stone-100"
-                          >
-                            {status}
-                          </DropdownMenuCheckboxItem>
-                        ))}
-                      </DropdownMenuSubContent>
-                    </DropdownMenuPortal>
-                  </DropdownMenuSub>
-
-                  {availableDepartments.length > 0 && (
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger className="rounded-xl py-2.5 px-3 font-bold text-sm text-stone-700 focus:bg-stone-100 cursor-pointer">
-                        Department {deptFilters.length > 0 && <span className="ml-auto text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">{deptFilters.length}</span>}
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuPortal>
-                        <DropdownMenuSubContent className="w-56 p-2 rounded-2xl border-stone-200 shadow-xl max-h-[300px] overflow-y-auto animate-in zoom-in-95">
-                          {availableDepartments.map((dept) => (
-                            <DropdownMenuCheckboxItem
-                              key={dept}
-                              checked={deptFilters.includes(dept)}
-                              onCheckedChange={(checked) => {
-                                setDeptFilters(prev => 
-                                  checked ? [...prev, dept] : prev.filter(d => d !== dept)
-                                );
-                              }}
-                              className="rounded-xl cursor-pointer py-2.5 px-3 font-bold text-xs text-stone-700 focus:bg-stone-100 line-clamp-1"
-                            >
-                              {dept}
-                            </DropdownMenuCheckboxItem>
-                          ))}
-                        </DropdownMenuSubContent>
-                      </DropdownMenuPortal>
-                    </DropdownMenuSub>
-                  )}
-
-                  {availableYears.length > 0 && (
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger className="rounded-xl py-2.5 px-3 font-bold text-sm text-stone-700 focus:bg-stone-100 cursor-pointer">
-                        Enrollment Year {yearFilters.length > 0 && <span className="ml-auto text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full">{yearFilters.length}</span>}
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuPortal>
-                        <DropdownMenuSubContent className="w-40 p-2 rounded-2xl border-stone-200 shadow-xl animate-in zoom-in-95">
-                          {availableYears.map((year) => (
-                            <DropdownMenuCheckboxItem
-                              key={year}
-                              checked={yearFilters.includes(year)}
-                              onCheckedChange={(checked) => {
-                                setYearFilters(prev => 
-                                  checked ? [...prev, year] : prev.filter(y => y !== year)
-                                );
-                              }}
-                              className="rounded-xl cursor-pointer py-2.5 px-3 font-bold text-sm text-stone-700 focus:bg-stone-100"
-                            >
-                              {year}
-                            </DropdownMenuCheckboxItem>
-                          ))}
-                        </DropdownMenuSubContent>
-                      </DropdownMenuPortal>
-                    </DropdownMenuSub>
-                  )}
-                  
-                  {activeFilterCount > 0 && (
-                    <>
-                      <DropdownMenuSeparator className="bg-stone-100 mt-2" />
-                      <button 
-                        onClick={() => {
-                          setStatusFilters([]);
-                          setDeptFilters([]);
-                          setYearFilters([]);
-                        }}
-                        className="w-full text-left px-3 py-2 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 rounded-lg mt-1 transition-colors"
-                      >
-                        Clear All Filters
-                      </button>
-                    </>
-                  )}
+                <DropdownMenuContent align="start" className="w-56 p-2 rounded-2xl border-stone-200 shadow-xl">
+                  {['Consistent', 'Moderate', 'At Risk', 'Inactive'].map((status) => (
+                    <DropdownMenuCheckboxItem
+                      key={status}
+                      checked={statusFilters.includes(status)}
+                      onCheckedChange={(checked) => {
+                        setStatusFilters(prev => checked ? [...prev, status] : prev.filter(s => s !== status));
+                      }}
+                      className="rounded-xl cursor-pointer py-2.5 px-3 font-bold text-sm text-stone-700 focus:bg-stone-100"
+                    >
+                      {status}
+                    </DropdownMenuCheckboxItem>
+                  ))}
                 </DropdownMenuContent>
               </DropdownMenu>
+
+              {/* Department Filter Dropdown */}
+              {availableDepartments.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "rounded-2xl h-14 px-6 border-stone-200 transition-all font-black text-[10px] uppercase tracking-widest gap-2",
+                        deptFilters.length > 0 ? "bg-stone-900 text-white hover:bg-stone-800 border-stone-900" : "hover:bg-stone-50 text-stone-700"
+                      )}
+                    >
+                      Department {deptFilters.length > 0 && <span className="text-[10px] bg-stone-100/20 text-current px-2 py-0.5 rounded-full">{deptFilters.length}</span>}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-auto min-w-[14rem] max-w-[24rem] p-2 rounded-2xl border-stone-200 shadow-xl max-h-[300px] overflow-y-auto">
+                    {availableDepartments.map((dept) => (
+                      <DropdownMenuCheckboxItem
+                        key={dept}
+                        checked={deptFilters.includes(dept)}
+                        onCheckedChange={(checked) => {
+                          setDeptFilters(prev => checked ? [...prev, dept] : prev.filter(d => d !== dept));
+                        }}
+                        className="rounded-xl cursor-pointer py-2.5 px-3 font-bold text-xs text-stone-700 focus:bg-stone-100 break-words whitespace-normal"
+                      >
+                        {dept}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {/* Year Filter Dropdown */}
+              {availableYears.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "rounded-2xl h-14 px-6 border-stone-200 transition-all font-black text-[10px] uppercase tracking-widest gap-2",
+                        yearFilters.length > 0 ? "bg-stone-900 text-white hover:bg-stone-800 border-stone-900" : "hover:bg-stone-50 text-stone-700"
+                      )}
+                    >
+                      Year {yearFilters.length > 0 && <span className="text-[10px] bg-stone-100/20 text-current px-2 py-0.5 rounded-full">{yearFilters.length}</span>}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-40 p-2 rounded-2xl border-stone-200 shadow-xl max-h-[300px] overflow-y-auto">
+                    {availableYears.map((year) => (
+                      <DropdownMenuCheckboxItem
+                        key={year}
+                        checked={yearFilters.includes(year)}
+                        onCheckedChange={(checked) => {
+                          setYearFilters(prev => checked ? [...prev, year] : prev.filter(y => y !== year));
+                        }}
+                        className="rounded-xl cursor-pointer py-2.5 px-3 font-bold text-sm text-stone-700 focus:bg-stone-100"
+                      >
+                        {year}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {/* Clear All action */}
+              {activeFilterCount > 0 && (
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setStatusFilters([]);
+                    setDeptFilters([]);
+                    setYearFilters([]);
+                  }}
+                  className="rounded-2xl h-14 px-5 text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  Clear Filters
+                </Button>
+              )}
             </div>
 
             <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-stone-400">
