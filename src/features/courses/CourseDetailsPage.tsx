@@ -36,12 +36,13 @@ import { cn, formatEthiopianTime } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { AddScheduleDialog } from './components/AddScheduleDialog';
 import { EnrollStudentsModal } from './components/EnrollStudentsModal';
+import { SendNotificationModal } from './components/SendNotificationModal';
+import { StudentHistoryModal } from './components/StudentHistoryModal';
 import CourseMaterials from './components/CourseMaterials';
 
 interface StudentActivity {
@@ -102,7 +103,7 @@ const CourseDetailsPage = () => {
 
   const filteredStudents = useMemo(() => {
     if (!course?.students) return [];
-    return course.students.filter(student => 
+    return course.students.filter((student: StudentActivity) => 
       student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       student.student_id.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -368,14 +369,18 @@ const CourseDetailsPage = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-stone-200 shadow-xl">
                           <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-stone-400 px-2 py-2">Actions</DropdownMenuLabel>
-                          <DropdownMenuItem className="rounded-xl p-3 gap-3 font-bold text-sm cursor-pointer hover:bg-stone-50">
-                            <Mail className="w-4 h-4" />
-                            Send Notification
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="rounded-xl p-3 gap-3 font-bold text-sm cursor-pointer hover:bg-stone-50">
-                            <TrendingUp className="w-4 h-4" />
-                            View Full History
-                          </DropdownMenuItem>
+                          
+                          <SendNotificationModal 
+                            studentId={student.id} 
+                            studentName={student.name} 
+                          />
+                          
+                          <StudentHistoryModal 
+                            studentId={student.id} 
+                            studentName={student.name} 
+                            courseId={course.id}
+                            courseName={course.name}
+                          />
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
