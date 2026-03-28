@@ -124,7 +124,7 @@ const SessionCreationPage = () => {
       courseId: queryCourseId || '',
       room: '',
       duration: '60',
-      radius: '50',
+      radius: '200',
       topic: '',
       notes: '',
       section: '',
@@ -158,8 +158,14 @@ const SessionCreationPage = () => {
     }
     const endTime = new Date(startTime.getTime() + parseInt(values.duration) * 60000);
 
-    // Find the selected room to get its telemetry
+    // Use the room's stored GPS coordinates as the geofence anchor
     const selectedRoom = rooms.find(r => r.name === values.room);
+    if (!selectedRoom?.latitude || !selectedRoom?.longitude) {
+      toast.error('This room has no GPS coordinates.', {
+        description: 'Ask your admin to set the room\'s GPS coordinates before creating a session.',
+      });
+      return;
+    }
 
     const payload = {
       course_id: parseInt(values.courseId),
@@ -167,8 +173,8 @@ const SessionCreationPage = () => {
       start_time: startTime.toISOString(),
       end_time: endTime.toISOString(),
       qr_code_content: `SECURE-SESSION-${values.courseId}-${startTime.getTime()}-${Math.random().toString(36).substring(7).toUpperCase()}`,
-      latitude: selectedRoom?.latitude || 0,
-      longitude: selectedRoom?.longitude || 0,
+      latitude: selectedRoom.latitude,
+      longitude: selectedRoom.longitude,
       geofence_radius: parseFloat(values.radius),
       topic: values.topic,
       notes: values.notes,
@@ -177,6 +183,7 @@ const SessionCreationPage = () => {
 
     createSessionMutation.mutate(payload);
   };
+
 
   if (isLoadingCourses || isLoadingRooms) {
     return (
@@ -272,6 +279,13 @@ const SessionCreationPage = () => {
                                     <div className="flex flex-col">
                                       <span>{room.name}</span>
                                       <span className="text-[9px] opacity-40 tracking-tighter">{room.building}</span>
+                                    </div>
+                                    <div className="ml-auto">
+                                      {room.latitude && room.longitude ? (
+                                        <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-md">GPS ✓</span>
+                                      ) : (
+                                        <span className="text-[8px] font-black uppercase tracking-widest text-amber-600 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-md">No GPS</span>
+                                      )}
                                     </div>
                                   </div>
                                 </SelectItem>
@@ -493,7 +507,7 @@ const SessionCreationPage = () => {
             <div className="space-y-8">
               {[
                 { id: "01", text: "Ensure students have GPS enabled for accurate attendance tracking." },
-                { id: "02", text: "The recommended attendance radius is between 40-60 meters for most classrooms." },
+                { id: "02", text: "Indoors, phone GPS can drift 100–300m. A radius of 200–500m is recommended for classrooms inside buildings." },
                 { id: "03", text: "Verify attendance records after each session to ensure accuracy." }
               ].map((item) => (
                 <div key={item.id} className="flex gap-5 group">
