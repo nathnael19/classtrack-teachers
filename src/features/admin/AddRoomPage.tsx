@@ -116,6 +116,8 @@ const PreviewRoomCard = ({ data }: { data: Partial<RoomFormValues> }) => (
 const AddRoomPage = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFetchingGps, setIsFetchingGps] = useState(false);
+  const [gpsFix, setGpsFix] = useState<{ lat: string; lng: string; acc: number } | null>(null);
 
   const {
     register,
@@ -132,7 +134,7 @@ const AddRoomPage = () => {
       location: "",
       latitude: "",
       longitude: "",
-      geofenceRadius: "100",
+      geofenceRadius: "200",
       description: "",
     }
   });
@@ -169,19 +171,43 @@ const AddRoomPage = () => {
       return;
     }
 
-    toast.info("Accessing GPS...", { description: "Please allow location access if prompted." });
-    
-    navigator.geolocation.getCurrentPosition(
+    setIsFetchingGps(true);
+    setGpsFix(null);
+    toast.info('Acquiring precise GPS fix...', { id: 'gps', description: 'Keep this window open and stay still.' });
+
+    let bestFix: GeolocationPosition | null = null;
+    let readingCount = 0;
+
+    const watchId = navigator.geolocation.watchPosition(
       (position) => {
-        setValue("latitude", position.coords.latitude.toString());
-        setValue("longitude", position.coords.longitude.toString());
-        toast.success("Location Captured!", { 
-          description: `Lat: ${position.coords.latitude.toFixed(4)}, Lng: ${position.coords.longitude.toFixed(4)}` 
-        });
+        readingCount++;
+        // Keep the best (lowest accuracy radius) reading
+        if (!bestFix || position.coords.accuracy < bestFix.coords.accuracy) {
+          bestFix = position;
+        }
+
+        // After 5 readings or when accuracy is good enough (< 20m), use it
+        if (readingCount >= 5 || position.coords.accuracy < 20) {
+          navigator.geolocation.clearWatch(watchId);
+          setIsFetchingGps(false);
+          const lat = bestFix!.coords.latitude.toFixed(7);
+          const lng = bestFix!.coords.longitude.toFixed(7);
+          const acc = Math.round(bestFix!.coords.accuracy);
+          setValue('latitude', lat);
+          setValue('longitude', lng);
+          setGpsFix({ lat, lng, acc });
+          toast.success('GPS Fixed!', {
+            id: 'gps',
+            description: `±${acc}m accuracy — Lat: ${lat}, Lng: ${lng}`,
+          });
+        }
       },
       (error) => {
-        toast.error("Location Access Failed", { description: error.message });
-      }
+        navigator.geolocation.clearWatch(watchId);
+        setIsFetchingGps(false);
+        toast.error('GPS Failed', { id: 'gps', description: error.message });
+      },
+      { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 }
     );
   };
 
@@ -308,18 +334,29 @@ const AddRoomPage = () => {
 
                     {/* GPS Coordinates */}
                     <div className="col-span-2 space-y-4">
-                      <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between">
                         <Label className="text-[11px] font-black uppercase tracking-[0.3em] opacity-40">GPS Location</Label>
-                        <Button 
-                          type="button" 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={getCurrentLocation}
-                          className="h-8 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 text-[10px] font-black uppercase tracking-widest px-3 border border-emerald-500/20"
-                        >
-                          <MapPin className="w-3 h-3 mr-2" />
-                          Set Current Coords
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          {gpsFix && (
+                            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-lg">
+                              ±{gpsFix.acc}m
+                            </span>
+                          )}
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={getCurrentLocation}
+                            disabled={isFetchingGps}
+                            className="h-8 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 text-[10px] font-black uppercase tracking-widest px-3 border border-emerald-500/20 disabled:opacity-60"
+                          >
+                            {isFetchingGps ? (
+                              <><div className="w-3 h-3 border-2 border-emerald-500/30 border-t-emerald-600 rounded-full animate-spin mr-2" />Locating...</>
+                            ) : (
+                              <><MapPin className="w-3 h-3 mr-2" />Capture Precise GPS</>
+                            )}
+                          </Button>
+                        </div>
                       </div>
                       
                       <div className="grid md:grid-cols-3 gap-4">
