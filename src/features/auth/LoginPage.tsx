@@ -106,7 +106,7 @@ const LoginPage = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center px-1">
                     <Label htmlFor="pass" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Password</Label>
-                    <button type="button" className="text-[10px] font-black text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 transition-colors uppercase tracking-widest cursor-pointer">Reset</button>
+                    <Link to="/forgot-password" className="text-[10px] font-black text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 transition-colors uppercase tracking-widest">Forgot?</Link>
                   </div>
                   <div className="relative group">
                     <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors duration-300">
