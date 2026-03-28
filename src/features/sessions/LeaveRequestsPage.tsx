@@ -31,6 +31,7 @@ import api from '@/services/api';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { GlassCard } from '@/components/ui/glass-card';
 
 interface LeaveRequest {
   id: number;
@@ -47,19 +48,17 @@ interface LeaveRequest {
 }
 
 const StatCard = ({ label, value, icon: Icon, color }: { label: string; value: number; icon: any; color: string }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="liquid-glass rounded-3xl p-6 flex items-center gap-5 group hover:border-white/40 transition-all duration-500"
+  <GlassCard
+    className="rounded-3xl p-6 flex items-center gap-5 group border-white/20"
   >
     <div className={cn("p-4 rounded-2xl bg-gradient-to-br transition-transform duration-500 group-hover:scale-110", color)}>
       <Icon className="w-6 h-6 text-white" />
     </div>
     <div>
       <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground/60 mb-0.5">{label}</p>
-      <p className="text-3xl font-black tracking-tighter text-premium">{value}</p>
+      <p className="text-3xl font-black tracking-tighter text-foreground font-['Satoshi']">{value}</p>
     </div>
-  </motion.div>
+  </GlassCard>
 );
 
 const LeaveRequestsPage = () => {
@@ -120,10 +119,10 @@ const LeaveRequestsPage = () => {
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-3 mb-2"
           >
-            <div className="h-1 w-12 bg-gold-gradient rounded-full" />
+            <div className="h-1 w-12 bg-gradient-to-br from-yellow-600 to-yellow-500 rounded-full" />
             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60">Approvals Engine</span>
           </motion.div>
-          <h1 className="text-5xl font-black tracking-tighter text-premium">
+          <h1 className="text-5xl font-black tracking-tighter text-foreground font-['Satoshi']">
             Leave Requests <span className="text-primary/20">.</span>
           </h1>
           <p className="text-muted-foreground mt-3 text-lg font-medium max-w-xl leading-relaxed">
@@ -176,23 +175,20 @@ const LeaveRequestsPage = () => {
       <div className="px-2">
         <AnimatePresence mode="wait">
           {filteredRequests.length === 0 ? (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="liquid-glass rounded-[3rem] p-24 text-center border-dashed border-2 border-white/40"
+            <GlassCard
+              className="rounded-[3rem] p-24 text-center border-dashed border-2 border-white/40"
+              noHover
             >
               <div className="w-24 h-24 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-8">
                 <FileText className="w-12 h-12 text-primary/20" />
               </div>
-              <h3 className="text-2xl font-black tracking-tight text-premium mb-2">No Records Found</h3>
+              <h3 className="text-2xl font-black tracking-tight text-foreground font-['Satoshi'] mb-2">No Records Found</h3>
               <p className="text-muted-foreground font-medium max-w-sm mx-auto">
                 {statusFilter !== 'all'
                   ? `There are currently no requests with "${statusFilter}" status.`
                   : 'Start by encouraging students to submit leave requests through the ClassTrack mobile app.'}
               </p>
-            </motion.div>
+            </GlassCard>
           ) : (
             <motion.div
               key={viewMode}
@@ -203,13 +199,9 @@ const LeaveRequestsPage = () => {
                 viewMode === 'grid' ? "grid grid-cols-1 lg:grid-cols-3" : "flex flex-col"
               )}
             >
-              {filteredRequests.map((req, index) => (
-                <motion.div
-                  key={req.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="liquid-glass rounded-[2rem] p-8 flex flex-col group hover:border-primary/20 transition-all duration-500"
+              {filteredRequests.map((req) => (
+                <GlassCard
+                  className="rounded-[2.5rem] p-8 flex flex-col group hover:border-primary/20 transition-all duration-500"
                 >
                   <div className="flex items-start justify-between mb-8">
                     <div className="flex items-center gap-4">
@@ -217,7 +209,7 @@ const LeaveRequestsPage = () => {
                         <User className="w-6 h-6" />
                       </div>
                       <div>
-                        <h4 className="text-xl font-black tracking-tight text-premium underline decoration-primary/10 decoration-2 underline-offset-4">
+                        <h4 className="text-xl font-black tracking-tight text-foreground font-['Satoshi'] underline decoration-primary/10 decoration-2 underline-offset-4">
                           {req.student_name || `Student #${req.student_id}`}
                         </h4>
                         <div className="flex items-center gap-2 mt-1">
@@ -247,7 +239,7 @@ const LeaveRequestsPage = () => {
                       </div>
                       <div>
                         <p className="text-xs font-black uppercase tracking-widest text-muted-foreground/40 mb-1">Scheduled Period</p>
-                        <p className="text-sm font-semibold text-premium">
+                        <p className="text-sm font-semibold text-foreground font-['Satoshi']">
                           {req.session_start ? format(new Date(req.session_start), 'MMMM d, yyyy • HH:mm') : 'Indefinite'}
                         </p>
                       </div>
@@ -259,7 +251,7 @@ const LeaveRequestsPage = () => {
                       </div>
                       <div>
                         <p className="text-xs font-black uppercase tracking-widest text-muted-foreground/40 mb-1">Location Context</p>
-                        <p className="text-sm font-semibold text-premium">{req.session_room || 'Remote Session'}</p>
+                        <p className="text-sm font-semibold text-foreground font-['Satoshi']">{req.session_room || 'Remote Session'}</p>
                       </div>
                     </div>
 
@@ -324,35 +316,13 @@ const LeaveRequestsPage = () => {
                       )}
                     </div>
                   </div>
-                </motion.div>
+                </GlassCard>
               ))}
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      <style>{`
-        .bg-gold-gradient {
-          background: linear-gradient(135deg, #CA8A04 0%, #EAB308 100%);
-        }
-        .liquid-glass {
-          background: rgba(255, 255, 255, 0.7);
-          backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-        }
-        .dark .liquid-glass {
-          background: rgba(0, 0, 0, 0.4);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .text-premium {
-          font-family: 'Satoshi', sans-serif;
-          tracking-tight: -0.02em;
-        }
-        .text-body-premium {
-          font-family: 'DM Sans', sans-serif;
-        }
-      `}</style>
     </div>
   );
 };
