@@ -9,7 +9,7 @@ import {
   Plus,
   Loader2,
   AlertCircle,
-  Clock,
+  Clock
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -17,6 +17,17 @@ import { format } from 'date-fns';
 import api from '@/services/api';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import {
@@ -294,15 +305,33 @@ const CourseMaterials: React.FC<CourseMaterialsProps> = ({ courseId, courseLectu
                     <div className="flex justify-between items-start mb-6 relative">
                        {getFileIcon(item.file_type)}
                        {isLecturer && (
-                         <Button 
-                           variant="ghost" 
-                           onClick={() => {
-                             if (window.confirm('Delete this material?')) deleteMutation.mutate(item.id);
-                           }}
-                           className="h-10 w-10 p-0 rounded-xl hover:bg-red-50 hover:text-red-500 text-stone-300 transition-all opacity-0 group-hover:opacity-100"
-                         >
-                           <Trash2 className="w-4 h-4" />
-                         </Button>
+                         <AlertDialog>
+                           <AlertDialogTrigger asChild>
+                             <Button 
+                               variant="ghost" 
+                               className="h-10 w-10 p-0 rounded-xl hover:bg-red-50 hover:text-red-500 text-stone-300 transition-all opacity-0 group-hover:opacity-100"
+                             >
+                               <Trash2 className="w-4 h-4" />
+                             </Button>
+                           </AlertDialogTrigger>
+                           <AlertDialogContent className="rounded-[2rem] p-8 border-foreground/10 bg-background/80 backdrop-blur-3xl">
+                             <AlertDialogHeader>
+                               <AlertDialogTitle className="text-2xl font-black">Delete material?</AlertDialogTitle>
+                               <AlertDialogDescription className="font-medium text-muted-foreground">
+                                 This action cannot be undone. This material will be permanently removed.
+                               </AlertDialogDescription>
+                             </AlertDialogHeader>
+                             <AlertDialogFooter className="mt-6">
+                               <AlertDialogCancel className="rounded-2xl h-12 px-6 font-bold">Cancel</AlertDialogCancel>
+                               <AlertDialogAction
+                                 onClick={() => deleteMutation.mutate(item.id)}
+                                 className="bg-red-500 text-white hover:bg-red-600 rounded-2xl h-12 px-6 font-bold"
+                               >
+                                 Delete
+                               </AlertDialogAction>
+                             </AlertDialogFooter>
+                           </AlertDialogContent>
+                         </AlertDialog>
                        )}
                     </div>
 
