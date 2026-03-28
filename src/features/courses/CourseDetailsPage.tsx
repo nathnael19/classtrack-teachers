@@ -38,8 +38,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
-  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { AddScheduleDialog } from './components/AddScheduleDialog';
 import { EnrollStudentsModal } from './components/EnrollStudentsModal';
 import { SendNotificationModal } from './components/SendNotificationModal';
@@ -98,7 +108,6 @@ const CourseDetailsPage = () => {
   });
 
   const handleDeleteSchedule = async (scheduleId: number) => {
-    if (!window.confirm("Are you sure you want to delete this schedule slot?")) return;
     try {
       await api.delete(`/courses/schedules/${scheduleId}`);
       refetch();
@@ -597,13 +606,33 @@ const CourseDetailsPage = () => {
                                 {slot.section}
                               </div>
                             </div>
-                            <Button
-                              variant="ghost"
-                              onClick={() => handleDeleteSchedule(slot.id)}
-                              className="h-10 w-10 p-0 rounded-2xl hover:bg-red-50 hover:text-red-500 text-stone-300 transition-all"
-                            >
-                              <Trash2 className="w-5 h-5" />
-                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  className="h-10 w-10 p-0 rounded-2xl hover:bg-red-50 hover:text-red-500 text-stone-300 transition-all"
+                                >
+                                  <Trash2 className="w-5 h-5" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="rounded-[2rem] p-8 border-foreground/10 bg-background/80 backdrop-blur-3xl">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle className="text-2xl font-black">Delete schedule slot?</AlertDialogTitle>
+                                  <AlertDialogDescription className="font-medium text-muted-foreground">
+                                    This action cannot be undone. This schedule slot will be permanently removed.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className="mt-6">
+                                  <AlertDialogCancel className="rounded-2xl h-12 px-6 font-bold">Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeleteSchedule(slot.id)}
+                                    className="bg-red-500 text-white hover:bg-red-600 rounded-2xl h-12 px-6 font-bold"
+                                  >
+                                    Delete Slot
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </div>
 
                           <div className="space-y-8 relative">
