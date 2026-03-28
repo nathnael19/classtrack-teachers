@@ -21,6 +21,8 @@ const UsersManagementPage = lazy(() => import("@/features/admin/UsersManagementP
 const AddUserPage = lazy(() => import("@/features/admin/AddUserPage"));
 const EditUserPage = lazy(() => import("@/features/admin/EditUserPage"));
 const SetupPasswordPage = lazy(() => import("@/features/auth/SetupPasswordPage"));
+const ForgotPasswordPage = lazy(() => import("@/features/auth/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("@/features/auth/ResetPasswordPage"));
 const AcademicManagementPage = lazy(() => import("@/features/admin/AcademicManagementPage"));
 const AddCoursePage = lazy(() => import("@/features/admin/AddCoursePage"));
 const AddDepartmentPage = lazy(() => import("@/features/admin/AddDepartmentPage"));
@@ -157,6 +159,8 @@ export const router = createBrowserRouter([
       { path: "/login", element: <Suspense fallback={<PageLoader />}><LoginPage /></Suspense> },
       { path: "/register", element: <Suspense fallback={<PageLoader />}><RegisterPage /></Suspense> },
       { path: "/setup-password", element: <Suspense fallback={<PageLoader />}><SetupPasswordPage /></Suspense> },
+      { path: "/forgot-password", element: <Suspense fallback={<PageLoader />}><ForgotPasswordPage /></Suspense> },
+      { path: "/reset-password", element: <Suspense fallback={<PageLoader />}><ResetPasswordPage /></Suspense> },
     ],
   },
 ]);
