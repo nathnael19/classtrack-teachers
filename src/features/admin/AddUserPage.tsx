@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import api from "@/services/api";
 import { useQuery } from "@tanstack/react-query";
+import { GlassCard } from "@/components/ui/glass-card";
 
 interface Organization {
   id: number;
@@ -41,18 +42,7 @@ const userSchema = z.object({
 
 type UserFormValues = z.infer<typeof userSchema>;
 
-const GlassCard = ({ children, className = "", noHover = false }: { children: React.ReactNode, className?: string, noHover?: boolean }) => (
-  <div className={cn(
-    "relative overflow-hidden border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/60 backdrop-blur-xl shadow-2xl transition-all duration-500 rounded-[2.5rem]",
-    !noHover && "hover:shadow-purple-500/10 hover:border-white/40 dark:hover:border-white/20 hover:-translate-y-1",
-    className
-  )}>
-    <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none mix-blend-overlay" 
-         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
-    <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-black/5 dark:from-white/5 dark:via-transparent dark:to-black/20 pointer-events-none" />
-    {children}
-  </div>
-);
+
 
 const PreviewUserCard = ({ data }: { data: Partial<UserFormValues> }) => (
   <GlassCard className="p-8 w-full max-w-sm sticky top-8 border-purple-500/30 ring-1 ring-purple-500/20 group">
