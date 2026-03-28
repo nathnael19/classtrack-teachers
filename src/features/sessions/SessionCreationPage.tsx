@@ -128,7 +128,7 @@ const SessionCreationPage = () => {
       topic: '',
       notes: '',
       section: '',
-      isScheduled: !!queryCourseId,
+      isScheduled: false,
       scheduledDate: new Date().toISOString().split('T')[0],
       scheduledTime: new Date().toTimeString().slice(0, 5),
     },
