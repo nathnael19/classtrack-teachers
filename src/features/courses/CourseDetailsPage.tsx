@@ -55,6 +55,8 @@ interface StudentActivity {
   last_seen: string | null;
   status: 'Consistent' | 'Moderate' | 'At Risk' | 'Inactive';
   section: string | null;
+  department?: string;
+  enrollment_year?: number;
 }
 
 interface CourseSchedule {
@@ -105,7 +107,8 @@ const CourseDetailsPage = () => {
     if (!course?.students) return [];
     return course.students.filter((student: StudentActivity) => 
       student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.student_id.toLowerCase().includes(searchQuery.toLowerCase())
+      student.student_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      student.department?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [course?.students, searchQuery]);
 
@@ -276,25 +279,27 @@ const CourseDetailsPage = () => {
             <Table>
               <TableHeader className="bg-stone-50/50 border-b border-stone-100">
                 <TableRow className="hover:bg-transparent border-none">
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400 w-[300px]">Student</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400">Sec</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400">University ID</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400">Attendance</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400">Last Seen</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400">Status</TableHead>
-                  <TableHead className="px-6 py-6 font-black uppercase text-[10px] tracking-[0.3em] text-stone-400 text-right">Actions</TableHead>
+                  <TableHead className="px-4 py-5 font-black uppercase text-[10px] tracking-[0.2em] text-stone-400 w-[250px]">Student</TableHead>
+                  <TableHead className="px-4 py-5 font-black uppercase text-[10px] tracking-[0.2em] text-stone-400">Sec</TableHead>
+                  <TableHead className="px-4 py-5 font-black uppercase text-[10px] tracking-[0.2em] text-stone-400">Dept</TableHead>
+                  <TableHead className="px-4 py-5 font-black uppercase text-[10px] tracking-[0.2em] text-stone-400">Year</TableHead>
+                  <TableHead className="px-4 py-5 font-black uppercase text-[10px] tracking-[0.2em] text-stone-400 whitespace-nowrap">University ID</TableHead>
+                  <TableHead className="px-4 py-5 font-black uppercase text-[10px] tracking-[0.2em] text-stone-400">Attendance</TableHead>
+                  <TableHead className="px-4 py-5 font-black uppercase text-[10px] tracking-[0.2em] text-stone-400 whitespace-nowrap">Last Seen</TableHead>
+                  <TableHead className="px-4 py-5 font-black uppercase text-[10px] tracking-[0.2em] text-stone-400">Status</TableHead>
+                  <TableHead className="px-4 py-5 font-black uppercase text-[10px] tracking-[0.2em] text-stone-400 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredStudents.map((student) => (
                   <TableRow key={student.id} className="group hover:bg-stone-50/50 transition-all duration-300 border-stone-50">
-                    <TableCell className="px-6 py-6">
-                      <div className="flex items-center gap-5">
-                        <div className="w-12 h-12 rounded-2xl bg-stone-100 border border-stone-200 flex items-center justify-center text-stone-900 shadow-sm group-hover:scale-105 transition-transform duration-500">
+                    <TableCell className="px-4 py-5">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-2xl bg-stone-100 border border-stone-200 flex items-center justify-center text-stone-900 shadow-sm group-hover:scale-105 transition-transform duration-500">
                           <span className="font-black text-sm">{student.name.charAt(0)}</span>
                         </div>
                         <div className="flex flex-col gap-1">
-                          <span className="font-black text-lg text-stone-900 leading-none">
+                          <span className="font-black text-base text-stone-900 leading-none whitespace-nowrap">
                             {student.name}
                           </span>
                           <div className="flex items-center gap-2 opacity-50">
@@ -304,19 +309,32 @@ const CourseDetailsPage = () => {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="px-6 py-6">
+                    <TableCell className="px-4 py-5">
                       <div className="inline-flex px-3 py-1 bg-stone-100 text-stone-900 border border-stone-200 rounded-lg text-[10px] font-black uppercase tracking-widest">
                         {student.section || '-'}
                       </div>
                     </TableCell>
-                    <TableCell className="px-6 py-6">
-                      <div className="inline-flex px-4 py-2 bg-stone-100 rounded-xl font-mono text-xs font-black text-stone-600 border border-stone-200 group-hover:bg-stone-900 group-hover:text-white transition-all">
+                    <TableCell className="px-4 py-5">
+                      <div className="flex flex-col">
+                        <span className="text-[11px] font-black text-stone-900 uppercase tracking-tight truncate max-w-[100px]">
+                          {student.department || 'N/A'}
+                        </span>
+                        <span className="text-[8px] font-black text-stone-400 uppercase tracking-[0.2em]">Department</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-4 py-5">
+                      <div className="w-9 h-9 rounded-xl bg-stone-50 border border-stone-100 flex items-center justify-center text-stone-500 font-mono text-xs font-black">
+                        {student.enrollment_year || '-'}
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-4 py-5">
+                      <div className="inline-flex px-3 py-1.5 bg-stone-100 rounded-xl font-mono text-[11px] font-black text-stone-600 border border-stone-200 group-hover:bg-stone-900 group-hover:text-white transition-all whitespace-nowrap">
                         {student.student_id}
                       </div>
                     </TableCell>
-                    <TableCell className="px-6 py-6">
+                    <TableCell className="px-4 py-5">
                       <div className="flex items-center gap-4">
-                        <div className="flex flex-col gap-1.5 w-full max-w-[120px]">
+                        <div className="flex flex-col gap-1.5 w-full min-w-[100px] max-w-[120px]">
                           <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-stone-500">
                             <span>Attendance</span>
                             <span>{Math.round(student.attendance_rate)}%</span>
@@ -334,33 +352,33 @@ const CourseDetailsPage = () => {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="px-6 py-6">
+                    <TableCell className="px-4 py-5">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-stone-100 flex items-center justify-center text-stone-400">
-                          <Clock className="w-4 h-4" />
+                        <div className="w-8 h-8 rounded-xl bg-stone-100 flex items-center justify-center text-stone-400">
+                          <Clock className="w-3 h-3" />
                         </div>
                         <div className="flex flex-col">
-                          <span className="font-black text-sm text-stone-900">
+                          <span className="font-black text-xs text-stone-900 whitespace-nowrap">
                             {student.last_seen ? format(new Date(student.last_seen), 'MMM dd, HH:mm') : 'Never'}
                           </span>
                           <span className="text-[9px] font-black uppercase tracking-widest text-stone-400">Last Seen</span>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="px-6 py-6">
+                    <TableCell className="px-4 py-5">
                       <Badge className={cn(
-                        "rounded-full px-5 py-2 font-black text-[9px] uppercase tracking-[0.2em] border-none shadow-sm",
+                        "rounded-full px-4 py-1.5 font-black text-[9px] uppercase tracking-[0.2em] border-none shadow-sm whitespace-nowrap",
                         student.status === 'Consistent' ? "bg-stone-900 text-stone-50" :
                         student.status === 'Moderate' ? "bg-stone-200 text-stone-700" :
                         student.status === 'At Risk' ? "bg-yellow-100 text-yellow-700" :
                         "bg-red-50 text-red-600"
                       )}>
-                        {student.status === 'Consistent' && <ShieldCheck className="w-3 h-3 mr-2 inline" />}
-                        {student.status === 'At Risk' && <AlertCircle className="w-3 h-3 mr-2 inline" />}
+                        {student.status === 'Consistent' && <ShieldCheck className="w-3 h-3 mr-1.5 inline" />}
+                        {student.status === 'At Risk' && <AlertCircle className="w-3 h-3 mr-1.5 inline" />}
                         {student.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="px-6 py-6 text-right">
+                    <TableCell className="px-4 py-5 text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-stone-100">
