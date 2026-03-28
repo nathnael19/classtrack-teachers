@@ -14,7 +14,8 @@ import {
   ArrowUpRight,
   ShieldCheck,
   AlertCircle,
-  Trash2
+  Trash2,
+  FileText
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useState, useMemo } from 'react';
@@ -40,6 +41,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { AddScheduleDialog } from './components/AddScheduleDialog';
+import CourseMaterials from './components/CourseMaterials';
 
 interface StudentActivity {
   id: number;
@@ -72,12 +74,13 @@ interface CourseDetail {
   average_attendance: number;
   students: StudentActivity[];
   schedules: CourseSchedule[];
+  lecturers: { id: number; name: string; email?: string }[];
 }
 
 const CourseDetailsPage = () => {
   const { id } = useParams();
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'students' | 'schedule'>('students');
+  const [activeTab, setActiveTab] = useState<'students' | 'schedule' | 'materials'>('students');
   const { data: course, isLoading, refetch } = useQuery<CourseDetail>({
     queryKey: ['course', id],
     queryFn: async () => {
@@ -173,6 +176,16 @@ const CourseDetailsPage = () => {
           )}
         >
           Schedule
+        </button>
+        <button 
+          onClick={() => setActiveTab('materials')}
+          className={cn(
+            "px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center gap-2",
+            activeTab === 'materials' ? "bg-white text-primary border border-primary/20 shadow-sm" : "text-muted-foreground hover:bg-white/50"
+          )}
+        >
+          <FileText className="w-3 h-3" />
+          Materials
         </button>
       </div>
 
@@ -381,7 +394,7 @@ const CourseDetailsPage = () => {
             )}
           </div>
         </div>
-      ) : (
+      ) : activeTab === 'schedule' ? (
         <div className="space-y-12">
           {(course?.schedules || []).length === 0 ? (
             <div className="relative overflow-hidden bg-white rounded-[40px] border border-stone-200 shadow-sm p-12 flex flex-col items-center justify-center text-center py-32 bg-gradient-to-b from-white to-stone-50/50">
@@ -491,6 +504,12 @@ const CourseDetailsPage = () => {
             </div>
           )}
         </div>
+      ) : (
+        <CourseMaterials 
+          courseId={Number(id)} 
+          courseLecturerId={course.lecturer_id} 
+          lecturers={course.lecturers}
+        />
       )}
     </div>
   );
