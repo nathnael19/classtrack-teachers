@@ -3,6 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Plus, BookOpen, Building2, MapPin, CalendarDays,
   Search, Layers, Clock,
   Users, Trash2, Pencil,
@@ -14,6 +25,7 @@ import api from "@/services/api";
 import { toast } from "sonner";
 // Removed old edit modals
 import { useAuthStore } from "@/store/authStore";
+import { GlassCard } from "@/components/ui/glass-card";
 
 interface Course {
   id: number;
@@ -70,23 +82,7 @@ const AnimatedNumber = ({ value }: { value: number }) => {
   return <span>{displayValue.toLocaleString()}</span>;
 };
 
-const GlassCard = ({ children, className = "", noHover = false, style = {} }: { children: React.ReactNode, className?: string, noHover?: boolean, style?: React.CSSProperties }) => (
-  <div
-    className={cn(
-      "relative overflow-hidden border border-white/20 dark:border-white/10 bg-white/40 dark:bg-black/40 backdrop-blur-xl shadow-2xl transition-all duration-500 rounded-[2.5rem]",
-      !noHover && "hover:shadow-primary/10 hover:border-white/40 dark:hover:border-white/20 hover:-translate-y-1.5 hover:scale-[1.01]",
-      className
-    )}
-    style={style}
-  >
-    <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none mix-blend-overlay"
-      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
-    <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-black/5 dark:from-white/5 dark:via-transparent dark:to-black/20 pointer-events-none" />
-    <div className="relative z-10 h-full">
-      {children}
-    </div>
-  </div>
-);
+
 
 const AcademicManagementPage = () => {
   const navigate = useNavigate();
@@ -101,6 +97,7 @@ const AcademicManagementPage = () => {
   const [isDeptsLoading, setIsDeptsLoading] = useState(true);
   const [isRoomsLoading, setIsRoomsLoading] = useState(true);
   const [isTermsLoading, setIsTermsLoading] = useState(true);
+  const [roomSearch, setRoomSearch] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -131,6 +128,12 @@ const AcademicManagementPage = () => {
 
   const featuredDept = departments[0];
   const otherDepts = departments.slice(1);
+
+  const filteredRooms = rooms.filter(room => 
+    room.name.toLowerCase().includes(roomSearch.toLowerCase()) || 
+    (room.building && room.building.toLowerCase().includes(roomSearch.toLowerCase())) ||
+    room.type.toLowerCase().includes(roomSearch.toLowerCase())
+  );
 
   return (
     <div className="relative space-y-10 font-sans p-4 mb-20">
@@ -362,7 +365,12 @@ const AcademicManagementPage = () => {
                 </div>
                 <div className="relative group">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-amber-500 transition-colors" />
-                  <input className="w-full bg-white/10 border border-white/20 rounded-2xl h-12 pl-12 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all font-bold placeholder:opacity-40" placeholder="Search classrooms..." />
+                  <input 
+                    className="w-full bg-white/10 border border-white/20 rounded-2xl h-12 pl-12 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500/50 transition-all font-bold placeholder:opacity-40" 
+                    placeholder="Search classrooms..." 
+                    value={roomSearch}
+                    onChange={(e) => setRoomSearch(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-4 pt-4 border-t border-white/10">
                   {[
@@ -395,8 +403,8 @@ const AcademicManagementPage = () => {
                     <div className="w-3/4 h-8 bg-white/10 rounded" />
                   </GlassCard>
                 ))
-              ) : rooms.length > 0 ? (
-                rooms.map((room) => (
+              ) : filteredRooms.length > 0 ? (
+                filteredRooms.map((room) => (
                   <GlassCard key={room.id} className="p-8 group">
                     <div className="flex justify-between items-start mb-6">
                       <div>
@@ -437,21 +445,41 @@ const AcademicManagementPage = () => {
                         >
                           <Pencil className="w-3.5 h-3.5" />
                         </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 rounded-lg hover:bg-rose-500/20 text-rose-500"
-                          onClick={() => {
-                            if (window.confirm("Are you sure you want to delete this room?")) {
-                              api.delete(`/rooms/${room.id}`).then(() => {
-                                toast.success("Room deleted");
-                                window.location.reload();
-                              });
-                            }
-                          }}
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 rounded-lg hover:bg-rose-500/20 text-rose-500"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent className="rounded-[2rem] p-8 border-foreground/10 bg-background/80 backdrop-blur-3xl">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle className="text-2xl font-black">Delete this room?</AlertDialogTitle>
+                              <AlertDialogDescription className="font-medium text-muted-foreground">
+                                This action cannot be undone. This will permanently delete the room.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter className="mt-6">
+                              <AlertDialogCancel className="rounded-2xl h-12 px-6 font-bold">Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => {
+                                  api.delete(`/rooms/${room.id}`).then(() => {
+                                    toast.success("Room deleted");
+                                    setRooms(rooms.filter(r => r.id !== room.id));
+                                  }).catch(() => {
+                                    toast.error("Failed to delete room.");
+                                  });
+                                }}
+                                className="bg-rose-500 text-white hover:bg-rose-600 rounded-2xl h-12 px-6 font-bold"
+                              >
+                                Delete Room
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   </GlassCard>
