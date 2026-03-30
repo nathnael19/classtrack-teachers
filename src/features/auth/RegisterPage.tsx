@@ -43,7 +43,6 @@ const RegisterPage = () => {
         name: formData.name,
         email: formData.email,
         password: formData.password,
-        role: 'lecturer' // Hardcoded for teacher registration
       });
       
       toast.success('Registration successful! Welcome to ClassTrack.');
@@ -77,7 +76,7 @@ const RegisterPage = () => {
             </div>
             <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-foreground">Create <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-indigo-400 italic">Account</span></h1>
           </div>
-          <p className="text-muted-foreground font-medium tracking-wide">Register as a lecturer to manage your courses and students.</p>
+          <p className="text-muted-foreground font-medium tracking-wide">Register as a student to track your attendance.</p>
         </div>
 
         <div className="bg-card/40 dark:bg-white/5 backdrop-blur-3xl rounded-[3rem] overflow-hidden shadow-2xl border border-foreground/10 relative">
