@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import CryptoJS from 'crypto-js';
 import { 
   Users, 
   MapPin, 
@@ -68,7 +67,6 @@ interface ActiveSession {
   room: string;
   start_time: string;
   end_time: string;
-  qr_code_content: string;
   latitude: number;
   longitude: number;
   geofence_radius: number;
@@ -78,6 +76,8 @@ interface ActiveSession {
     name: string;
     code: string;
   };
+  active_qr_token?: string;
+  active_qr_token_expires_in_seconds?: number;
 }
 
 const LiveSessionPage = () => {
@@ -87,6 +87,7 @@ const LiveSessionPage = () => {
   const [rotationProgress, setRotationProgress] = useState(0);
   const [activeToken, setActiveToken] = useState("");
   const [qrTimeLeft, setQrTimeLeft] = useState(120);
+  const [tokenExpiresAtMs, setTokenExpiresAtMs] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isManageOpen, setIsManageOpen] = useState(false);
 
@@ -94,7 +95,7 @@ const LiveSessionPage = () => {
   const ROTATION_INTERVAL = 120; // seconds — 2 minutes
 
   // 1. Fetch Active Session
-  const { data: session, isLoading: isLoadingSession, isFetching: isFetchingSession, error: sessionError } = useQuery<ActiveSession>({
+  const { data: session, isLoading: isLoadingSession, isFetching: isFetchingSession, error: sessionError, refetch } = useQuery<ActiveSession>({
     queryKey: ['active-session'],
     queryFn: async () => {
       const res = await api.get('/sessions/active-lecturer');
@@ -132,9 +133,15 @@ const LiveSessionPage = () => {
     const connectToWebSocket = () => {
       if (!isComponentMounted) return;
       
+      const authToken = localStorage.getItem('geoattend_token');
+      if (!authToken) {
+        toast.error("Not authenticated for live feed.");
+        return;
+      }
+
       // Derive WS URL from API URL
       const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
-      const wsUrl = apiUrl.replace(/^http/, 'ws') + `/sessions/${session.id}/ws`;
+      const wsUrl = apiUrl.replace(/^http/, 'ws') + `/sessions/${session.id}/ws?token=${encodeURIComponent(authToken)}`;
       
       ws = new WebSocket(wsUrl);
 
@@ -263,31 +270,49 @@ const LiveSessionPage = () => {
     }
   });
 
-  // Timer & Token Rotation Hook (2-minute rotation)
+  // Keep current time updated for session expiry logic and token countdown.
   useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date();
-      setCurrentTime(now);
-      
-      if (session?.qr_code_content) {
-        const timestamp = Math.floor(now.getTime() / 1000);
-        const timeStep = Math.floor(timestamp / ROTATION_INTERVAL);
-        
-        // Generate HMAC-SHA256 token for this 2-minute window
-        const hmac = CryptoJS.HmacSHA256(timeStep.toString(), session.qr_code_content);
-        const token = hmac.toString(CryptoJS.enc.Hex).toUpperCase().slice(0, 8);
-        setActiveToken(token);
-        
-        // Calculate progress and time remaining within the 120s window
-        const secondsInWindow = timestamp % ROTATION_INTERVAL;
-        const elapsed = secondsInWindow + (now.getMilliseconds() / 1000);
-        const progress = (elapsed / ROTATION_INTERVAL) * 100;
-        setRotationProgress(progress);
-        setQrTimeLeft(Math.ceil(ROTATION_INTERVAL - elapsed));
-      }
-    }, 500);
+    const interval = setInterval(() => setCurrentTime(new Date()), 500);
     return () => clearInterval(interval);
-  }, [session?.qr_code_content]);
+  }, [session?.id]);
+
+  // Initialize token + expiry whenever the server rotates it.
+  useEffect(() => {
+    const token = session?.active_qr_token;
+    const expiresIn = session?.active_qr_token_expires_in_seconds;
+    if (!token || typeof expiresIn !== "number") return;
+
+    setActiveToken(token);
+    setTokenExpiresAtMs(Date.now() + expiresIn * 1000);
+  }, [session?.active_qr_token, session?.active_qr_token_expires_in_seconds]);
+
+  // Drive token countdown/progress based on the server-provided expiry.
+  useEffect(() => {
+    if (!tokenExpiresAtMs) return;
+    const secondsLeft = Math.max(0, Math.ceil((tokenExpiresAtMs - currentTime.getTime()) / 1000));
+    setQrTimeLeft(secondsLeft);
+
+    const elapsedInWindow = ROTATION_INTERVAL - secondsLeft;
+    const progress = (elapsedInWindow / ROTATION_INTERVAL) * 100;
+    setRotationProgress(Math.max(0, Math.min(100, progress)));
+  }, [currentTime, tokenExpiresAtMs]);
+
+  // Refresh token when it expires (prevents drift without re-deriving from the secret seed).
+  const tokenRefreshInFlight = useRef(false);
+  useEffect(() => {
+    if (!tokenExpiresAtMs || !session?.id) return;
+    if (qrTimeLeft > 0) return;
+    if (isFetchingSession || tokenRefreshInFlight.current) return;
+
+    tokenRefreshInFlight.current = true;
+    refetch()
+      .catch(() => {
+        // keep existing token state until the next successful refresh
+      })
+      .finally(() => {
+        tokenRefreshInFlight.current = false;
+      });
+  }, [qrTimeLeft, tokenExpiresAtMs, isFetchingSession, session?.id, refetch]);
 
   // Handle Automatic Session Termination
   const hasAutoTerminated = useRef(false);
