@@ -59,6 +59,7 @@ const SettingsPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isRotating, setIsRotating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [profilePictureSrc, setProfilePictureSrc] = useState<string | null>(null);
 
   // --- Queries ---
   const { data: profile, isLoading } = useQuery<UserProfile>({
@@ -131,6 +132,31 @@ const SettingsPage = () => {
       });
     }
   }, [profile]);
+
+  // Load profile picture via an authenticated endpoint (no public URL).
+  useEffect(() => {
+    let objectUrl: string | null = null;
+
+    const loadProfilePicture = async () => {
+      if (!profile?.profile_picture_url) {
+        setProfilePictureSrc(null);
+        return;
+      }
+
+      try {
+        const response = await api.get('/users/me/profile-picture', { responseType: 'blob' });
+        objectUrl = URL.createObjectURL(response.data);
+        setProfilePictureSrc(objectUrl);
+      } catch {
+        setProfilePictureSrc(null);
+      }
+    };
+
+    loadProfilePicture();
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [profile?.profile_picture_url]);
 
   const handleSaveProfile = () => {
     const activeUpdate: Partial<UserProfile> = {
@@ -269,10 +295,10 @@ const SettingsPage = () => {
                 <div className="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-indigo-500/20 blur-2xl rounded-full opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-700" />
                 <div className="w-32 h-32 rounded-[2.5rem] bg-gradient-to-br from-primary via-indigo-600 to-indigo-800 flex items-center justify-center text-4xl font-black text-white shadow-2xl relative z-10 overflow-hidden group-hover/avatar:scale-105 transition-transform duration-700">
                   <div className="absolute inset-0 bg-white/10 animate-pulse" />
-                  {profile?.profile_picture_url ? (
-                    <img 
-                      src={`${api.defaults.baseURL?.replace('/api/v1', '')}${profile.profile_picture_url}`} 
-                      alt="Profile" 
+                  {profilePictureSrc ? (
+                    <img
+                      src={profilePictureSrc}
+                      alt="Profile"
                       className="w-full h-full object-cover"
                     />
                   ) : (
