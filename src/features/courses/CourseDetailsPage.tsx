@@ -14,10 +14,13 @@ import {
   ShieldCheck,
   AlertCircle,
   Trash2,
-  FileText
+  FileText,
+  FileSpreadsheet,
+  FileJson,
+  ChevronDown
 } from 'lucide-react';
 import { format } from 'date-fns';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 
 import api from '@/services/api';
 import { Button } from '@/components/ui/button';
@@ -35,6 +38,7 @@ import { cn, formatEthiopianTime } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
@@ -99,6 +103,9 @@ const CourseDetailsPage = () => {
   const [deptFilters, setDeptFilters] = useState<string[]>([]);
   const [yearFilters, setYearFilters] = useState<number[]>([]);
   const [activeTab, setActiveTab] = useState<'students' | 'schedule' | 'materials'>('students');
+  const [isExporting, setIsExporting] = useState(false);
+  const dayRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+
   const { data: course, isLoading, refetch } = useQuery<CourseDetail>({
     queryKey: ['course', id],
     queryFn: async () => {
@@ -107,12 +114,72 @@ const CourseDetailsPage = () => {
     },
   });
 
+  useEffect(() => {
+    if (activeTab === 'schedule' && course?.schedules?.length) {
+      const today = new Date().getDay();
+      const currentDayIndex = (today + 6) % 7; // Map Sun(0) to 6, Mon(1) to 0, Tue(2) to 1
+      
+      // Find the first day that has a schedule, starting from today
+      let targetDayIndex = -1;
+      for (let i = 0; i < 7; i++) {
+        const checkIndex = (currentDayIndex + i) % 7;
+        if (course.schedules.some(s => s.day_of_week === checkIndex)) {
+          targetDayIndex = checkIndex;
+          break;
+        }
+      }
+
+      if (targetDayIndex !== -1) {
+        // Delay to ensure the DOM is rendered and animations are mostly done
+        const timer = setTimeout(() => {
+          dayRefs.current[targetDayIndex]?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+        }, 300);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [activeTab, course?.schedules]);
+
   const handleDeleteSchedule = async (scheduleId: number) => {
     try {
       await api.delete(`/courses/schedules/${scheduleId}`);
       refetch();
     } catch (error) {
       console.error('Failed to delete schedule:', error);
+    }
+  };
+
+  const handleExport = async (format: 'csv' | 'json' | 'excel' | 'pdf') => {
+    try {
+      setIsExporting(true);
+      const response = await api.get(`/courses/${id}/export?format=${format}`, {
+        responseType: 'blob', // Important for downloading files
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      
+      const extmap = {
+        csv: 'csv',
+        json: 'json',
+        excel: 'xlsx',
+        pdf: 'pdf'
+      };
+      const extension = extmap[format];
+      link.setAttribute('download', `${course?.code || 'Course'}_Report.${extension}`);
+      
+      document.body.appendChild(link);
+      link.click();
+      
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export report:', error);
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -185,10 +252,68 @@ const CourseDetailsPage = () => {
           <div className="flex items-center gap-3">
             <EnrollStudentsModal courseId={course.id} courseName={course.name} />
 
-            <Button variant="outline" className="rounded-2xl h-14 px-8 border-border hover:bg-primary/5 font-black text-xs uppercase tracking-widest gap-2">
-              <Download className="w-4 h-4" />
-              Export Report
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  disabled={isExporting}
+                  className="rounded-2xl h-14 px-8 border-transparent bg-stone-900 text-stone-50 hover:bg-stone-800 font-black text-[10px] uppercase tracking-[0.2em] gap-3 shadow-lg shadow-stone-900/10 transition-all hover:-translate-y-0.5"
+                >
+                  {isExporting ? (
+                    <div className="w-4 h-4 border-2 border-stone-400 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4" />
+                  )}
+                  Export Report
+                  <ChevronDown className="w-3.5 h-3.5 ml-1 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[280px] p-3 rounded-[32px] border-stone-100 shadow-xl shadow-stone-200/50">
+                <DropdownMenuLabel className="px-4 py-3 text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">
+                  Export Format
+                </DropdownMenuLabel>
+                
+                <DropdownMenuItem 
+                  onClick={() => handleExport('csv')}
+                  className="rounded-2xl p-2 cursor-pointer hover:bg-stone-50 transition-colors flex items-center gap-4 m-1"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <FileSpreadsheet className="w-5 h-5" />
+                  </div>
+                  <span className="font-bold text-stone-700 text-sm">CSV Spreadsheet</span>
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem 
+                  onClick={() => handleExport('excel')}
+                  className="rounded-2xl p-2 cursor-pointer hover:bg-stone-50 transition-colors flex items-center gap-4 m-1"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <FileSpreadsheet className="w-5 h-5" />
+                  </div>
+                  <span className="font-bold text-stone-700 text-sm">Excel File</span>
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem 
+                  onClick={() => handleExport('pdf')}
+                  className="rounded-2xl p-2 cursor-pointer hover:bg-stone-50 transition-colors flex items-center gap-4 m-1"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <span className="font-bold text-stone-700 text-sm">PDF Document</span>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem 
+                  onClick={() => handleExport('json')}
+                  className="rounded-2xl p-2 cursor-pointer hover:bg-stone-50 transition-colors flex items-center gap-4 m-1"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <FileJson className="w-5 h-5" />
+                  </div>
+                  <span className="font-bold text-stone-700 text-sm">JSON Data</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             {activeTab === 'schedule' && (
               <AddScheduleDialog courseId={id!} onSuccess={() => refetch()} />
             )}
@@ -582,7 +707,11 @@ const CourseDetailsPage = () => {
                 const dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][dayIndex];
 
                 return (
-                  <div key={dayIndex} className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-700">
+                  <div 
+                    key={dayIndex} 
+                    ref={el => { dayRefs.current[dayIndex] = el; }}
+                    className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-700 scroll-mt-32"
+                  >
                     <div className="flex items-center gap-6">
                       <div className="h-px flex-1 bg-stone-200" />
                       <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-stone-400 bg-stone-50 px-6 py-2 rounded-full border border-stone-200 shadow-sm">
