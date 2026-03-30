@@ -82,28 +82,40 @@ const ReportsPage = () => {
   });
 
   const handleExport = async (type: string) => {
-    if (type !== 'CSV') {
-      toast.error(`${type} export not yet implemented. Use CSV.`);
-      return;
-    }
-
     setIsExporting(true);
+    const formatStr = type.toLowerCase();
+    
     try {
-      const response = await api.get('/analytics/reports/export/csv', {
+      const params = new URLSearchParams();
+      if (searchTerm) params.append('q', searchTerm);
+      if (selectedCourse !== 'all') params.append('course_id', selectedCourse);
+      params.append('format', formatStr);
+
+      const response = await api.get(`/analytics/reports/export?${params.toString()}`, {
         responseType: 'blob',
       });
       
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `attendance_report_${new Date().toISOString().split('T')[0]}.csv`);
+      
+      const extmap: Record<string, string> = {
+        csv: 'csv',
+        json: 'json',
+        xlsx: 'xlsx',
+        pdf: 'pdf'
+      };
+      const extension = extmap[formatStr] || 'csv';
+      
+      link.setAttribute('download', `attendance_report_${new Date().toISOString().split('T')[0]}.${extension}`);
       document.body.appendChild(link);
       link.click();
       link.remove();
-      toast.success('Report exported successfully!');
+      toast.success(`${type} Report exported successfully!`);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Export failed:', error);
-      toast.error('Failed to export report.');
+      toast.error(`Failed to export ${type} report.`);
     } finally {
       setIsExporting(false);
     }
